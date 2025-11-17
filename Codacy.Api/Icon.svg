@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   fill="#000000"
+   width="839.99994"
+   height="839.99994"
+   viewBox="0 0 25.199998 25.199998"
+   role="img"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="Icon.svg"
+   inkscape:version="1.4.2 (ebf0e94, 2025-05-08)"
+   inkscape:export-filename="Icon.png"
+   inkscape:export-xdpi="58.51429"
+   inkscape:export-ydpi="58.51429"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     inkscape:zoom="1.0633118"
+     inkscape:cx="399.22438"
+     inkscape:cy="456.59231"
+     inkscape:window-width="2560"
+     inkscape:window-height="1417"
+     inkscape:window-x="5992"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0.59999996"
+       originy="0.59999996"
+       spacingx="0.03"
+       spacingy="0.03"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <title
+     id="title1">Codacy icon</title>
+  <path
+     d="M 4.483,10.425 A 8.46,8.46 0 0 1 8.358,5.355 L 8.398,5.334 6.595,2.221 C 3.876,3.812 1.868,6.369 1.027,9.41 l -0.02,0.084 z m 5.941,-5.931 a 8.246,8.246 0 0 1 2.164,-0.283 h 0.005 V 0.61599996 H 12.574 A 12.05,12.05 0 0 0 9.409,1.037 l 0.084,-0.02 z m 4.354,0.003 a 8.449,8.449 0 0 1 5.063,3.875 l 0.021,0.04 3.117,-1.799 C 21.388,3.895 18.833,1.887 15.793,1.045 L 15.709,1.025 Z M 0.59999996,12.6 v 0.006 c 0,1.1 0.148,2.165 0.42500004,3.177 L 1.005,15.699 4.481,14.77 A 8.14,8.14 0 0 1 4.197,12.609 V 12.601 Z M 2.205,18.595 c 0.55,0.941 1.18,1.754 1.901,2.475 L 6.659,18.53 A 8.56,8.56 0 0 1 5.346,16.835 l -0.022,-0.04 z m 4.39,4.385 a 11.77,11.77 0 0 0 5.967,1.604 h 0.021 -10e-4 V 20.989 H 12.578 A 8.308,8.308 0 0 1 8.355,19.844 l 0.039,0.021 z m 13.264,-6.175 a 8.44,8.44 0 0 1 -5.034,3.884 l -0.059,0.014 0.931,3.476 c 3.124,-0.86 5.681,-2.863 7.246,-5.52 l 0.031,-0.056 z m 4.318,-0.984 c 0.268,-0.947 0.423,-2.035 0.423,-3.159 0,-1.087 -0.144,-2.14 -0.415,-3.142 l 0.019,0.084 -3.486,0.931 c 0.175,0.64 0.275,1.374 0.275,2.132 0,0.79 -0.109,1.555 -0.313,2.28 l 0.014,-0.059 z"
+     id="path1" />
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Codacy icon</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

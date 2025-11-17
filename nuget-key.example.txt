@@ -1,0 +1,15 @@
+# NuGet API Key Template
+#
+# This file should contain your NuGet API key for publishing packages.
+#
+# To use:
+# 1. Copy this file to 'nuget-key.txt' (which is gitignored)
+# 2. Replace the line below with your actual API key from https://www.nuget.org/account/apikeys
+# 3. Never commit the actual nuget-key.txt file to source control
+#
+# Example format:
+# oy2abc...yourkey...xyz
+#
+# Get your API key from: https://www.nuget.org/account/apikeys
+
+your-nuget-api-key-here

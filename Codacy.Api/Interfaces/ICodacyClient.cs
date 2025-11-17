@@ -6,6 +6,16 @@
 public interface ICodacyClient : IDisposable
 {
 	/// <summary>
+	/// Gets the Version API module
+	/// </summary>
+	IVersionApi Version { get; }
+
+	/// <summary>
+	/// Gets the Account API module
+	/// </summary>
+	IAccountApi Account { get; }
+
+	/// <summary>
 	/// Gets the Organizations API module
 	/// </summary>
 	IOrganizationsApi Organizations { get; }
@@ -34,4 +44,24 @@ public interface ICodacyClient : IDisposable
 	/// Gets the Pull Requests API module
 	/// </summary>
 	IPullRequestsApi PullRequests { get; }
+
+	/// <summary>
+	/// Gets the People API module
+	/// </summary>
+	IPeopleApi People { get; }
+
+	/// <summary>
+	/// Gets the Coverage API module
+	/// </summary>
+	ICoverageApi Coverage { get; }
+
+	/// <summary>
+	/// Gets the Coding Standards API module
+	/// </summary>
+	ICodingStandardsApi CodingStandards { get; }
+
+	/// <summary>
+	/// Gets the Security API module
+	/// </summary>
+	ISecurityApi Security { get; }
 }

@@ -145,6 +145,68 @@ public record CodacyApiResponse(string Data, int StatusCode, DateTime Timestamp)
 - Use xUnit for testing framework
 - Follow AAA pattern (Arrange, Act, Assert)
 - Use descriptive test method names that explain the scenario
+- **Use AwesomeAssertions for all assertions**
+
+#### AwesomeAssertions Patterns
+**Basic Assertions:**
+```csharp
+// Null checks
+response.Should().NotBeNull();
+response.Data.Should().BeNull();
+
+// Equality
+value.Should().Be(expected);
+value.Should().NotBe(unexpected);
+
+// Booleans
+condition.Should().BeTrue();
+condition.Should().BeFalse();
+
+// Strings
+text.Should().Contain("substring");
+text.Should().NotBeEmpty();
+text.Should().Be("expected");
+
+// Collections
+list.Should().NotBeEmpty();
+list.Should().BeEmpty();
+(list.Count <= limit).Should().BeTrue("reason message");
+```
+
+**Exception Assertions:**
+```csharp
+// Correct pattern - cast lambda to Action and use discard for unused instance
+((Action)(() => _ = new MyClass(invalidArg)))
+    .Should()
+    .ThrowExactly<ArgumentException>()
+    .WithMessage("*parameter*");
+
+// For method calls
+((Action)(() => _ = methodThatThrows()))
+    .Should()
+    .ThrowExactly<ArgumentException>()
+    .WithMessage("*ApiToken*");
+
+// For void methods (no discard needed)
+((Action)(() => options.Validate()))
+    .Should()
+    .ThrowExactly<ArgumentException>()
+    .WithMessage("*RequestTimeout*");
+
+// No exception expected
+var exception = Record.Exception(() => method());
+exception.Should().BeNull();
+```
+
+**Iterating Collections:**
+```csharp
+// Use foreach instead of Assert.ALL
+foreach (var item in collection)
+{
+    item.Property.Should().NotBeNull();
+    item.Value.Should().Be(expected);
+}
+```
 
 ### EditorConfig Compliance
 - Follow the .editorconfig settings in the workspace

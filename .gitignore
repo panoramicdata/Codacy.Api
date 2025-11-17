@@ -11,6 +11,9 @@
 *.sln.docstates
 *.env
 
+# NuGet API key (DO NOT COMMIT!)
+nuget-key.txt
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

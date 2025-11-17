@@ -63,6 +63,16 @@ public partial class CodacyClientOptions
 	public TimeSpan MaxRetryDelay { get; init; } = TimeSpan.FromSeconds(30);
 
 	/// <summary>
+	/// An optional HTTP client factory to create HTTP clients. Should only be used if HttpClient is not provided
+	/// </summary>
+	public IHttpClientFactory? HttpClientFactory { get; init; }
+
+	/// <summary>
+	/// An optional HTTP client to use for requests. Should only be used if HttpClientFactory is not provided
+	/// </summary>
+	public HttpClient? HttpClient { get; init; }
+
+	/// <summary>
 	/// Validates the configuration options
 	/// </summary>
 	/// <exception cref="ArgumentException">Thrown when required options are missing or invalid</exception>
@@ -96,6 +106,12 @@ public partial class CodacyClientOptions
 		if (MaxRetryDelay < RetryDelay)
 		{
 			throw new ArgumentException("MaxRetryDelay must be greater than or equal to RetryDelay.", nameof(MaxRetryDelay));
+		}
+
+		// Only one of HttpClient or HttpClientFactory can be provided
+		if (HttpClient != null && HttpClientFactory != null)
+		{
+			throw new ArgumentException("Only one of HttpClient or HttpClientFactory can be provided.");
 		}
 	}
 }

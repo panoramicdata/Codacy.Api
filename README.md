@@ -310,6 +310,17 @@ We welcome contributions from the community! Here's how you can help:
    dotnet test
    ```
 
+### Publishing to NuGet
+
+For maintainers who need to publish new versions:
+
+📦 **See [PUBLISHING.md](PUBLISHING.md)** for complete publishing instructions
+
+Quick publish:
+```powershell
+.\Publish.ps1
+```
+
 ### Coding Standards
 
 - **Follow the project's coding standards** as defined in `copilot-instructions.md`

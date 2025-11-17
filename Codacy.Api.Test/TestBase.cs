@@ -5,17 +5,15 @@ namespace Codacy.Api.Test;
 /// <summary>
 /// Base class for integration tests that require API credentials
 /// </summary>
-public abstract class TestBase
+public abstract class TestBase(ITestOutputHelper output)
 {
-	protected IConfiguration Configuration { get; }
-
-	protected TestBase()
-	{
-		Configuration = new ConfigurationBuilder()
+	protected IConfiguration Configuration { get; } = new ConfigurationBuilder()
 			.AddJsonFile("secrets.example.json", optional: true)
 			.AddUserSecrets<TestBase>()
 			.Build();
-	}
+	protected ITestOutputHelper Output { get; } = output;
+
+	protected static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 
 	protected CodacyClientOptions GetClientOptions()
 	{
@@ -31,12 +29,28 @@ public abstract class TestBase
 		// Get base URL from configuration or use default
 		var baseUrl = Configuration["CodacyApi:BaseUrl"];
 
+		// Create logger for HTTP operations
+		var loggerProvider = new XunitLoggerProvider(Output, LogLevel.Debug);
+		var logger = loggerProvider.CreateLogger("Codacy.Api.Http");
+
+		// Create HTTP client with logging handler
+		var loggingHandler = new LoggingHttpMessageHandler(logger);
+		var httpClient = new HttpClient(loggingHandler)
+		{
+			BaseAddress = new Uri(!string.IsNullOrWhiteSpace(baseUrl) ? baseUrl : "https://app.codacy.com")
+		};
+
+		// Add authentication header to the custom HttpClient
+		httpClient.DefaultRequestHeaders.Add("api-token", apiToken);
+
 		return new CodacyClientOptions
 		{
 			ApiToken = apiToken,
 			BaseUrl = !string.IsNullOrWhiteSpace(baseUrl) ? baseUrl : "https://app.codacy.com",
 			EnableRequestLogging = true,
-			EnableResponseLogging = true
+			EnableResponseLogging = true,
+			Logger = logger,
+			HttpClient = httpClient
 		};
 	}
 

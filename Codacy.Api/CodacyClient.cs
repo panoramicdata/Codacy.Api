@@ -1,4 +1,5 @@
 ﻿using Codacy.Api.Interfaces;
+using Refit;
 
 namespace Codacy.Api;
 
@@ -12,25 +13,43 @@ public class CodacyClient : ICodacyClient, IDisposable
 	private bool _disposed;
 
 	/// <summary>
-	/// Initializes a new instance of the CodacyClient
+	/// Initializes a new instance of the CodacyClient for testing
 	/// </summary>
 	/// <param name="options">Configuration options for the client</param>
-	public CodacyClient(CodacyClientOptions options)
+	internal CodacyClient(CodacyClientOptions options)
 	{
 		ArgumentNullException.ThrowIfNull(options);
 		options.Validate();
 
 		_options = options;
-		_httpClient = CreateHttpClient();
+		_httpClient = options.HttpClientFactory?.CreateClient()
+			?? options.HttpClient
+			?? CreateHttpClient();
 
-		// Initialize API modules
-		Organizations = new OrganizationsApi(_httpClient);
-		Repositories = new RepositoriesApi(_httpClient);
-		Analysis = new AnalysisApi(_httpClient);
-		Issues = new IssuesApi(_httpClient);
-		Commits = new CommitsApi(_httpClient);
-		PullRequests = new PullRequestsApi(_httpClient);
+		// Initialize API modules using Refit
+		Version = CreateApiClient<IVersionApi>();
+		Account = CreateApiClient<IAccountApi>();
+		Organizations = CreateApiClient<IOrganizationsApi>();
+		Repositories = CreateApiClient<IRepositoriesApi>();
+		Analysis = CreateApiClient<IAnalysisApi>();
+		Issues = CreateApiClient<IIssuesApi>();
+		Commits = CreateApiClient<ICommitsApi>();
+		PullRequests = CreateApiClient<IPullRequestsApi>();
+		People = CreateApiClient<IPeopleApi>();
+		Coverage = CreateApiClient<ICoverageApi>();
+		CodingStandards = CreateApiClient<ICodingStandardsApi>();
+		Security = CreateApiClient<ISecurityApi>();
 	}
+
+	/// <summary>
+	/// Gets the Version API module
+	/// </summary>
+	public IVersionApi Version { get; }
+
+	/// <summary>
+	/// Gets the Account API module
+	/// </summary>
+	public IAccountApi Account { get; }
 
 	/// <summary>
 	/// Gets the Organizations API module
@@ -61,6 +80,32 @@ public class CodacyClient : ICodacyClient, IDisposable
 	/// Gets the Pull Requests API module
 	/// </summary>
 	public IPullRequestsApi PullRequests { get; }
+
+	/// <summary>
+	/// Gets the People API module
+	/// </summary>
+	public IPeopleApi People { get; }
+
+	/// <summary>
+	/// Gets the Coverage API module
+	/// </summary>
+	public ICoverageApi Coverage { get; }
+
+	/// <summary>
+	/// Gets the Coding Standards API module
+	/// </summary>
+	public ICodingStandardsApi CodingStandards { get; }
+
+	/// <summary>
+	/// Gets the Security API module
+	/// </summary>
+	public ISecurityApi Security { get; }
+
+	/// <summary>
+	/// Creates an API client using Refit
+	/// </summary>
+	protected virtual T CreateApiClient<T>() where T : class
+		=> RestService.For<T>(_httpClient);
 
 	private HttpClient CreateHttpClient()
 	{
