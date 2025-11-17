@@ -29,7 +29,7 @@
 param(
     [Parameter(Mandatory = $false)]
     [switch]$SkipTests,
-    
+
     [Parameter(Mandatory = $false)]
     [switch]$Force
 )
@@ -91,7 +91,7 @@ Write-Header "Checking Git Status"
 
 try {
     $gitStatus = git status --porcelain 2>&1
-    
+
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "Git is not available or this is not a git repository"
         if (-not $Force) {
@@ -102,7 +102,7 @@ try {
     elseif ($gitStatus) {
         Write-Warning "Git working directory is not clean:"
         Write-Host $gitStatus
-        
+
         if (-not $Force) {
             Write-Error "Please commit or stash your changes before publishing"
             Write-Info "Use -Force to publish anyway"
@@ -115,11 +115,11 @@ try {
     else {
         Write-Success "Git working directory is clean"
     }
-    
+
     # Show current branch and latest commit
     $currentBranch = git branch --show-current 2>$null
     $latestCommit = git log -1 --oneline 2>$null
-    
+
     if ($currentBranch) {
         Write-Info "Current branch: $currentBranch"
     }
@@ -200,18 +200,18 @@ Write-Success "Build completed successfully"
 # Step 6: Run tests (unless skipped)
 if (-not $SkipTests) {
     Write-Header "Running Tests"
-    
+
     Write-Info "Running unit tests only (skipping integration tests)..."
     $testResult = dotnet test --configuration Release --no-build --nologo --filter "Category!=Integration" 2>&1
-    
+
     Write-Host $testResult
-    
+
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Tests failed"
         Write-Info "Fix the failing tests or use -SkipTests to publish anyway"
         exit 1
     }
-    
+
     Write-Success "All tests passed"
 }
 else {
