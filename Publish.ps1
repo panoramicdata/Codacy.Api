@@ -272,8 +272,7 @@ Write-Info "Publishing package..."
 dotnet nuget push $packageFile.FullName `
     --api-key $nugetApiKey `
     --source https://api.nuget.org/v3/index.json `
-    --skip-duplicate `
-    --nologo
+    --skip-duplicate
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Publish failed"

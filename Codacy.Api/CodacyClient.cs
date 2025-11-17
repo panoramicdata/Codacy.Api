@@ -16,7 +16,7 @@ public class CodacyClient : ICodacyClient, IDisposable
 	/// Initializes a new instance of the CodacyClient for testing
 	/// </summary>
 	/// <param name="options">Configuration options for the client</param>
-	internal CodacyClient(CodacyClientOptions options)
+	public CodacyClient(CodacyClientOptions options)
 	{
 		ArgumentNullException.ThrowIfNull(options);
 		options.Validate();
