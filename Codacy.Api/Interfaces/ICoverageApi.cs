@@ -17,7 +17,7 @@ public interface ICoverageApi
 		string remoteOrganizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get pull request files coverage
@@ -28,7 +28,7 @@ public interface ICoverageApi
 		string remoteOrganizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Reanalyze coverage for pull request
@@ -39,7 +39,7 @@ public interface ICoverageApi
 		string remoteOrganizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get pull request coverage reports status
@@ -50,5 +50,5 @@ public interface ICoverageApi
 		string remoteOrganizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 }

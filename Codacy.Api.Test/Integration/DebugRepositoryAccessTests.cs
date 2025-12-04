@@ -1,6 +1,3 @@
-using Codacy.Api.Models;
-using System.Web;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -24,7 +21,7 @@ public class DebugRepositoryAccessTests(ITestOutputHelper output) : TestBase(out
 		Output.WriteLine($"Repository: {repoName}");
 		Output.WriteLine($"\nExpected URL: /api/v3/repositories/{provider}/{orgName}/{repoName}");
 		Output.WriteLine($"Full URL: https://app.codacy.com/api/v3/repositories/{provider}/{orgName}/{repoName}");
-		
+
 		// Check if repo name needs encoding
 		var encoded = Uri.EscapeDataString(repoName);
 		if (encoded != repoName)
@@ -36,11 +33,7 @@ public class DebugRepositoryAccessTests(ITestOutputHelper output) : TestBase(out
 
 		// Get repo from organization list to see its exact properties
 		Output.WriteLine($"\n=== Repository from Organization List ===");
-		var repos = await client.Organizations.ListOrganizationRepositoriesAsync(
-			provider,
-			orgName,
-			limit: 100,
-			cancellationToken: CancellationToken);
+		var repos = await client.Organizations.ListOrganizationRepositoriesAsync(provider, orgName, null, 100, null, null, null, null, CancellationToken);
 
 		var repo = repos.Data.FirstOrDefault(r => r.Name == repoName);
 		if (repo != null)
@@ -57,7 +50,7 @@ public class DebugRepositoryAccessTests(ITestOutputHelper output) : TestBase(out
 
 			// Try accessing with exact values from org list
 			Output.WriteLine($"\n=== Attempting Direct Access ===");
-			
+
 			try
 			{
 				_ = await client.Repositories.GetRepositoryAsync(
@@ -70,7 +63,7 @@ public class DebugRepositoryAccessTests(ITestOutputHelper output) : TestBase(out
 			catch (Refit.ApiException ex)
 			{
 				Output.WriteLine($"? FAILED: {ex.StatusCode} - {ex.Message}");
-				
+
 				if (!string.IsNullOrEmpty(repo.RemoteIdentifier))
 				{
 					Output.WriteLine($"\n? Note: Repository has RemoteIdentifier: {repo.RemoteIdentifier}");
@@ -84,7 +77,7 @@ public class DebugRepositoryAccessTests(ITestOutputHelper output) : TestBase(out
 				Output.WriteLine($"   1. API token lacks 'repository:read' permission");
 				Output.WriteLine($"   2. Repository is in 'Following' not 'Added' state");
 				Output.WriteLine($"   3. Codacy API requires repository to be explicitly 'Added'");
-				
+
 				if (repo.AddedState == AddedState.Following)
 				{
 					Output.WriteLine($"\n?? SOLUTION: Repository is in 'Following' state!");
@@ -100,3 +93,4 @@ public class DebugRepositoryAccessTests(ITestOutputHelper output) : TestBase(out
 		}
 	}
 }
+

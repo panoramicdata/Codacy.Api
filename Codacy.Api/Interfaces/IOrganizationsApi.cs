@@ -1,4 +1,4 @@
-﻿using Codacy.Api.Models;
+using Codacy.Api.Models;
 using Refit;
 
 namespace Codacy.Api.Interfaces;
@@ -15,7 +15,7 @@ public interface IOrganizationsApi
 	Task<OrganizationResponse> GetOrganizationAsync(
 		Provider provider,
 		string organizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Delete an organization
@@ -24,7 +24,7 @@ public interface IOrganizationsApi
 	Task DeleteOrganizationAsync(
 		Provider provider,
 		string organizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List organization repositories
@@ -33,13 +33,13 @@ public interface IOrganizationsApi
 	Task<RepositoryListResponse> ListOrganizationRepositoriesAsync(
 		Provider provider,
 		string organizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		[Query] string? filter = null,
-		[Query] string? languages = null,
-		[Query] string? segments = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? search,
+		[Query] string? filter,
+		[Query] string? languages,
+		[Query] string? segments,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get organization billing information
@@ -48,7 +48,7 @@ public interface IOrganizationsApi
 	Task<OrganizationBillingInformationResponse> GetOrganizationBillingAsync(
 		Provider provider,
 		string organizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List people from an organization
@@ -57,11 +57,11 @@ public interface IOrganizationsApi
 	Task<ListPeopleResponse> ListPeopleFromOrganizationAsync(
 		Provider provider,
 		string organizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		[Query] bool onlyMembers = false,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? search,
+		[Query] bool onlyMembers,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Add people to an organization
@@ -71,7 +71,7 @@ public interface IOrganizationsApi
 		Provider provider,
 		string organizationName,
 		[Body] List<string> emails,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Remove people from an organization
@@ -81,7 +81,7 @@ public interface IOrganizationsApi
 		Provider provider,
 		string organizationName,
 		[Body] RemovePeopleBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Clean organization cache
@@ -90,7 +90,7 @@ public interface IOrganizationsApi
 	Task CleanCacheAsync(
 		Provider provider,
 		string organizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Join an organization
@@ -99,7 +99,7 @@ public interface IOrganizationsApi
 	Task<JoinResponse> JoinOrganizationAsync(
 		Provider provider,
 		string organizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Sync organization name with Git provider
@@ -108,7 +108,7 @@ public interface IOrganizationsApi
 	Task<SyncProviderSettingOrganizationResponse> SyncOrganizationNameAsync(
 		Provider provider,
 		string organizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 }
 
 /// <summary>

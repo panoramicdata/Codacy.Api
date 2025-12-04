@@ -15,12 +15,12 @@ public interface ISecurityApi
 	Task<SrmItemsResponse> SearchSecurityItemsAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMItems? body = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? sort = null,
-		[Query] string? direction = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchSRMItems? body,
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? sort,
+		[Query] string? direction,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get a security item
@@ -30,7 +30,7 @@ public interface ISecurityApi
 		Provider provider,
 		string remoteOrganizationName,
 		Guid srmItemId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Ignore a security item
@@ -41,7 +41,7 @@ public interface ISecurityApi
 		string remoteOrganizationName,
 		Guid srmItemId,
 		[Body] IgnoreSRMItemBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Unignore a security item
@@ -51,7 +51,7 @@ public interface ISecurityApi
 		Provider provider,
 		string remoteOrganizationName,
 		Guid srmItemId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get security dashboard metrics
@@ -60,8 +60,8 @@ public interface ISecurityApi
 	Task<SRMDashboardResponse> SearchSecurityDashboardAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMDashboard? body = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchSRMDashboard? body,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get security dashboard repositories
@@ -70,8 +70,8 @@ public interface ISecurityApi
 	Task<SRMDashboardRepositoriesResponse> SearchSecurityDashboardRepositoriesAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMDashboardRepositories? body = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchSRMDashboardRepositories? body,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get security dashboard history
@@ -80,8 +80,8 @@ public interface ISecurityApi
 	Task<SRMDashboardHistoryResponse> SearchSecurityDashboardHistoryAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMDashboardHistory? body = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchSRMDashboardHistory? body,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get security dashboard categories
@@ -90,8 +90,8 @@ public interface ISecurityApi
 	Task<SRMDashboardCategoriesResponse> SearchSecurityDashboardCategoriesAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMDashboardCategories? body = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchSRMDashboardCategories? body,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List security managers
@@ -100,9 +100,9 @@ public interface ISecurityApi
 	Task<SecurityManagersResponse> ListSecurityManagersAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Add a security manager
@@ -112,7 +112,7 @@ public interface ISecurityApi
 		Provider provider,
 		string remoteOrganizationName,
 		[Body] SecurityManagerBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Remove a security manager
@@ -122,7 +122,7 @@ public interface ISecurityApi
 		Provider provider,
 		string remoteOrganizationName,
 		long userId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List repositories with security issues
@@ -131,10 +131,10 @@ public interface ISecurityApi
 	Task<SecurityRepositoriesResponse> ListSecurityRepositoriesAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? segments = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? segments,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List security categories with findings
@@ -143,9 +143,9 @@ public interface ISecurityApi
 	Task<SecurityCategoriesResponse> ListSecurityCategoriesAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Upload DAST report
@@ -158,7 +158,7 @@ public interface ISecurityApi
 		string toolName,
 		[AliasAs("file")] StreamPart file,
 		[AliasAs("reportFormat")] string reportFormat,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List DAST reports
@@ -167,9 +167,9 @@ public interface ISecurityApi
 	Task<SRMDastReportResponse> ListDastReportsAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get SLA configuration
@@ -178,7 +178,7 @@ public interface ISecurityApi
 	Task<SLAConfigResponse> GetSLAConfigAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update SLA configuration
@@ -188,7 +188,7 @@ public interface ISecurityApi
 		Provider provider,
 		string remoteOrganizationName,
 		[Body] SLAConfigBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get OSSF Scorecard for a repository
@@ -196,5 +196,5 @@ public interface ISecurityApi
 	[Post("/api/v3/security/dependencies/ossf/scorecard")]
 	Task<OssfScorecardResponse> GetOssfScorecardAsync(
 		[Body] OssfScorecardUrlRequest request,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 }

@@ -1,17 +1,11 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
 /// Integration tests for Issues API
 /// </summary>
 [Trait("Category", "Integration")]
-public class IssuesApiTests : TestBase
+public class IssuesApiTests(ITestOutputHelper output) : TestBase(output)
 {
-	public IssuesApiTests(ITestOutputHelper output) : base(output)
-	{
-	}
-
 	[Fact]
 	public async Task SearchRepositoryIssues_ReturnsIssues()
 	{
@@ -28,8 +22,10 @@ public class IssuesApiTests : TestBase
 				provider,
 				orgName,
 				repoName,
-				filter: new SearchRepositoryIssuesBody(),
-				cancellationToken: CancellationToken);
+				new SearchRepositoryIssuesBody(),
+				null,
+				null,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -59,9 +55,10 @@ public class IssuesApiTests : TestBase
 				provider,
 				orgName,
 				repoName,
-				filter: new SearchRepositoryIssuesBody(),
-				limit: limit,
-				cancellationToken: CancellationToken);
+				new SearchRepositoryIssuesBody(),
+				null,
+				limit,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -122,8 +119,10 @@ public class IssuesApiTests : TestBase
 				provider,
 				orgName,
 				repoName,
-				filter: new SearchRepositoryIssuesBody(),
-				cancellationToken: CancellationToken);
+				new SearchRepositoryIssuesBody(),
+				null,
+				null,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -153,9 +152,10 @@ public class IssuesApiTests : TestBase
 				provider,
 				orgName,
 				repoName,
-				filter: new SearchRepositoryIssuesBody(),
-				limit: limit,
-				cancellationToken: CancellationToken);
+				new SearchRepositoryIssuesBody(),
+				null,
+				limit,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -169,3 +169,4 @@ public class IssuesApiTests : TestBase
 		}
 	}
 }
+

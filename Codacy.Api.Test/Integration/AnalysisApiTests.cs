@@ -1,5 +1,3 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -19,10 +17,17 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Analysis.ListOrganizationRepositoriesWithAnalysisAsync(
-				provider,
-				orgName,
-				cancellationToken: CancellationToken);
+			var response = await client
+				.Analysis
+				.ListOrganizationRepositoriesWithAnalysisAsync(
+					provider,
+					orgName,
+					null,
+					null,
+					null,
+					null,
+					null,
+					CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -47,11 +52,7 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Analysis.GetRepositoryWithAnalysisAsync(
-				provider,
-				orgName,
-				repoName,
-				cancellationToken: CancellationToken);
+			var response = await client.Analysis.GetRepositoryWithAnalysisAsync(provider, orgName, repoName, null, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -85,11 +86,7 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Analysis.ListCommitAnalysisStatsAsync(
-				provider,
-				orgName,
-				repoName,
-				cancellationToken: CancellationToken);
+			var response = await client.Analysis.ListCommitAnalysisStatsAsync(provider, orgName, repoName, null, 31, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -123,11 +120,7 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Analysis.ListRepositoryCommitsAsync(
-				provider,
-				orgName,
-				repoName,
-				cancellationToken: CancellationToken);
+			var response = await client.Analysis.ListRepositoryCommitsAsync(provider, orgName, repoName, null, null, null, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -153,12 +146,7 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Analysis.ListRepositoryCommitsAsync(
-				provider,
-				orgName,
-				repoName,
-				limit: limit,
-				cancellationToken: CancellationToken);
+			var response = await client.Analysis.ListRepositoryCommitsAsync(provider, orgName, repoName, null, null, limit, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -184,12 +172,9 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Analysis.SearchRepositoryIssuesAsync(
-				provider,
-				orgName,
-				repoName,
-				body: new SearchRepositoryIssuesBody(),
-				cancellationToken: CancellationToken);
+			var response = await client
+				.Analysis
+				.SearchRepositoryIssuesAsync(provider, orgName, repoName, new SearchRepositoryIssuesBody(), null, null, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -244,11 +229,7 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Analysis.ListRepositoryPullRequestsAsync(
-				provider,
-				orgName,
-				repoName,
-				cancellationToken: CancellationToken);
+			var response = await client.Analysis.ListRepositoryPullRequestsAsync(provider, orgName, repoName, null, null, null, false, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -274,12 +255,7 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Analysis.ListRepositoryPullRequestsAsync(
-				provider,
-				orgName,
-				repoName,
-				limit: limit,
-				cancellationToken: CancellationToken);
+			var response = await client.Analysis.ListRepositoryPullRequestsAsync(provider, orgName, repoName, limit, null, null, false, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();

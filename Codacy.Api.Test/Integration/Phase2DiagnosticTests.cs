@@ -1,5 +1,3 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -24,14 +22,10 @@ public class Phase2DiagnosticTests(ITestOutputHelper output) : TestBase(output)
 		Output.WriteLine("1. Checking organization repository list...");
 		try
 		{
-			var orgRepos = await client.Organizations.ListOrganizationRepositoriesAsync(
-				provider,
-				orgName,
-				limit: 100,
-				cancellationToken: CancellationToken);
+			var orgRepos = await client.Organizations.ListOrganizationRepositoriesAsync(provider, orgName, null, 100, null, null, null, null, CancellationToken);
 
 			var testRepo = orgRepos.Data.FirstOrDefault(r => r.Name == repoName);
-			
+
 			if (testRepo != null)
 			{
 				Output.WriteLine($"   ? Found in organization list");
@@ -42,7 +36,7 @@ public class Phase2DiagnosticTests(ITestOutputHelper output) : TestBase(output)
 				Output.WriteLine($"   - Last Updated: {testRepo.LastUpdated}");
 				Output.WriteLine($"   - Visibility: {testRepo.Visibility}");
 				Output.WriteLine($"   - Remote Identifier: {testRepo.RemoteIdentifier}");
-				
+
 				if (testRepo.DefaultBranch != null)
 				{
 					Output.WriteLine($"   - Default Branch: {testRepo.DefaultBranch.Name}");
@@ -59,7 +53,7 @@ public class Phase2DiagnosticTests(ITestOutputHelper output) : TestBase(output)
 				}
 
 				Output.WriteLine($"\n   ** Added State: {testRepo.AddedState} **");
-				
+
 				if (testRepo.AddedState == AddedState.Following)
 				{
 					Output.WriteLine("   ? Repository is in 'Following' state, not 'Added' state!");
@@ -134,3 +128,4 @@ public class Phase2DiagnosticTests(ITestOutputHelper output) : TestBase(output)
 		Output.WriteLine($"5. Re-run: dotnet test --filter \"FullyQualifiedName~VerifyPhase2Prerequisites\"");
 	}
 }
+

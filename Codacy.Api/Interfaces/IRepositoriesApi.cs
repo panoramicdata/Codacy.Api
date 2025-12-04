@@ -1,4 +1,4 @@
-﻿using Codacy.Api.Models;
+using Codacy.Api.Models;
 using Refit;
 
 namespace Codacy.Api.Interfaces;
@@ -16,7 +16,7 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Delete a repository
@@ -26,7 +26,7 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Follow a repository
@@ -36,7 +36,7 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Unfollow a repository
@@ -46,7 +46,7 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List repository branches
@@ -56,13 +56,13 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Query] bool? enabled = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		[Query] string? sort = null,
-		[Query] string? direction = null,
-		CancellationToken cancellationToken = default);
+		[Query] bool? enabled,
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? search,
+		[Query] string? sort,
+		[Query] string? direction,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update repository branch configuration
@@ -74,7 +74,7 @@ public interface IRepositoriesApi
 		string repositoryName,
 		string branchName,
 		[Body] UpdateRepositoryBranchConfigurationBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Set branch as default
@@ -85,7 +85,7 @@ public interface IRepositoriesApi
 		string organizationName,
 		string repositoryName,
 		string branchName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get quality settings for repository
@@ -95,7 +95,7 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update quality settings for repository
@@ -106,7 +106,7 @@ public interface IRepositoriesApi
 		string organizationName,
 		string repositoryName,
 		[Body] RepositoryQualitySettings settings,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get commit quality settings
@@ -116,7 +116,7 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update commit quality settings
@@ -127,7 +127,7 @@ public interface IRepositoriesApi
 		string organizationName,
 		string repositoryName,
 		[Body] QualityGate settings,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get pull request quality settings
@@ -137,7 +137,7 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update pull request quality settings
@@ -148,7 +148,7 @@ public interface IRepositoriesApi
 		string organizationName,
 		string repositoryName,
 		[Body] QualityGate settings,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List repository files
@@ -158,13 +158,13 @@ public interface IRepositoriesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Query] string? branch = null,
-		[Query] string? search = null,
-		[Query] string? sort = null,
-		[Query] string? direction = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? branch,
+		[Query] string? search,
+		[Query] string? sort,
+		[Query] string? direction,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get file with analysis
@@ -175,7 +175,7 @@ public interface IRepositoriesApi
 		string organizationName,
 		string repositoryName,
 		long fileId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Reanalyze a commit
@@ -186,8 +186,8 @@ public interface IRepositoriesApi
 		string organizationName,
 		string repositoryName,
 		string commitUuid,
-		[Query] bool cleanCache = false,
-		CancellationToken cancellationToken = default);
+		[Query] bool cleanCache,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Add a repository
@@ -195,7 +195,7 @@ public interface IRepositoriesApi
 	[Post("/api/v3/repositories")]
 	Task<Repository> AddRepositoryAsync(
 		[Body] AddRepositoryBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 }
 
 /// <summary>

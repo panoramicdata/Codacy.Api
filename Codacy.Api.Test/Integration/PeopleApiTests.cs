@@ -1,5 +1,3 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -17,10 +15,7 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.People.ListPeopleFromOrganizationAsync(
-			provider,
-			orgName,
-			cancellationToken: CancellationToken);
+		var response = await client.People.ListPeopleFromOrganizationAsync(provider, orgName, null, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -42,11 +37,7 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 		const int limit = 5;
 
 		// Act
-		var response = await client.People.ListPeopleFromOrganizationAsync(
-			provider,
-			orgName,
-			limit: limit,
-			cancellationToken: CancellationToken);
+		var response = await client.People.ListPeopleFromOrganizationAsync(provider, orgName, null, limit, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -61,13 +52,10 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 		using var client = GetClient();
 		var provider = Enum.Parse<Provider>(GetTestProvider());
 		var orgName = GetTestOrganization();
-		
+
 		// Get all people first to find a search term
-		var allPeople = await client.People.ListPeopleFromOrganizationAsync(
-			provider,
-			orgName,
-			cancellationToken: CancellationToken);
-		
+		var allPeople = await client.People.ListPeopleFromOrganizationAsync(provider, orgName, null, null, null, null, CancellationToken);
+
 		if (allPeople.Data.Count == 0)
 		{
 			return; // Skip test if no people
@@ -76,11 +64,7 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 		var searchTerm = allPeople.Data[0].Email[..Math.Min(3, allPeople.Data[0].Email.Length)];
 
 		// Act
-		var response = await client.People.ListPeopleFromOrganizationAsync(
-			provider,
-			orgName,
-			search: searchTerm,
-			cancellationToken: CancellationToken);
+		var response = await client.People.ListPeopleFromOrganizationAsync(provider, orgName, null, null, searchTerm, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -96,10 +80,7 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.People.PeopleSuggestionsForOrganizationAsync(
-			provider,
-			orgName,
-			cancellationToken: CancellationToken);
+		var response = await client.People.PeopleSuggestionsForOrganizationAsync(provider, orgName, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -122,3 +103,4 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 		// See CODACY_API_ACCESS_LIMITATION.md for details
 	}
 }
+

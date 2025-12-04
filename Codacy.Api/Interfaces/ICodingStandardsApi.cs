@@ -15,7 +15,7 @@ public interface ICodingStandardsApi
 	Task<CodingStandardsListResponse> ListCodingStandardsAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Create a coding standard
@@ -25,9 +25,9 @@ public interface ICodingStandardsApi
 		Provider provider,
 		string remoteOrganizationName,
 		[Body] CreateCodingStandardBody body,
-		[Query] string? sourceRepository = null,
-		[Query] long? sourceCodingStandard = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? sourceRepository,
+		[Query] long? sourceCodingStandard,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Create a coding standard from presets
@@ -37,7 +37,7 @@ public interface ICodingStandardsApi
 		Provider provider,
 		string remoteOrganizationName,
 		[Body] CreateCodingStandardPresetBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get a coding standard
@@ -47,7 +47,7 @@ public interface ICodingStandardsApi
 		Provider provider,
 		string remoteOrganizationName,
 		long codingStandardId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Delete a coding standard
@@ -57,7 +57,7 @@ public interface ICodingStandardsApi
 		Provider provider,
 		string remoteOrganizationName,
 		long codingStandardId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Duplicate a coding standard
@@ -67,7 +67,7 @@ public interface ICodingStandardsApi
 		Provider provider,
 		string remoteOrganizationName,
 		long codingStandardId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Set a coding standard as default
@@ -78,7 +78,7 @@ public interface ICodingStandardsApi
 		string remoteOrganizationName,
 		long codingStandardId,
 		[Body] SetDefaultCodingStandardBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List tools in a coding standard
@@ -88,7 +88,7 @@ public interface ICodingStandardsApi
 		Provider provider,
 		string remoteOrganizationName,
 		long codingStandardId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List patterns for a tool in a coding standard
@@ -99,18 +99,18 @@ public interface ICodingStandardsApi
 		string remoteOrganizationName,
 		long codingStandardId,
 		string toolUuid,
-		[Query] string? languages = null,
-		[Query] string? categories = null,
-		[Query] string? severityLevels = null,
-		[Query] string? tags = null,
-		[Query] string? search = null,
-		[Query] bool? enabled = null,
-		[Query] bool? recommended = null,
-		[Query] string? sort = null,
-		[Query] string? direction = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? languages,
+		[Query] string? categories,
+		[Query] string? severityLevels,
+		[Query] string? tags,
+		[Query] string? search,
+		[Query] bool? enabled,
+		[Query] bool? recommended,
+		[Query] string? sort,
+		[Query] string? direction,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update patterns for a tool in a coding standard
@@ -122,13 +122,13 @@ public interface ICodingStandardsApi
 		long codingStandardId,
 		string toolUuid,
 		[Body] UpdatePatternsBody body,
-		[Query] string? languages = null,
-		[Query] string? categories = null,
-		[Query] string? severityLevels = null,
-		[Query] string? tags = null,
-		[Query] string? search = null,
-		[Query] bool? recommended = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? languages,
+		[Query] string? categories,
+		[Query] string? severityLevels,
+		[Query] string? tags,
+		[Query] string? search,
+		[Query] bool? recommended,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update tool configuration in a coding standard
@@ -140,7 +140,7 @@ public interface ICodingStandardsApi
 		long codingStandardId,
 		string toolUuid,
 		[Body] ToolConfiguration body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List repositories using a coding standard
@@ -150,9 +150,9 @@ public interface ICodingStandardsApi
 		Provider provider,
 		string remoteOrganizationName,
 		long codingStandardId,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Apply a coding standard to repositories
@@ -163,7 +163,7 @@ public interface ICodingStandardsApi
 		string remoteOrganizationName,
 		long codingStandardId,
 		[Body] ApplyCodingStandardToRepositoriesBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Promote a draft coding standard
@@ -173,5 +173,5 @@ public interface ICodingStandardsApi
 		Provider provider,
 		string remoteOrganizationName,
 		long codingStandardId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 }

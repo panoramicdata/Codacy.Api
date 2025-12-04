@@ -1,5 +1,3 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -208,11 +206,7 @@ public class Phase2SetupTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Organizations.ListOrganizationRepositoriesAsync(
-				provider,
-				orgName,
-				limit: 50,
-				cancellationToken: CancellationToken);
+			var response = await client.Organizations.ListOrganizationRepositoriesAsync(provider, orgName, null, 50, null, null, null, null, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();

@@ -1,5 +1,3 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -16,16 +14,11 @@ public class CoverageApiTests(ITestOutputHelper output) : TestBase(output)
 		var provider = Enum.Parse<Provider>(GetTestProvider());
 		var orgName = GetTestOrganization();
 		var repoName = GetTestRepository();
-		
+
 		try
 		{
 			// First, get a list of pull requests to find one to test
-			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(
-				provider,
-				orgName,
-				repoName,
-				limit: 1,
-				cancellationToken: CancellationToken);
+			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(provider, orgName, repoName, 1, null, null, false, CancellationToken);
 
 			if (pullRequests.Data.Count == 0)
 			{
@@ -49,7 +42,7 @@ public class CoverageApiTests(ITestOutputHelper output) : TestBase(output)
 			response.Data.Should().NotBeNull();
 		}
 		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-		                                     ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+											 ex.StatusCode == System.Net.HttpStatusCode.NotFound)
 		{
 			// PR may not have coverage data - skip test
 			Output.WriteLine($"Pull request coverage not available: {ex.Message}");
@@ -64,16 +57,11 @@ public class CoverageApiTests(ITestOutputHelper output) : TestBase(output)
 		var provider = Enum.Parse<Provider>(GetTestProvider());
 		var orgName = GetTestOrganization();
 		var repoName = GetTestRepository();
-		
+
 		try
 		{
 			// First, get a list of pull requests
-			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(
-				provider,
-				orgName,
-				repoName,
-				limit: 1,
-				cancellationToken: CancellationToken);
+			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(provider, orgName, repoName, 1, null, null, false, CancellationToken);
 
 			if (pullRequests.Data.Count == 0)
 			{
@@ -97,7 +85,7 @@ public class CoverageApiTests(ITestOutputHelper output) : TestBase(output)
 			response.Data.Should().NotBeNull();
 		}
 		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-		                                     ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+											 ex.StatusCode == System.Net.HttpStatusCode.NotFound)
 		{
 			// PR may not have file coverage data - skip test
 			Output.WriteLine($"Pull request file coverage not available: {ex.Message}");
@@ -112,16 +100,11 @@ public class CoverageApiTests(ITestOutputHelper output) : TestBase(output)
 		var provider = Enum.Parse<Provider>(GetTestProvider());
 		var orgName = GetTestOrganization();
 		var repoName = GetTestRepository();
-		
+
 		try
 		{
 			// First, get a list of pull requests
-			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(
-				provider,
-				orgName,
-				repoName,
-				limit: 1,
-				cancellationToken: CancellationToken);
+			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(provider, orgName, repoName, 1, null, null, false, CancellationToken);
 
 			if (pullRequests.Data.Count == 0)
 			{
@@ -145,10 +128,11 @@ public class CoverageApiTests(ITestOutputHelper output) : TestBase(output)
 			response.Data.Should().NotBeNull();
 		}
 		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-		                                     ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+											 ex.StatusCode == System.Net.HttpStatusCode.NotFound)
 		{
 			// PR may not have coverage reports - skip test
 			Output.WriteLine($"Pull request coverage reports not available: {ex.Message}");
 		}
 	}
 }
+

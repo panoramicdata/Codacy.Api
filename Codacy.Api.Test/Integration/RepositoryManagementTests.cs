@@ -1,5 +1,3 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -49,7 +47,7 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 			Output.WriteLine($"4. Wait for initial analysis to complete");
 			Output.WriteLine("");
 			Output.WriteLine($"Repository URL: https://github.com/{orgName}/{TestRepoName}");
-			
+
 			// Skip test - repository needs to be added manually
 			// Note: Codacy API doesn't currently support adding repositories via API
 		}
@@ -72,12 +70,18 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				provider,
 				orgName,
 				TestRepoName,
-				cancellationToken: CancellationToken);
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
 			response.Data.Should().NotBeNull();
-			
+
 			Output.WriteLine($"? Found {response.Data.Count} branches:");
 			foreach (var branch in response.Data)
 			{
@@ -111,7 +115,13 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				provider,
 				orgName,
 				TestRepoName,
-				cancellationToken: CancellationToken);
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -155,9 +165,10 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				provider,
 				orgName,
 				TestRepoName,
-				filter: new SearchRepositoryIssuesBody(),
-				limit: 10,
-				cancellationToken: CancellationToken);
+				new SearchRepositoryIssuesBody(),
+				null,
+				10,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -236,7 +247,8 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				provider,
 				orgName,
 				TestRepoName,
-				cancellationToken: CancellationToken);
+				null,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -275,7 +287,13 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 			var response = await client.Organizations.ListOrganizationRepositoriesAsync(
 				provider,
 				orgName,
-				cancellationToken: CancellationToken);
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -349,3 +367,4 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 		}
 	}
 }
+

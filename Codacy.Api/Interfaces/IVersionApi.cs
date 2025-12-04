@@ -14,5 +14,5 @@ public interface IVersionApi
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>Version information</returns>
 	[Get("/api/v3/version")]
-	Task<VersionResponse> GetVersionAsync(CancellationToken cancellationToken = default);
+	Task<VersionResponse> GetVersionAsync(CancellationToken cancellationToken);
 }

@@ -1,4 +1,4 @@
-﻿using Codacy.Api.Models;
+using Codacy.Api.Models;
 using Refit;
 
 namespace Codacy.Api.Interfaces;
@@ -15,12 +15,12 @@ public interface IAnalysisApi
 	Task<RepositoryListResponse> ListOrganizationRepositoriesWithAnalysisAsync(
 		Provider provider,
 		string organizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		[Query] string? repositories = null,
-		[Query] string? segments = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? search,
+		[Query] string? repositories,
+		[Query] string? segments,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Search organization repositories with analysis information
@@ -30,9 +30,9 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		[Body] SearchOrganizationRepositoriesRequest body,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get a repository with analysis information
@@ -42,8 +42,8 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Query] string? branch = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? branch,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List repository tools
@@ -53,7 +53,7 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List repository tool conflicts
@@ -63,7 +63,7 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Configure a repository tool
@@ -75,7 +75,7 @@ public interface IAnalysisApi
 		string repositoryName,
 		string toolUuid,
 		[Body] ConfigureToolBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get analysis progress
@@ -85,8 +85,8 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Query] string? branch = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? branch,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List pull requests from a repository
@@ -96,11 +96,11 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Query] int? limit = null,
-		[Query] string? cursor = null,
-		[Query] string? search = null,
-		[Query] bool includeNotAnalyzed = false,
-		CancellationToken cancellationToken = default);
+		[Query] int? limit,
+		[Query] string? cursor,
+		[Query] string? search,
+		[Query] bool includeNotAnalyzed,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get a specific pull request
@@ -111,7 +111,7 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get pull request commits
@@ -122,9 +122,9 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		[Query] int? limit = null,
-		[Query] string? cursor = null,
-		CancellationToken cancellationToken = default);
+		[Query] int? limit,
+		[Query] string? cursor,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Bypass pull request analysis
@@ -135,7 +135,7 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get pull request issues
@@ -146,11 +146,11 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		[Query] string? status = null,
-		[Query] bool? onlyPotential = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? status,
+		[Query] bool? onlyPotential,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get pull request clones
@@ -161,11 +161,11 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		[Query] string? status = null,
-		[Query] bool? onlyPotential = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? status,
+		[Query] bool? onlyPotential,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get pull request logs
@@ -176,7 +176,7 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List commit analysis statistics
@@ -186,9 +186,9 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Query] string? branch = null,
-		[Query] int days = 31,
-		CancellationToken cancellationToken = default);
+		[Query] string? branch,
+		[Query] int days,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List category overviews
@@ -198,8 +198,8 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Query] string? branch = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? branch,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Search repository issues
@@ -209,10 +209,10 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Body] SearchRepositoryIssuesBody? body = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchRepositoryIssuesBody? body,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get issues overview
@@ -222,8 +222,8 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Body] SearchRepositoryIssuesBody? body = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchRepositoryIssuesBody? body,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get an issue
@@ -234,7 +234,7 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		long issueId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update issue state (ignore/unignore)
@@ -246,7 +246,7 @@ public interface IAnalysisApi
 		string repositoryName,
 		string issueId,
 		[Body] IssueStateBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Bulk ignore issues
@@ -257,7 +257,7 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		[Body] BulkIgnoreIssuesBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List repository commits
@@ -267,10 +267,10 @@ public interface IAnalysisApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Query] string? branch = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? branch,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get a specific commit
@@ -281,7 +281,7 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		string commitUuid,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get commit delta statistics
@@ -292,7 +292,7 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		string commitUuid,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get commit delta issues
@@ -303,12 +303,12 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		string srcCommitUuid,
-		[Query] string? targetCommitUuid = null,
-		[Query] string? status = null,
-		[Query] bool? onlyPotential = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? targetCommitUuid,
+		[Query] string? status,
+		[Query] bool? onlyPotential,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get commit clones
@@ -319,11 +319,11 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		string commitUuid,
-		[Query] string? status = null,
-		[Query] bool? onlyPotential = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? status,
+		[Query] bool? onlyPotential,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get commit logs
@@ -334,7 +334,7 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		string commitUuid,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get commit files
@@ -345,14 +345,14 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		string commitUuid,
-		[Query] string? branch = null,
-		[Query] string? filter = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		[Query] string? sortColumn = null,
-		[Query] string? columnOrder = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? branch,
+		[Query] string? filter,
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? search,
+		[Query] string? sortColumn,
+		[Query] string? columnOrder,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get pull request files
@@ -363,11 +363,11 @@ public interface IAnalysisApi
 		string organizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? sortColumn = null,
-		[Query] string? columnOrder = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? sortColumn,
+		[Query] string? columnOrder,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List organization pull requests
@@ -376,8 +376,8 @@ public interface IAnalysisApi
 	Task<PullRequestWithAnalysisListResponse> ListOrganizationPullRequestsAsync(
 		Provider provider,
 		string organizationName,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		[Query] string? repositories = null,
-		CancellationToken cancellationToken = default);
+		[Query] int? limit,
+		[Query] string? search,
+		[Query] string? repositories,
+		CancellationToken cancellationToken);
 }

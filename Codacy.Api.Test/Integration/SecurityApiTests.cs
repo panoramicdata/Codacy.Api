@@ -1,5 +1,3 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -19,17 +17,24 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Security.SearchSecurityItemsAsync(
-				provider,
-				orgName,
-				cancellationToken: CancellationToken);
+			var response = await client
+				.Security
+				.SearchSecurityItemsAsync(
+					provider,
+					orgName,
+					null,
+					null,
+					null,
+					null,
+					null,
+					CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
 			response.Data.Should().NotBeNull();
 		}
 		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-		                                     ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+											 ex.StatusCode == System.Net.HttpStatusCode.NotFound)
 		{
 			// Organization may not have security items - skip test
 			Output.WriteLine($"Security items not available: {ex.Message}");
@@ -48,11 +53,7 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 		try
 		{
 			// Act
-			var response = await client.Security.SearchSecurityItemsAsync(
-				provider,
-				orgName,
-				limit: limit,
-				cancellationToken: CancellationToken);
+			var response = await client.Security.SearchSecurityItemsAsync(provider, orgName, null, null, limit, null, null, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -60,7 +61,7 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 			(response.Data.Count <= limit).Should().BeTrue($"Should return at most {limit} security items");
 		}
 		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-		                                     ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+											 ex.StatusCode == System.Net.HttpStatusCode.NotFound)
 		{
 			// Organization may not have security items - skip test
 			Output.WriteLine($"Security items not available: {ex.Message}");
@@ -156,10 +157,7 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.ListSecurityManagersAsync(
-			provider,
-			orgName,
-			cancellationToken: CancellationToken);
+		var response = await client.Security.ListSecurityManagersAsync(provider, orgName, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -175,10 +173,7 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.ListSecurityRepositoriesAsync(
-			provider,
-			orgName,
-			cancellationToken: CancellationToken);
+		var response = await client.Security.ListSecurityRepositoriesAsync(provider, orgName, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -212,13 +207,11 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.ListSecurityCategoriesAsync(
-			provider,
-			orgName,
-			cancellationToken: CancellationToken);
+		var response = await client.Security.ListSecurityCategoriesAsync(provider, orgName, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
 	}
 }
+

@@ -1,5 +1,3 @@
-using Codacy.Api.Models;
-
 namespace Codacy.Api.Test.Integration;
 
 /// <summary>
@@ -20,24 +18,29 @@ public class QuickDiagnosticTests(ITestOutputHelper output) : TestBase(output)
 		var repos = await client.Organizations.ListOrganizationRepositoriesAsync(
 			provider,
 			orgName,
-			limit: 100,
-			cancellationToken: CancellationToken);
+			null,
+			100,
+			null,
+			null,
+			null,
+			null,
+			CancellationToken);
 
 		Output.WriteLine("=== All Repositories ===\n");
-		
+
 		foreach (var repo in repos.Data)
 		{
 			Output.WriteLine($"Repository: {repo.Name}");
 			Output.WriteLine($"  - Added State: {repo.AddedState}");
 			Output.WriteLine($"  - Repository ID: {repo.RepositoryId}");
-			
+
 			if (repo.Name == "Codacy.Api.TestRepo" || repo.Name?.Contains("TestRepo") == true)
 			{
 				Output.WriteLine($"  ***** THIS IS THE TEST REPO *****");
 				Output.WriteLine($"  - Full Path: {repo.FullPath}");
 				Output.WriteLine($"  - Default Branch: {repo.DefaultBranch?.Name}");
 				Output.WriteLine($"  - Last Updated: {repo.LastUpdated}");
-				
+
 				// Try to access it directly
 				Output.WriteLine("\n  Trying direct access...");
 				try
@@ -58,3 +61,4 @@ public class QuickDiagnosticTests(ITestOutputHelper output) : TestBase(output)
 		}
 	}
 }
+

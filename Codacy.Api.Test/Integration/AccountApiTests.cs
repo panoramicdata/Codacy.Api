@@ -49,7 +49,10 @@ public class AccountApiTests(ITestOutputHelper output) : TestBase(output)
 		using var client = GetClient();
 
 		// Act
-		var response = await client.Account.ListUserOrganizationsAsync(cancellationToken: CancellationToken);
+		var response = await client.Account.ListUserOrganizationsAsync(
+			null, // cursor
+			null, // limit
+			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -67,8 +70,9 @@ public class AccountApiTests(ITestOutputHelper output) : TestBase(output)
 
 		// Act
 		var response = await client.Account.ListUserOrganizationsAsync(
-			limit: limit,
-			cancellationToken: CancellationToken);
+			null, // cursor
+			limit,
+			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -86,7 +90,9 @@ public class AccountApiTests(ITestOutputHelper output) : TestBase(output)
 		// Act
 		var response = await client.Account.ListOrganizationsAsync(
 			provider,
-			cancellationToken: CancellationToken);
+			null, // cursor
+			null, // limit
+			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -163,7 +169,10 @@ public class AccountApiTests(ITestOutputHelper output) : TestBase(output)
 		using var client = GetClient();
 
 		// Act
-		var response = await client.Account.ListUserIntegrationsAsync(cancellationToken: CancellationToken);
+		var response = await client.Account.ListUserIntegrationsAsync(
+			null, // cursor
+			null, // limit
+			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -184,7 +193,10 @@ public class AccountApiTests(ITestOutputHelper output) : TestBase(output)
 		using var client = GetClient();
 
 		// Act
-		var response = await client.Account.GetUserApiTokensAsync(cancellationToken: CancellationToken);
+		var response = await client.Account.GetUserApiTokensAsync(
+			null, // cursor
+			null, // limit
+			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();

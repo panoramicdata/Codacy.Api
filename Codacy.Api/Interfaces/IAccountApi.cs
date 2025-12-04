@@ -12,28 +12,28 @@ public interface IAccountApi
 	/// Get the authenticated user
 	/// </summary>
 	[Get("/api/v3/user")]
-	Task<UserResponse> GetUserAsync(CancellationToken cancellationToken = default);
+	Task<UserResponse> GetUserAsync(CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Delete the authenticated user
 	/// </summary>
 	[Delete("/api/v3/user")]
-	Task DeleteUserAsync(CancellationToken cancellationToken = default);
+	Task DeleteUserAsync(CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update the authenticated user
 	/// </summary>
 	[Patch("/api/v3/user")]
-	Task<UserResponse> UpdateUserAsync([Body] UserBody body, CancellationToken cancellationToken = default);
+	Task<UserResponse> UpdateUserAsync([Body] UserBody body, CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List user organizations
 	/// </summary>
 	[Get("/api/v3/user/organizations")]
 	Task<OrganizationListResponse> ListUserOrganizationsAsync(
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List organizations for a provider
@@ -41,9 +41,9 @@ public interface IAccountApi
 	[Get("/api/v3/user/organizations/{provider}")]
 	Task<OrganizationListResponse> ListOrganizationsAsync(
 		Provider provider,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get organization for the authenticated user
@@ -52,69 +52,75 @@ public interface IAccountApi
 	Task<OrganizationResponse> GetUserOrganizationAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List user emails
 	/// </summary>
 	[Get("/api/v3/user/emails")]
-	Task<UserEmailsResponse> ListUserEmailsAsync(CancellationToken cancellationToken = default);
+	Task<UserEmailsResponse> ListUserEmailsAsync(CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Remove an email from user account
 	/// </summary>
 	[Post("/api/v3/user/emails/remove")]
-	Task RemoveUserEmailAsync([Body] string email, CancellationToken cancellationToken = default);
+	Task RemoveUserEmailAsync([Body] string email, CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get email notification settings
 	/// </summary>
 	[Get("/api/v3/user/emails/settings")]
-	Task<EmailNotificationSettingsResponse> GetEmailSettingsAsync(CancellationToken cancellationToken = default);
+	Task<EmailNotificationSettingsResponse> GetEmailSettingsAsync(CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update email notification settings
 	/// </summary>
 	[Patch("/api/v3/user/emails/settings")]
-	Task UpdateEmailSettingsAsync([Body] EmailNotificationSettingsOptional settings, CancellationToken cancellationToken = default);
+	Task UpdateEmailSettingsAsync(
+		[Body] EmailNotificationSettingsOptional settings,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Set an email as default
 	/// </summary>
 	[Post("/api/v3/user/emails/set-default")]
-	Task SetDefaultEmailAsync([Body] string email, CancellationToken cancellationToken = default);
+	Task SetDefaultEmailAsync(
+		[Body] string email,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List user integrations
 	/// </summary>
 	[Get("/api/v3/user/integrations")]
 	Task<IntegrationListResponse> ListUserIntegrationsAsync(
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Delete an integration for the authenticated user
 	/// </summary>
 	[Delete("/api/v3/user/integrations/{provider}")]
-	Task DeleteIntegrationAsync(Provider provider, CancellationToken cancellationToken = default);
+	Task DeleteIntegrationAsync(
+		Provider provider,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get user API tokens
 	/// </summary>
 	[Get("/api/v3/user/tokens")]
 	Task<ApiTokenListResponse> GetUserApiTokensAsync(
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Create user API token
 	/// </summary>
 	[Post("/api/v3/user/tokens")]
 	Task<ApiToken> CreateUserApiTokenAsync(
-		[Body] ApiTokenCreateRequest? request = null,
-		CancellationToken cancellationToken = default);
+		[Body] ApiTokenCreateRequest? request,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Delete user API token
@@ -122,7 +128,7 @@ public interface IAccountApi
 	[Delete("/api/v3/user/tokens/{tokenId}")]
 	Task DeleteUserApiTokenAsync(
 		long tokenId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -168,52 +174,4 @@ public class User
 
 	/// <summary>Should do client qualification</summary>
 	public bool? ShouldDoClientQualification { get; set; }
-}
-
-/// <summary>
-/// User body for updates
-/// </summary>
-public class UserBody
-{
-	/// <summary>Name</summary>
-	public string? Name { get; set; }
-
-	/// <summary>Should do client qualification</summary>
-	public bool? ShouldDoClientQualification { get; set; }
-}
-
-/// <summary>
-/// API token list response
-/// </summary>
-public class ApiTokenListResponse
-{
-	/// <summary>Pagination info</summary>
-	public PaginationInfo? Pagination { get; set; }
-
-	/// <summary>API tokens</summary>
-	public required List<ApiToken> Data { get; set; }
-}
-
-/// <summary>
-/// API token
-/// </summary>
-public class ApiToken
-{
-	/// <summary>Token ID</summary>
-	public required long Id { get; set; }
-
-	/// <summary>Token value</summary>
-	public required string Token { get; set; }
-
-	/// <summary>Expiration date</summary>
-	public DateTimeOffset? ExpiresAt { get; set; }
-}
-
-/// <summary>
-/// API token create request
-/// </summary>
-public class ApiTokenCreateRequest
-{
-	/// <summary>Expiration date</summary>
-	public DateTimeOffset? ExpiresAt { get; set; }
 }

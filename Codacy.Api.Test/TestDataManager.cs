@@ -134,7 +134,13 @@ public class TestDataManager : IDisposable
 					_testProvider,
 					_testOrganization,
 					_testRepository,
-					cancellationToken: cancellationToken);
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					cancellationToken);
 				return response.Data?.Count > 0;
 			}, cancellationToken);
 
@@ -177,7 +183,13 @@ public class TestDataManager : IDisposable
 					_testProvider,
 					_testOrganization,
 					_testRepository,
-					cancellationToken: cancellationToken);
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					cancellationToken);
 				return response.Data?.Count > 0;
 			}, cancellationToken);
 
@@ -255,8 +267,13 @@ public class TestDataManager : IDisposable
 					_testProvider,
 					_testOrganization,
 					_testRepository,
-					limit: limit,
-					cancellationToken: cancellationToken);
+					null,
+					null,
+					limit,
+					null,
+					null,
+					null,
+					cancellationToken);
 				return response.Data ?? [];
 			}
 			catch (ApiException ex) when (
@@ -300,9 +317,13 @@ public class TestDataManager : IDisposable
 					_testProvider,
 					_testOrganization,
 					_testRepository,
-					branch: branch,
-					limit: limit,
-					cancellationToken: cancellationToken);
+					branch,
+					null,
+					null,
+					null,
+					null,
+					limit,
+					cancellationToken);
 				return response.Data ?? [];
 			}
 			catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -564,3 +585,4 @@ public class TestEnvironmentStatus
 			   $"Ready: {IsReady}";
 	}
 }
+

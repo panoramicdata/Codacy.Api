@@ -15,11 +15,11 @@ public interface IPeopleApi
 	Task<ListPeopleResponse> ListPeopleFromOrganizationAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		[Query] bool? onlyMembers = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? search,
+		[Query] bool? onlyMembers,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Add people to organization
@@ -29,7 +29,7 @@ public interface IPeopleApi
 		Provider provider,
 		string remoteOrganizationName,
 		[Body] List<string> emails,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Remove people from organization
@@ -39,7 +39,7 @@ public interface IPeopleApi
 		Provider provider,
 		string remoteOrganizationName,
 		[Body] RemovePeopleBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List people suggestions for an organization
@@ -48,10 +48,10 @@ public interface IPeopleApi
 	Task<SuggestedAuthorsResponse> PeopleSuggestionsForOrganizationAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? search,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List people suggestions for a repository
@@ -61,10 +61,10 @@ public interface IPeopleApi
 		Provider provider,
 		string remoteOrganizationName,
 		string repositoryName,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		[Query] string? search = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? cursor,
+		[Query] int? limit,
+		[Query] string? search,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Export people list as CSV
@@ -73,5 +73,5 @@ public interface IPeopleApi
 	Task<string> ListPeopleFromOrganizationCsvAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 }

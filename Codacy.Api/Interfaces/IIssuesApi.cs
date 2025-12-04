@@ -1,4 +1,4 @@
-﻿using Codacy.Api.Models;
+using Codacy.Api.Models;
 using Refit;
 
 namespace Codacy.Api.Interfaces;
@@ -16,10 +16,10 @@ public interface IIssuesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Body] SearchRepositoryIssuesBody? filter = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchRepositoryIssuesBody? filter,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get an issue
@@ -30,7 +30,7 @@ public interface IIssuesApi
 		string organizationName,
 		string repositoryName,
 		long issueId,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Update issue state (ignore/unignore)
@@ -42,7 +42,7 @@ public interface IIssuesApi
 		string repositoryName,
 		string issueId,
 		[Body] IssueStateBody state,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Bulk ignore issues
@@ -53,7 +53,7 @@ public interface IIssuesApi
 		string organizationName,
 		string repositoryName,
 		[Body] BulkIgnoreIssuesBody body,
-		CancellationToken cancellationToken = default);
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Get issues overview
@@ -63,8 +63,8 @@ public interface IIssuesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Body] SearchRepositoryIssuesBody? filter = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchRepositoryIssuesBody? filter,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// Search ignored issues
@@ -74,10 +74,10 @@ public interface IIssuesApi
 		Provider provider,
 		string organizationName,
 		string repositoryName,
-		[Body] SearchRepositoryIssuesBody? filter = null,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Body] SearchRepositoryIssuesBody? filter,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List pull request issues
@@ -88,11 +88,11 @@ public interface IIssuesApi
 		string organizationName,
 		string repositoryName,
 		int pullRequestNumber,
-		[Query] string? status = null,
-		[Query] bool onlyPotential = false,
-		[Query] string? cursor = null,
-		[Query] int? limit = null,
-		CancellationToken cancellationToken = default);
+		[Query] string? status,
+		[Query] bool onlyPotential,
+		[Query] string? cursor,
+		[Query] int? limit,
+		CancellationToken cancellationToken);
 }
 
 /// <summary>

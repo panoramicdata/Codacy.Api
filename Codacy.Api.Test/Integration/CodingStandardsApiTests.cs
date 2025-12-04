@@ -140,7 +140,18 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 			orgName,
 			standardId,
 			toolUuid,
-			cancellationToken: CancellationToken);
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -194,8 +205,18 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 			orgName,
 			standardId,
 			toolUuid,
-			limit: limit,
-			cancellationToken: CancellationToken);
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			limit,
+			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -230,10 +251,13 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 			provider,
 			orgName,
 			standardId,
-			cancellationToken: CancellationToken);
+			null,
+			null,
+			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
 	}
 }
+

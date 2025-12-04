@@ -24,5 +24,5 @@ public interface IPullRequestsApi
 	/// Placeholder method to satisfy Refit interface requirements
 	/// </summary>
 	[Get("/api/v3/version")]
-	Task<VersionResponse> PlaceholderAsync(CancellationToken cancellationToken = default);
+	Task<VersionResponse> PlaceholderAsync(CancellationToken cancellationToken);
 }
