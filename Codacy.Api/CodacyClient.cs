@@ -1,4 +1,6 @@
-﻿using Codacy.Api.Interfaces;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Codacy.Api.Interfaces;
 using Refit;
 
 namespace Codacy.Api;
@@ -10,6 +12,7 @@ public class CodacyClient : ICodacyClient, IDisposable
 {
 	private readonly CodacyClientOptions _options;
 	private readonly HttpClient _httpClient;
+	private readonly RefitSettings _refitSettings;
 	private bool _disposed;
 
 	/// <summary>
@@ -25,6 +28,18 @@ public class CodacyClient : ICodacyClient, IDisposable
 		_httpClient = options.HttpClientFactory?.CreateClient()
 			?? options.HttpClient
 			?? CreateHttpClient();
+
+		// Configure JSON serialization with camelCase naming policy
+		_refitSettings = new RefitSettings
+		{
+			ContentSerializer = new SystemTextJsonContentSerializer(
+				new JsonSerializerOptions
+				{
+					PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+					PropertyNameCaseInsensitive = true,
+					Converters = { new JsonStringEnumConverter() }
+				})
+		};
 
 		// Initialize API modules using Refit
 		Version = CreateApiClient<IVersionApi>();
@@ -105,7 +120,7 @@ public class CodacyClient : ICodacyClient, IDisposable
 	/// Creates an API client using Refit
 	/// </summary>
 	protected virtual T CreateApiClient<T>() where T : class
-		=> RestService.For<T>(_httpClient);
+		=> RestService.For<T>(_httpClient, _refitSettings);
 
 	private HttpClient CreateHttpClient()
 	{

@@ -379,26 +379,11 @@ public class SecurityRepository
 /// </summary>
 public class SecurityCategoriesResponse
 {
-	/// <summary>Security categories</summary>
-	public required List<SecurityCategory> Data { get; set; }
+	/// <summary>Security category names</summary>
+	public required List<string> Data { get; set; }
 
 	/// <summary>Pagination</summary>
 	public PaginationInfo? Pagination { get; set; }
-}
-
-/// <summary>
-/// Security category
-/// </summary>
-public class SecurityCategory
-{
-	/// <summary>Category name</summary>
-	public string? Category { get; set; }
-
-	/// <summary>Item count</summary>
-	public int? Count { get; set; }
-
-	/// <summary>Description</summary>
-	public string? Description { get; set; }
 }
 
 /// <summary>

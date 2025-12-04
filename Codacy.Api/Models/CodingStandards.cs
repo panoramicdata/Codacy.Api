@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Codacy.Api.Models;
 
 // ===== Coding Standards Models =====
@@ -8,6 +11,7 @@ namespace Codacy.Api.Models;
 public class CodingStandardsListResponse
 {
 	/// <summary>Coding standards</summary>
+	[JsonPropertyName("data")]
 	public required List<CodingStandard> Data { get; set; }
 }
 
@@ -17,6 +21,7 @@ public class CodingStandardsListResponse
 public class CodingStandardResponse
 {
 	/// <summary>Coding standard data</summary>
+	[JsonPropertyName("data")]
 	public required CodingStandard Data { get; set; }
 }
 
@@ -26,33 +31,43 @@ public class CodingStandardResponse
 public class CodingStandard
 {
 	/// <summary>Coding standard ID</summary>
+	[JsonPropertyName("id")]
 	public required long Id { get; set; }
 
 	/// <summary>Name</summary>
+	[JsonPropertyName("name")]
 	public required string Name { get; set; }
 
 	/// <summary>Description</summary>
+	[JsonPropertyName("description")]
 	public string? Description { get; set; }
 
 	/// <summary>Is default</summary>
+	[JsonPropertyName("isDefault")]
 	public bool? IsDefault { get; set; }
 
 	/// <summary>Is draft</summary>
+	[JsonPropertyName("isDraft")]
 	public bool? IsDraft { get; set; }
 
 	/// <summary>Created at</summary>
+	[JsonPropertyName("createdAt")]
 	public DateTimeOffset? CreatedAt { get; set; }
 
 	/// <summary>Updated at</summary>
+	[JsonPropertyName("updatedAt")]
 	public DateTimeOffset? UpdatedAt { get; set; }
 
 	/// <summary>Created by</summary>
+	[JsonPropertyName("createdBy")]
 	public string? CreatedBy { get; set; }
 
 	/// <summary>Number of repositories using this standard</summary>
+	[JsonPropertyName("repositoryCount")]
 	public int? RepositoryCount { get; set; }
 
 	/// <summary>Languages covered</summary>
+	[JsonPropertyName("languages")]
 	public List<string>? Languages { get; set; }
 }
 
@@ -107,6 +122,7 @@ public class SetDefaultCodingStandardBody
 public class CodingStandardToolsListResponse
 {
 	/// <summary>Tools</summary>
+	[JsonPropertyName("data")]
 	public required List<CodingStandardTool> Data { get; set; }
 }
 
@@ -116,22 +132,57 @@ public class CodingStandardToolsListResponse
 public class CodingStandardTool
 {
 	/// <summary>Tool UUID</summary>
-	public required string Uuid { get; set; }
+	[JsonPropertyName("uuid")]
+	public string? Uuid { get; set; }
 
 	/// <summary>Tool name</summary>
-	public required string Name { get; set; }
+	[JsonPropertyName("name")]
+	public string? Name { get; set; }
 
 	/// <summary>Is enabled</summary>
-	public required bool IsEnabled { get; set; }
+	[JsonPropertyName("isEnabled")]
+	public bool? IsEnabled { get; set; }
 
 	/// <summary>Language</summary>
-	public required string Language { get; set; }
+	[JsonPropertyName("language")]
+	public string? Language { get; set; }
 
-	/// <summary>Total patterns</summary>
-	public required int TotalPatterns { get; set; }
+	/// <summary>Total patterns (camelCase)</summary>
+	[JsonPropertyName("totalPatterns")]
+	public int? TotalPatterns { get; set; }
 
-	/// <summary>Enabled patterns count</summary>
-	public required int EnabledPatterns { get; set; }
+	/// <summary>Enabled patterns count (camelCase)</summary>
+	[JsonPropertyName("enabledPatterns")]
+	public int? EnabledPatterns { get; set; }
+
+	// Additional properties that might be returned by the API
+	// Based on Codacy API patterns, tools might have nested structure
+
+	/// <summary>Tool information (nested object)</summary>
+	[JsonPropertyName("tool")]
+	public CodingStandardToolInfo? Tool { get; set; }
+
+	/// <summary>Number of patterns</summary>
+	[JsonPropertyName("numberOfPatterns")]
+	public int? NumberOfPatterns { get; set; }
+
+	/// <summary>Number of enabled patterns</summary>
+	[JsonPropertyName("numberOfEnabledPatterns")]
+	public int? NumberOfEnabledPatterns { get; set; }
+}
+
+/// <summary>
+/// Tool information (for nested structure)
+/// </summary>
+public class CodingStandardToolInfo
+{
+	/// <summary>Tool UUID</summary>
+	[JsonPropertyName("uuid")]
+	public string? Uuid { get; set; }
+
+	/// <summary>Tool name</summary>
+	[JsonPropertyName("name")]
+	public string? Name { get; set; }
 }
 
 /// <summary>
@@ -152,33 +203,43 @@ public class ConfiguredPatternsListResponse
 public class ConfiguredPattern
 {
 	/// <summary>Pattern ID</summary>
-	public required string PatternId { get; set; }
+	[JsonPropertyName("patternId")]
+	public string? PatternId { get; set; }
 
 	/// <summary>Title</summary>
-	public required string Title { get; set; }
+	[JsonPropertyName("title")]
+	public string? Title { get; set; }
 
 	/// <summary>Description</summary>
+	[JsonPropertyName("description")]
 	public string? Description { get; set; }
 
 	/// <summary>Category</summary>
-	public required string Category { get; set; }
+	[JsonPropertyName("category")]
+	public string? Category { get; set; }
 
 	/// <summary>Severity level</summary>
-	public required SeverityLevel Level { get; set; }
+	[JsonPropertyName("level")]
+	public SeverityLevel? Level { get; set; }
 
 	/// <summary>Languages</summary>
-	public required List<string> Languages { get; set; }
+	[JsonPropertyName("languages")]
+	public List<string>? Languages { get; set; }
 
 	/// <summary>Is enabled</summary>
-	public required bool IsEnabled { get; set; }
+	[JsonPropertyName("isEnabled")]
+	public bool? IsEnabled { get; set; }
 
 	/// <summary>Is recommended</summary>
-	public required bool IsRecommended { get; set; }
+	[JsonPropertyName("isRecommended")]
+	public bool? IsRecommended { get; set; }
 
-	/// <summary>Parameters</summary>
-	public Dictionary<string, object>? Parameters { get; set; }
+	/// <summary>Parameters - using JsonElement for flexible JSON structure</summary>
+	[JsonPropertyName("parameters")]
+	public JsonElement? Parameters { get; set; }
 
 	/// <summary>Tags</summary>
+	[JsonPropertyName("tags")]
 	public List<string>? Tags { get; set; }
 }
 
@@ -215,9 +276,11 @@ public class ToolConfiguration
 public class CodingStandardRepositoriesListResponse
 {
 	/// <summary>Repositories</summary>
+	[JsonPropertyName("data")]
 	public required List<CodingStandardRepository> Data { get; set; }
 
 	/// <summary>Pagination</summary>
+	[JsonPropertyName("pagination")]
 	public PaginationInfo? Pagination { get; set; }
 }
 
@@ -227,19 +290,12 @@ public class CodingStandardRepositoriesListResponse
 public class CodingStandardRepository
 {
 	/// <summary>Repository ID</summary>
+	[JsonPropertyName("repositoryId")]
 	public required long RepositoryId { get; set; }
 
 	/// <summary>Repository name</summary>
-	public required string RepositoryName { get; set; }
-
-	/// <summary>Provider</summary>
-	public required Provider Provider { get; set; }
-
-	/// <summary>Organization name</summary>
-	public required string OrganizationName { get; set; }
-
-	/// <summary>Applied at</summary>
-	public required DateTimeOffset AppliedAt { get; set; }
+	[JsonPropertyName("name")]
+	public string? Name { get; set; }
 }
 
 /// <summary>

@@ -97,4 +97,26 @@ public abstract class TestBase(ITestOutputHelper output)
 		}
 		return repo;
 	}
+
+	/// <summary>
+	/// Creates a TestDataManager for managing test data lifecycle
+	/// </summary>
+	protected TestDataManager GetTestDataManager()
+	{
+		var client = GetClient();
+		var organization = GetTestOrganization();
+		var repository = GetTestRepository();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+
+		// Create logger for test data manager
+		var loggerProvider = new XunitLoggerProvider(Output, LogLevel.Debug);
+		var logger = loggerProvider.CreateLogger("TestDataManager");
+
+		return new TestDataManager(
+			client,
+			organization,
+			repository,
+			provider,
+			logger);
+	}
 }

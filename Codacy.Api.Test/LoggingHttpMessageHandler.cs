@@ -69,13 +69,12 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 	private async Task LogRequestAsync(Guid requestId, HttpRequestMessage request)
 	{
 		var sb = new StringBuilder();
-		sb.AppendLine($"╔══════════════════════════════════════════════════════════════════");
-		sb.AppendLine($"║ HTTP REQUEST [{requestId}]");
-		sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-		sb.AppendLine($"║ {request.Method} {request.RequestUri}");
-		sb.AppendLine($"║ HTTP/{request.Version}");
-		sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-		sb.AppendLine($"║ HEADERS:");
+		sb.AppendLine($"");
+		sb.AppendLine($"HTTP REQUEST [{requestId}]");
+		sb.AppendLine($"{request.Method} {request.RequestUri}");
+		sb.AppendLine($"HTTP/{request.Version}");
+		sb.AppendLine($"");
+		sb.AppendLine($"HEADERS:");
 
 		foreach (var header in request.Headers)
 		{
@@ -86,25 +85,25 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 								   header.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase)
 					? MaskToken(value)
 					: value;
-				sb.AppendLine($"║   {header.Key}: {displayValue}");
+				sb.AppendLine($"  {header.Key}: {displayValue}");
 			}
 		}
 
 		// Log request content if present
 		if (request.Content != null)
 		{
-			sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-			sb.AppendLine($"║ CONTENT HEADERS:");
+			sb.AppendLine($"");
+			sb.AppendLine($"CONTENT HEADERS:");
 			foreach (var header in request.Content.Headers)
 			{
 				foreach (var value in header.Value)
 				{
-					sb.AppendLine($"║   {header.Key}: {value}");
+					sb.AppendLine($"  {header.Key}: {value}");
 				}
 			}
 
-			sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-			sb.AppendLine($"║ BODY:");
+			sb.AppendLine($"");
+			sb.AppendLine($"BODY:");
 			try
 			{
 				var content = await request.Content.ReadAsStringAsync();
@@ -112,23 +111,20 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 				{
 					// Format JSON for readability
 					var formattedContent = FormatJson(content);
-					foreach (var line in formattedContent.Split('\n'))
-					{
-						sb.AppendLine($"║   {line}");
-					}
+					sb.AppendLine(formattedContent);
 				}
 				else
 				{
-					sb.AppendLine($"║   (empty)");
+					sb.AppendLine($"  (empty)");
 				}
 			}
 			catch (Exception ex)
 			{
-				sb.AppendLine($"║   (unable to read content: {ex.Message})");
+				sb.AppendLine($"  (unable to read content: {ex.Message})");
 			}
 		}
 
-		sb.AppendLine($"╚══════════════════════════════════════════════════════════════════");
+		sb.AppendLine($"");
 
 		LogMessage(sb.ToString());
 	}
@@ -137,37 +133,36 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 	private async Task LogResponseAsync(Guid requestId, HttpResponseMessage response, TimeSpan duration)
 	{
 		var sb = new StringBuilder();
-		sb.AppendLine($"╔══════════════════════════════════════════════════════════════════");
-		sb.AppendLine($"║ HTTP RESPONSE [{requestId}]");
-		sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-		sb.AppendLine($"║ HTTP/{response.Version} {(int)response.StatusCode} {response.ReasonPhrase}");
-		sb.AppendLine($"║ Duration: {duration.TotalMilliseconds.ToString("F2", CultureInfo.InvariantCulture)}ms");
-		sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-		sb.AppendLine($"║ HEADERS:");
+		sb.AppendLine($"");
+		sb.AppendLine($"HTTP RESPONSE [{requestId}]");
+		sb.AppendLine($"HTTP/{response.Version} {(int)response.StatusCode} {response.ReasonPhrase}");
+		sb.AppendLine($"Duration: {duration.TotalMilliseconds.ToString("F2", CultureInfo.InvariantCulture)}ms");
+		sb.AppendLine($"");
+		sb.AppendLine($"HEADERS:");
 
 		foreach (var header in response.Headers)
 		{
 			foreach (var value in header.Value)
 			{
-				sb.AppendLine($"║   {header.Key}: {value}");
+				sb.AppendLine($"  {header.Key}: {value}");
 			}
 		}
 
 		// Log response content if present
 		if (response.Content != null)
 		{
-			sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-			sb.AppendLine($"║ CONTENT HEADERS:");
+			sb.AppendLine($"");
+			sb.AppendLine($"CONTENT HEADERS:");
 			foreach (var header in response.Content.Headers)
 			{
 				foreach (var value in header.Value)
 				{
-					sb.AppendLine($"║   {header.Key}: {value}");
+					sb.AppendLine($"  {header.Key}: {value}");
 				}
 			}
 
-			sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-			sb.AppendLine($"║ BODY:");
+			sb.AppendLine($"");
+			sb.AppendLine($"BODY:");
 			try
 			{
 				var content = await response.Content.ReadAsStringAsync();
@@ -184,25 +179,25 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 					{
 						if (lineCount >= maxLines)
 						{
-							sb.AppendLine($"║   ... ({lines.Length - maxLines} more lines)");
+							sb.AppendLine($"... ({lines.Length - maxLines} more lines)");
 							break;
 						}
-						sb.AppendLine($"║   {line}");
+						sb.AppendLine(line);
 						lineCount++;
 					}
 				}
 				else
 				{
-					sb.AppendLine($"║   (empty)");
+					sb.AppendLine($"  (empty)");
 				}
 			}
 			catch (Exception ex)
 			{
-				sb.AppendLine($"║   (unable to read content: {ex.Message})");
+				sb.AppendLine($"  (unable to read content: {ex.Message})");
 			}
 		}
 
-		sb.AppendLine($"╚══════════════════════════════════════════════════════════════════");
+		sb.AppendLine($"");
 
 		var logLevel = response.IsSuccessStatusCode ? LogLevel.Debug : LogLevel.Warning;
 		LogMessage(sb.ToString(), logLevel);
@@ -212,13 +207,12 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 	private void LogException(Guid requestId, Exception exception, TimeSpan duration)
 	{
 		var sb = new StringBuilder();
-		sb.AppendLine($"╔══════════════════════════════════════════════════════════════════");
-		sb.AppendLine($"║ HTTP EXCEPTION [{requestId}]");
-		sb.AppendLine($"╠══════════════════════════════════════════════════════════════════");
-		sb.AppendLine($"║ Duration: {duration.TotalMilliseconds.ToString("F2", CultureInfo.InvariantCulture)}ms");
-		sb.AppendLine($"║ Exception: {exception.GetType().Name}");
-		sb.AppendLine($"║ Message: {exception.Message}");
-		sb.AppendLine($"╚══════════════════════════════════════════════════════════════════");
+		sb.AppendLine($"");
+		sb.AppendLine($"HTTP EXCEPTION [{requestId}]");
+		sb.AppendLine($"Duration: {duration.TotalMilliseconds.ToString("F2", CultureInfo.InvariantCulture)}ms");
+		sb.AppendLine($"Exception: {exception.GetType().Name}");
+		sb.AppendLine($"Message: {exception.Message}");
+		sb.AppendLine($"");
 
 		LogMessage(sb.ToString(), LogLevel.Error);
 	}

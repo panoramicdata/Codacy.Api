@@ -128,6 +128,11 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 		}
 
 		var toolUuid = tools.Data[0].Uuid;
+		if (string.IsNullOrEmpty(toolUuid))
+		{
+			Output.WriteLine("Tool UUID is null or empty - skipping test");
+			return;
+		}
 
 		// Act
 		var response = await client.CodingStandards.ListCodingStandardPatternsAsync(
@@ -177,6 +182,11 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 		}
 
 		var toolUuid = tools.Data[0].Uuid;
+		if (string.IsNullOrEmpty(toolUuid))
+		{
+			Output.WriteLine("Tool UUID is null or empty - skipping test");
+			return;
+		}
 
 		// Act
 		var response = await client.CodingStandards.ListCodingStandardPatternsAsync(

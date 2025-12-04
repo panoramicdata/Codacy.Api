@@ -165,6 +165,9 @@ public class User
 
 	/// <summary>Zendesk hash</summary>
 	public string? ZendeskHash { get; set; }
+
+	/// <summary>Should do client qualification</summary>
+	public bool? ShouldDoClientQualification { get; set; }
 }
 
 /// <summary>

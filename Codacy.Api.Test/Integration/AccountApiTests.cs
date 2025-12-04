@@ -198,9 +198,18 @@ public class AccountApiTests(ITestOutputHelper output) : TestBase(output)
 		// Arrange
 		using var client = GetClient();
 		var originalUser = await client.Account.GetUserAsync(CancellationToken);
+
+		// Note: The Codacy API's UpdateUser endpoint has strict username validation:
+		// - Only alphanumeric characters, underscores, and hyphens allowed
+		// - Length between 3-15 characters
+		// The GET /user endpoint returns a display name (e.g., "David Bond"), but the
+		// PATCH endpoint expects a username format.
+		//
+		// To avoid permanently modifying the user's data, we only test with
+		// ShouldDoClientQualification which is a toggle-able boolean setting.
 		var updateBody = new Interfaces.UserBody
 		{
-			Name = originalUser.Data.Name // Keep same name to avoid side effects
+			ShouldDoClientQualification = originalUser.Data.ShouldDoClientQualification ?? false
 		};
 
 		// Act
