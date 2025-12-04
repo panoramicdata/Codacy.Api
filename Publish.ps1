@@ -25,6 +25,8 @@
     Publishes even with uncommitted changes
 #>
 
+# PSScriptAnalyzer suppression: Write-Host is intentionally used for interactive colored console output
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'Write-Host is required for colored ANSI output in this interactive script')]
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $false)]

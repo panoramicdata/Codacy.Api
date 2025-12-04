@@ -37,7 +37,7 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 		// Send request
 		var startTime = DateTimeOffset.UtcNow;
 		HttpResponseMessage? response = null;
-		Exception? exception = null;
+		Exception? caughtException = null;
 
 		try
 		{
@@ -46,7 +46,7 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 		}
 		catch (Exception ex)
 		{
-			exception = ex;
+			caughtException = ex;
 			throw;
 		}
 		finally
@@ -58,9 +58,9 @@ public class LoggingHttpMessageHandler : DelegatingHandler
 			{
 				await LogResponseAsync(requestId, response, duration);
 			}
-			else if (exception != null)
+			else if (caughtException != null)
 			{
-				LogException(requestId, exception, duration);
+				LogException(requestId, caughtException, duration);
 			}
 		}
 	}

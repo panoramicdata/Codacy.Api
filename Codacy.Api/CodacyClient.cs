@@ -8,6 +8,7 @@ namespace Codacy.Api;
 /// <summary>
 /// Client for interacting with the Codacy API
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "S1699:Calling virtual method in constructor", Justification = "CreateApiClient is intentionally virtual to allow testing; the method does not rely on any derived class state")]
 public class CodacyClient : ICodacyClient, IDisposable
 {
 	private readonly CodacyClientOptions _options;

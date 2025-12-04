@@ -27,9 +27,9 @@ public class TestDataManager : IDisposable
 	/// <summary>
 	/// Default retry policy configuration
 	/// </summary>
-	public const int DefaultMaxRetries = 3;
-	public const int DefaultRetryDelayMs = 1000;
-	public const int DefaultRetryBackoffMultiplier = 2;
+	internal const int DefaultMaxRetries = 3;
+	internal const int DefaultRetryDelayMs = 1000;
+	internal const int DefaultRetryBackoffMultiplier = 2;
 
 	/// <summary>
 	/// Initializes a new instance of the TestDataManager

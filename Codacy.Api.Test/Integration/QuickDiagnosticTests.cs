@@ -42,7 +42,7 @@ public class QuickDiagnosticTests(ITestOutputHelper output) : TestBase(output)
 				Output.WriteLine("\n  Trying direct access...");
 				try
 				{
-					var direct = await client.Repositories.GetRepositoryAsync(
+					_ = await client.Repositories.GetRepositoryAsync(
 						provider,
 						orgName,
 						repo.Name!,

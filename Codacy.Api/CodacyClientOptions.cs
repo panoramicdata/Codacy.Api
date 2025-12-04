@@ -5,7 +5,7 @@ namespace Codacy.Api;
 /// <summary>
 /// Configuration options for the Codacy API client
 /// </summary>
-public partial class CodacyClientOptions
+public class CodacyClientOptions
 {
 	/// <summary>
 	/// Gets or sets the Codacy API token for authentication

@@ -1,4 +1,4 @@
-﻿namespace Codacy.Api.Test;
+namespace Codacy.Api.Test;
 
 /// <summary>
 /// Unit tests for CodacyClientOptions
@@ -29,7 +29,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*ApiToken*");
@@ -45,7 +45,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*ApiToken*");
@@ -62,7 +62,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*BaseUrl*");
@@ -79,7 +79,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*BaseUrl*");
@@ -96,7 +96,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*RequestTimeout*");
@@ -113,7 +113,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*RequestTimeout*");
@@ -130,7 +130,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*MaxRetryAttempts*");
@@ -162,7 +162,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*RetryDelay*");
@@ -180,7 +180,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*MaxRetryDelay*");
@@ -217,7 +217,7 @@ public class CodacyClientOptionsTests
 		};
 
 		// Act & Assert
-		var result = ((Action)(() => options.Validate()))
+		((Action)(() => options.Validate()))
 			.Should()
 			.ThrowExactly<ArgumentException>()
 			.WithMessage("*HttpClient*HttpClientFactory*");

@@ -1,0 +1,61 @@
+#!/bin/sh
+#
+# Pre-commit hook to prevent committing secrets
+# Install: git config core.hooksPath .githooks
+#
+
+echo "Checking for potential secrets..."
+
+# Patterns that might indicate secrets (adjust as needed)
+# Note: These are regex patterns for grep
+PATTERNS=(
+    '"ApiToken"[[:space:]]*:[[:space:]]*"[^<]'
+    '"api-token"[[:space:]]*:[[:space:]]*"[^<]'
+    'api-token.*:[[:space:]]*[A-Za-z0-9]'
+    'api_token.*=[[:space:]]*[A-Za-z0-9]'
+    'apikey.*=[[:space:]]*[A-Za-z0-9]'
+    'api_key.*=[[:space:]]*[A-Za-z0-9]'
+    '"secret"[[:space:]]*:[[:space:]]*"[^<]'
+    '"password"[[:space:]]*:[[:space:]]*"[^<]'
+)
+
+# Files to check (staged files only)
+FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$FILES" ]; then
+    exit 0
+fi
+
+FOUND=0
+
+for pattern in "${PATTERNS[@]}"; do
+    # Search for pattern in staged changes (not in .example files or comments)
+    MATCHES=$(git diff --cached -U0 -- ':(exclude)*.example.*' | grep -iE "$pattern" | grep -v "YOUR_" | grep -v "your-" | grep -v "<.*>" | grep -v "example" || true)
+    
+    if [ -n "$MATCHES" ]; then
+        echo "??  Potential secret found matching pattern: $pattern"
+        echo "$MATCHES"
+        FOUND=1
+    fi
+done
+
+# Check for common secret file patterns being added
+for file in $FILES; do
+    if echo "$file" | grep -qE "(secrets\.json|\.secret|key\.txt|token\.txt)$"; then
+        if ! echo "$file" | grep -q "example"; then
+            echo "??  Suspicious file being committed: $file"
+            FOUND=1
+        fi
+    fi
+done
+
+if [ $FOUND -eq 1 ]; then
+    echo ""
+    echo "? Commit blocked: Potential secrets detected!"
+    echo "   If these are false positives, you can bypass with: git commit --no-verify"
+    echo "   But please review carefully first!"
+    exit 1
+fi
+
+echo "? No secrets detected"
+exit 0

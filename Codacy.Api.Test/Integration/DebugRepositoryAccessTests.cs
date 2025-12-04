@@ -60,7 +60,7 @@ public class DebugRepositoryAccessTests(ITestOutputHelper output) : TestBase(out
 			
 			try
 			{
-				var direct = await client.Repositories.GetRepositoryAsync(
+				_ = await client.Repositories.GetRepositoryAsync(
 					repo.Provider ?? provider,
 					repo.Owner ?? orgName,
 					repo.Name!,

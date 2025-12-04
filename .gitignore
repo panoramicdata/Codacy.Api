@@ -419,3 +419,22 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Secrets and API keys (prevent accidental commits)
+**/secrets.json
+!**/secrets.example.json
+*.secrets
+*.secret
+*-key.txt
+*-token.txt
+
+# Debug output and logs that might contain sensitive data
+*.log
+*.logs
+**/TestResults/
+**/DebugOutput/
+**/*.received.*
+
+# JetBrains Rider
+.idea/
+*.sln.iml

@@ -40,16 +40,16 @@ public class XunitLogger(ITestOutputHelper output, string categoryName, LogLevel
 			_ => "NONE "
 		};
 
-		var output = $"[{timestamp}] [{logLevelString}] [{_categoryName}] {message}";
+		var logOutput = $"[{timestamp}] [{logLevelString}] [{_categoryName}] {message}";
 
 		if (eventId.Id != 0)
 		{
-			output = $"[{timestamp}] [{logLevelString}] [{_categoryName}] [EventId:{eventId.Id}] {message}";
+			logOutput = $"[{timestamp}] [{logLevelString}] [{_categoryName}] [EventId:{eventId.Id}] {message}";
 		}
 
 		try
 		{
-			_output.WriteLine(output);
+			_output.WriteLine(logOutput);
 
 			if (exception != null)
 			{
