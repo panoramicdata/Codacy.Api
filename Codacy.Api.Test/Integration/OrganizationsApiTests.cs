@@ -20,8 +20,13 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
+		response.Data.Organization.Should().NotBeNull();
 
-		// Note: Name and Provider may be null in some API responses
+		// Verify organization details using the nested Organization property
+		response.Data.Organization.Name.Should().Be(orgName);
+		response.Data.Organization.Provider.Should().Be(provider);
+		
+		// Also verify the convenience properties work
 		response.Data.Name.Should().Be(orgName);
 		response.Data.Provider.Should().Be(provider);
 	}

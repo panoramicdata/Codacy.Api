@@ -125,20 +125,13 @@ public class CodacyClient : ICodacyClient, IDisposable
 
 	private HttpClient CreateHttpClient()
 	{
-		var httpClient = new HttpClient
+		var handler = new LoggingHttpClientHandler(_options);
+		
+		var httpClient = new HttpClient(handler)
 		{
 			BaseAddress = new Uri(_options.BaseUrl),
 			Timeout = _options.RequestTimeout
 		};
-
-		// Add authentication header
-		httpClient.DefaultRequestHeaders.Add("api-token", _options.ApiToken);
-
-		// Add any custom default headers
-		foreach (var header in _options.DefaultHeaders)
-		{
-			httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
-		}
 
 		return httpClient;
 	}

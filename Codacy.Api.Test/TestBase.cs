@@ -33,16 +33,6 @@ public abstract class TestBase(ITestOutputHelper output)
 		var loggerProvider = new XunitLoggerProvider(Output, LogLevel.Debug);
 		var logger = loggerProvider.CreateLogger("Codacy.Api.Http");
 
-		// Create HTTP client with logging handler
-		var loggingHandler = new LoggingHttpMessageHandler(logger);
-		var httpClient = new HttpClient(loggingHandler)
-		{
-			BaseAddress = new Uri(!string.IsNullOrWhiteSpace(baseUrl) ? baseUrl : "https://app.codacy.com")
-		};
-
-		// Add authentication header to the custom HttpClient
-		httpClient.DefaultRequestHeaders.Add("api-token", apiToken);
-
 		return new CodacyClientOptions
 		{
 			ApiToken = apiToken,
@@ -50,7 +40,6 @@ public abstract class TestBase(ITestOutputHelper output)
 			EnableRequestLogging = true,
 			EnableResponseLogging = true,
 			Logger = logger,
-			HttpClient = httpClient
 		};
 	}
 
