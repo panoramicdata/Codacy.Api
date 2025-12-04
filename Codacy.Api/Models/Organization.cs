@@ -98,10 +98,48 @@ public class OrganizationResponse
 /// </summary>
 public class OrganizationData
 {
-	/// <summary>Organization details</summary>
+	/// <summary>The organization details</summary>
 	[JsonPropertyName("organization")]
-	public required Organization Organization { get; set; }
+	public Organization? Organization { get; set; }
 
+	// Convenience accessors for backward compatibility
+	/// <summary>Organization identifier</summary>
+	public long? Identifier => Organization?.Identifier;
+
+	/// <summary>Remote identifier on Git provider</summary>
+	public string? RemoteIdentifier => Organization?.RemoteIdentifier;
+
+	/// <summary>Organization name</summary>
+	public string? Name => Organization?.Name;
+
+	/// <summary>Avatar URL</summary>
+	public string? Avatar => Organization?.Avatar;
+
+	/// <summary>Creation timestamp</summary>
+	public DateTimeOffset? Created => Organization?.Created;
+
+	/// <summary>Git provider</summary>
+	public Provider? Provider => Organization?.Provider;
+
+	/// <summary>Join mode</summary>
+	public JoinMode? JoinMode => Organization?.JoinMode;
+
+	/// <summary>Organization type</summary>
+	public OrganizationType? Type => Organization?.Type;
+
+	/// <summary>Join status</summary>
+	public JoinStatus? JoinStatus => Organization?.JoinStatus;
+
+	/// <summary>Single provider login</summary>
+	public bool? SingleProviderLogin => Organization?.SingleProviderLogin;
+
+	/// <summary>Has DAST access</summary>
+	public bool? HasDastAccess => Organization?.HasDastAccess;
+
+	/// <summary>Has SCA enabled</summary>
+	public bool? HasScaEnabled => Organization?.HasScaEnabled;
+
+	// Additional OrganizationData properties
 	/// <summary>User membership information for this organization</summary>
 	[JsonPropertyName("membership")]
 	public OrganizationMembership? Membership { get; set; }
@@ -125,16 +163,6 @@ public class OrganizationData
 	/// <summary>Organization-level paywall</summary>
 	[JsonPropertyName("organizationPayWall")]
 	public OrganizationPaywall? OrganizationPayWall { get; set; }
-
-	// Convenience properties to access nested organization data
-	/// <summary>Organization name (convenience accessor)</summary>
-	public string? Name => Organization?.Name;
-
-	/// <summary>Organization provider (convenience accessor)</summary>
-	public Provider? Provider => Organization?.Provider;
-
-	/// <summary>Organization identifier (convenience accessor)</summary>
-	public long? Identifier => Organization?.Identifier;
 }
 
 /// <summary>

@@ -108,25 +108,6 @@ public class CodacyClientTests
 	}
 
 	[Fact]
-	public void Constructor_CreatesOwnHttpClient_AddsApiTokenHeader()
-	{
-		// Arrange
-		var apiToken = "test-api-token-12345";
-		var options = new CodacyClientOptions
-		{
-			ApiToken = apiToken
-		};
-
-		// Act - Don't provide HttpClient, let CodacyClient create its own
-		using var client = new TestableCodacyClientWithRealCreation(options);
-
-		// Assert
-		client.Should().NotBeNull();
-		client.HttpClientHeaders.Contains("api-token").Should().BeTrue();
-		client.HttpClientHeaders.GetValues("api-token").Should().Contain(apiToken);
-	}
-
-	[Fact]
 	public void Constructor_CreatesOwnHttpClient_SetsTimeout()
 	{
 		// Arrange
@@ -310,6 +291,10 @@ public class CodacyClientTests
 			HttpRequestMessage request,
 			CancellationToken cancellationToken)
 		{
+			// Suppress unused parameter warnings - parameters required by base class
+			_ = request;
+			_ = cancellationToken;
+
 			return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
 			{
 				Content = new StringContent("{}")

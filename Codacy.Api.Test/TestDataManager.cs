@@ -1,5 +1,6 @@
 #pragma warning disable CA1848 // Use LoggerMessage delegates for improved performance
 #pragma warning disable CA1510 // Use ArgumentNullException.ThrowIfNull
+#pragma warning disable S2360 // Optional parameters should not be used - This is a test helper class where optional parameters improve usability
 
 using Polly;
 using Polly.Retry;
