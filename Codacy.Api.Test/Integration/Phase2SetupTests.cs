@@ -164,35 +164,6 @@ public class Phase2SetupTests(ITestOutputHelper output) : TestBase(output)
 			"See test output for specific issues.");
 	}
 
-	[Fact(Skip = "Manual execution only - removes test repository")]
-	public async Task RemoveTestRepositoryFromCodacy_RemovesRepository_Successfully()
-	{
-		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
-
-		Output.WriteLine($"? WARNING: This will remove {orgName}/{repoName} from Codacy");
-		Output.WriteLine("This is typically only needed for cleanup or testing.");
-
-		try
-		{
-			// Act
-			await client.Repositories.DeleteRepositoryAsync(
-				provider,
-				orgName,
-				repoName,
-				CancellationToken);
-
-			Output.WriteLine($"? Repository removed successfully");
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			Output.WriteLine($"Repository not found (may already be removed): {ex.Message}");
-		}
-	}
-
 	[Fact]
 	public async Task ListAvailableRepositories_ShowsRepositoriesInOrganization()
 	{
