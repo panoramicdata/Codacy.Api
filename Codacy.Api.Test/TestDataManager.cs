@@ -54,35 +54,49 @@ public class TestDataManager : IDisposable
 		_testRepository = testRepository ?? throw new ArgumentNullException(nameof(testRepository));
 		_testProvider = testProvider;
 		_logger = logger;
+		_retryPipeline = BuildRetryPipeline(maxRetries);
+	}
 
-		// Configure retry pipeline with exponential backoff (Polly v8)
-		_retryPipeline = new ResiliencePipelineBuilder()
-			.AddRetry(new RetryStrategyOptions
-			{
-				MaxRetryAttempts = maxRetries,
-				Delay = TimeSpan.FromMilliseconds(DefaultRetryDelayMs),
-				BackoffType = DelayBackoffType.Exponential,
-				UseJitter = true,
-				ShouldHandle = new PredicateBuilder().Handle<ApiException>(ex =>
-					// Retry on transient errors
-					ex.StatusCode == HttpStatusCode.TooManyRequests ||
-					ex.StatusCode == HttpStatusCode.ServiceUnavailable ||
-					ex.StatusCode == HttpStatusCode.GatewayTimeout ||
-					ex.StatusCode == HttpStatusCode.RequestTimeout ||
-					(int)ex.StatusCode >= 500)
+	private ResiliencePipeline BuildRetryPipeline(int maxRetries)
+	{
+		return new ResiliencePipelineBuilder()
+			.AddRetry(CreateRetryOptions(maxRetries))
+			.Build();
+	}
+
+	private RetryStrategyOptions CreateRetryOptions(int maxRetries)
+	{
+		return new RetryStrategyOptions
+		{
+			MaxRetryAttempts = maxRetries,
+			Delay = TimeSpan.FromMilliseconds(DefaultRetryDelayMs),
+			BackoffType = DelayBackoffType.Exponential,
+			UseJitter = true,
+			ShouldHandle = new PredicateBuilder()
+				.Handle<ApiException>(IsTransientError)
 				.Handle<HttpRequestException>()
 				.Handle<TaskCanceledException>(),
-				OnRetry = args =>
-				{
-					_logger?.LogWarning(
-						args.Outcome.Exception,
-						"Request failed. Retry {RetryCount} of {MaxRetries} after {Delay}ms. Error: {Message}",
-						args.AttemptNumber, maxRetries, args.RetryDelay.TotalMilliseconds,
-						args.Outcome.Exception?.Message ?? "Unknown error");
-					return ValueTask.CompletedTask;
-				}
-			})
-			.Build();
+			OnRetry = args => LogRetryAttempt(args, maxRetries)
+		};
+	}
+
+	private static bool IsTransientError(ApiException ex)
+	{
+		return ex.StatusCode == HttpStatusCode.TooManyRequests ||
+			ex.StatusCode == HttpStatusCode.ServiceUnavailable ||
+			ex.StatusCode == HttpStatusCode.GatewayTimeout ||
+			ex.StatusCode == HttpStatusCode.RequestTimeout ||
+			(int)ex.StatusCode >= 500;
+	}
+
+	private ValueTask LogRetryAttempt(OnRetryArguments<object> args, int maxRetries)
+	{
+		_logger?.LogWarning(
+			args.Outcome.Exception,
+			"Request failed. Retry {RetryCount} of {MaxRetries} after {Delay}ms. Error: {Message}",
+			args.AttemptNumber, maxRetries, args.RetryDelay.TotalMilliseconds,
+			args.Outcome.Exception?.Message ?? "Unknown error");
+		return ValueTask.CompletedTask;
 	}
 
 	#region Test Data Verification

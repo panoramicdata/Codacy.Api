@@ -6,7 +6,10 @@ namespace Codacy.Api;
 /// <summary>
 /// HTTP client handler that logs requests and responses for debugging purposes
 /// </summary>
+// S2333 suppressed: 'partial' is required for LoggerMessage source generator
+#pragma warning disable S2333
 public partial class LoggingHttpClientHandler : DelegatingHandler
+#pragma warning restore S2333
 {
 	private readonly CodacyClientOptions _options;
 	private readonly ILogger _logger;

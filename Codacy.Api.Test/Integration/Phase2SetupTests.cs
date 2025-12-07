@@ -18,15 +18,8 @@ public class Phase2SetupTests(ITestOutputHelper output) : TestBase(output)
 		var repoName = GetTestRepository();
 
 		// First check if repository already exists
-		var exists = await testDataManager.VerifyRepositoryExistsAsync(CancellationToken);
-
-		if (exists)
+		if (await CheckExistingRepositoryAsync(testDataManager, orgName, repoName))
 		{
-			Output.WriteLine($"? Repository {orgName}/{repoName} already exists in Codacy");
-
-			// Get and display status
-			var status = await testDataManager.GetEnvironmentStatusAsync(CancellationToken);
-			Output.WriteLine($"Status: {status}");
 			return;
 		}
 
@@ -34,68 +27,100 @@ public class Phase2SetupTests(ITestOutputHelper output) : TestBase(output)
 
 		try
 		{
-			// Act - Add repository using the API
-			var addBody = new AddRepositoryBody
-			{
-				RepositoryFullPath = $"{orgName}/{repoName}",
-				Provider = provider
-			};
-
-			var repository = await testDataManager.ExecuteWithRetryAsync(
-				() => client.Repositories.AddRepositoryAsync(addBody, CancellationToken),
-				CancellationToken);
-
-			// Assert
-			repository.Should().NotBeNull();
-			repository.Name.Should().Be(repoName);
-			repository.Owner.Should().Be(orgName);
-			repository.Provider.Should().Be(provider);
-
-			Output.WriteLine($"? Repository added successfully: {repository.FullPath}");
-			Output.WriteLine($"  - Repository ID: {repository.RepositoryId}");
-			Output.WriteLine($"  - Provider: {repository.Provider}");
-			Output.WriteLine($"  - Added State: {repository.AddedState}");
-
-			// Wait for initial analysis to start
-			Output.WriteLine("\nWaiting for initial analysis to complete (max 5 minutes)...");
-
-			var analyzed = await testDataManager.WaitForRepositoryAnalysisAsync(
-				maxWaitTime: TimeSpan.FromMinutes(5),
-				pollingInterval: TimeSpan.FromSeconds(15),
-				cancellationToken: CancellationToken);
-
-			if (analyzed)
-			{
-				Output.WriteLine("? Repository analyzed successfully");
-
-				// Display final status
-				var status = await testDataManager.GetEnvironmentStatusAsync(CancellationToken);
-				Output.WriteLine($"\nFinal Status: {status}");
-			}
-			else
-			{
-				Output.WriteLine("? Repository added but analysis not completed within timeout");
-				Output.WriteLine("  Analysis may still be in progress. Check Codacy UI.");
-			}
+			await AddAndVerifyRepositoryAsync(client, testDataManager, provider, orgName, repoName);
 		}
 		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
 		{
-			Output.WriteLine($"Repository may already exist (conflict): {ex.Message}");
+			await HandleConflictResponseAsync(testDataManager, ex);
+		}
+	}
 
-			// Verify it exists - note that API may be inconsistent
-			exists = await testDataManager.VerifyRepositoryExistsAsync(CancellationToken);
-			if (exists)
-			{
-				Output.WriteLine("? Repository confirmed to exist after conflict response");
-			}
-			else
-			{
-				// API returned conflict but repository not found - this is an API inconsistency
-				// Log it but don't fail the test as this is a known quirk
-				Output.WriteLine("? API inconsistency: Conflict returned but repository not found via GetRepository.");
-				Output.WriteLine("  This may indicate the repository exists in a different state or the API is eventually consistent.");
-				Output.WriteLine("  Please verify the repository status manually in the Codacy UI.");
-			}
+	private async Task<bool> CheckExistingRepositoryAsync(TestDataManager testDataManager, string orgName, string repoName)
+	{
+		var exists = await testDataManager.VerifyRepositoryExistsAsync(CancellationToken);
+
+		if (exists)
+		{
+			Output.WriteLine($"✓ Repository {orgName}/{repoName} already exists in Codacy");
+			var status = await testDataManager.GetEnvironmentStatusAsync(CancellationToken);
+			Output.WriteLine($"Status: {status}");
+			return true;
+		}
+
+		return false;
+	}
+
+	private async Task AddAndVerifyRepositoryAsync(
+		CodacyClient client,
+		TestDataManager testDataManager,
+		Provider provider,
+		string orgName,
+		string repoName)
+	{
+		var addBody = new AddRepositoryBody
+		{
+			RepositoryFullPath = $"{orgName}/{repoName}",
+			Provider = provider
+		};
+
+		var repository = await testDataManager.ExecuteWithRetryAsync(
+			() => client.Repositories.AddRepositoryAsync(addBody, CancellationToken),
+			CancellationToken);
+
+		// Assert
+		repository.Should().NotBeNull();
+		repository.Name.Should().Be(repoName);
+		repository.Owner.Should().Be(orgName);
+		repository.Provider.Should().Be(provider);
+
+		LogRepositoryAdded(repository);
+		await WaitForAnalysisAsync(testDataManager);
+	}
+
+	private void LogRepositoryAdded(Repository repository)
+	{
+		Output.WriteLine($"✓ Repository added successfully: {repository.FullPath}");
+		Output.WriteLine($"  - Repository ID: {repository.RepositoryId}");
+		Output.WriteLine($"  - Provider: {repository.Provider}");
+		Output.WriteLine($"  - Added State: {repository.AddedState}");
+	}
+
+	private async Task WaitForAnalysisAsync(TestDataManager testDataManager)
+	{
+		Output.WriteLine("\nWaiting for initial analysis to complete (max 5 minutes)...");
+
+		var analyzed = await testDataManager.WaitForRepositoryAnalysisAsync(
+			maxWaitTime: TimeSpan.FromMinutes(5),
+			pollingInterval: TimeSpan.FromSeconds(15),
+			cancellationToken: CancellationToken);
+
+		if (analyzed)
+		{
+			Output.WriteLine("✓ Repository analyzed successfully");
+			var status = await testDataManager.GetEnvironmentStatusAsync(CancellationToken);
+			Output.WriteLine($"\nFinal Status: {status}");
+		}
+		else
+		{
+			Output.WriteLine("⚠ Repository added but analysis not completed within timeout");
+			Output.WriteLine("  Analysis may still be in progress. Check Codacy UI.");
+		}
+	}
+
+	private async Task HandleConflictResponseAsync(TestDataManager testDataManager, Refit.ApiException ex)
+	{
+		Output.WriteLine($"Repository may already exist (conflict): {ex.Message}");
+
+		var exists = await testDataManager.VerifyRepositoryExistsAsync(CancellationToken);
+		if (exists)
+		{
+			Output.WriteLine("✓ Repository confirmed to exist after conflict response");
+		}
+		else
+		{
+			Output.WriteLine("⚠ API inconsistency: Conflict returned but repository not found via GetRepository.");
+			Output.WriteLine("  This may indicate the repository exists in a different state or the API is eventually consistent.");
+			Output.WriteLine("  Please verify the repository status manually in the Codacy UI.");
 		}
 	}
 
@@ -110,58 +135,69 @@ public class Phase2SetupTests(ITestOutputHelper output) : TestBase(output)
 		// Act & Assert
 		var status = await testDataManager.GetEnvironmentStatusAsync(CancellationToken);
 
-		Output.WriteLine($"Repository: {status.Organization}/{status.Repository}");
-		Output.WriteLine($"Provider: {status.Provider}");
-		Output.WriteLine(string.Empty);
-
-		// Check 1: Repository exists
-		Output.WriteLine($"1. Repository Exists: {(status.RepositoryExists ? "? PASS" : "? FAIL")}");
-		if (!status.RepositoryExists)
-		{
-			Output.WriteLine("   ? Run: dotnet test --filter \"FullyQualifiedName~AddTestRepositoryToCodacy\"");
-		}
-
-		// Check 2: Repository analyzed
-		Output.WriteLine($"2. Repository Analyzed: {(status.HasAnalysisData ? "? PASS" : "? FAIL")}");
-		if (!status.HasAnalysisData && status.RepositoryExists)
-		{
-			Output.WriteLine("   ? Wait for analysis to complete (5-10 minutes)");
-		}
-
-		// Check 3: Branches configured
-		Output.WriteLine($"3. Branches Configured: {(status.HasBranches ? "? PASS" : "? FAIL")} ({status.BranchCount} branches)");
-		if (!status.HasBranches && status.RepositoryExists)
-		{
-			Output.WriteLine("   ? Check GitHub repository has branches");
-		}
-
-		// Check 4: Files indexed
-		Output.WriteLine($"4. Files Indexed: {(status.FileCount > 0 ? "? PASS" : "? FAIL")} ({status.FileCount} files)");
-		if (status.FileCount == 0 && status.HasAnalysisData)
-		{
-			Output.WriteLine("   ? Wait for file indexing to complete");
-		}
-
-		Output.WriteLine(string.Empty);
-		Output.WriteLine($"Overall Status: {(status.IsReady ? "? READY FOR PHASE 2" : "? NOT READY")}");
-
-		if (!status.IsReady)
-		{
-			Output.WriteLine("\n? Prerequisites not met. Please complete setup before running Phase 2 tests.");
-			Output.WriteLine("See PHASE_2_SETUP_GUIDE.md for detailed instructions.");
-		}
-		else
-		{
-			Output.WriteLine("\n? All prerequisites met! Ready to run Phase 2 tests.");
-			Output.WriteLine("\nNext steps:");
-			Output.WriteLine("  1. Run Repository API tests: dotnet test --filter \"FullyQualifiedName~RepositoriesApiTests\"");
-			Output.WriteLine("  2. Run Analysis API tests: dotnet test --filter \"FullyQualifiedName~AnalysisApiTests\"");
-		}
+		LogPrerequisiteHeader(status);
+		LogPrerequisiteChecks(status);
+		LogPrerequisiteSummary(status);
 
 		// Final assertion
 		status.IsReady.Should().BeTrue(
 			"Environment must be ready before running Phase 2 tests. " +
 			"See test output for specific issues.");
+	}
+
+	private void LogPrerequisiteHeader(TestEnvironmentStatus status)
+	{
+		Output.WriteLine($"Repository: {status.Organization}/{status.Repository}");
+		Output.WriteLine($"Provider: {status.Provider}");
+		Output.WriteLine(string.Empty);
+	}
+
+	private void LogPrerequisiteChecks(TestEnvironmentStatus status)
+	{
+		LogCheck("1. Repository Exists", status.RepositoryExists,
+			"Run: dotnet test --filter \"FullyQualifiedName~AddTestRepositoryToCodacy\"");
+
+		LogCheck("2. Repository Analyzed", status.HasAnalysisData,
+			status.RepositoryExists ? "Wait for analysis to complete (5-10 minutes)" : null);
+
+		LogCheck($"3. Branches Configured", status.HasBranches,
+			status.RepositoryExists ? "Check GitHub repository has branches" : null,
+			$"({status.BranchCount} branches)");
+
+		LogCheck($"4. Files Indexed", status.FileCount > 0,
+			status.HasAnalysisData ? "Wait for file indexing to complete" : null,
+			$"({status.FileCount} files)");
+	}
+
+	private void LogCheck(string checkName, bool passed, string? failureHint = null, string? suffix = null)
+	{
+		var statusText = passed ? "✓ PASS" : "✗ FAIL";
+		var suffixText = suffix != null ? $" {suffix}" : "";
+		Output.WriteLine($"{checkName}: {statusText}{suffixText}");
+
+		if (!passed && failureHint != null)
+		{
+			Output.WriteLine($"   → {failureHint}");
+		}
+	}
+
+	private void LogPrerequisiteSummary(TestEnvironmentStatus status)
+	{
+		Output.WriteLine(string.Empty);
+		Output.WriteLine($"Overall Status: {(status.IsReady ? "✓ READY FOR PHASE 2" : "✗ NOT READY")}");
+
+		if (!status.IsReady)
+		{
+			Output.WriteLine("\n⚠ Prerequisites not met. Please complete setup before running Phase 2 tests.");
+			Output.WriteLine("See PHASE_2_SETUP_GUIDE.md for detailed instructions.");
+		}
+		else
+		{
+			Output.WriteLine("\n✓ All prerequisites met! Ready to run Phase 2 tests.");
+			Output.WriteLine("\nNext steps:");
+			Output.WriteLine("  1. Run Repository API tests: dotnet test --filter \"FullyQualifiedName~RepositoriesApiTests\"");
+			Output.WriteLine("  2. Run Analysis API tests: dotnet test --filter \"FullyQualifiedName~AnalysisApiTests\"");
+		}
 	}
 
 	[Fact]

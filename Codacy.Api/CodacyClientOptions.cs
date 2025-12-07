@@ -78,16 +78,19 @@ public class CodacyClientOptions
 	/// <exception cref="ArgumentException">Thrown when required options are missing or invalid</exception>
 	internal void Validate()
 	{
-		if (string.IsNullOrWhiteSpace(ApiToken))
-		{
-			throw new ArgumentException("ApiToken cannot be null or empty.", nameof(ApiToken));
-		}
+		ValidateRequiredStrings();
+		ValidateTimeouts();
+		ValidateHttpClientConfiguration();
+	}
 
-		if (string.IsNullOrWhiteSpace(BaseUrl))
-		{
-			throw new ArgumentException("BaseUrl cannot be null or empty.", nameof(BaseUrl));
-		}
+	private void ValidateRequiredStrings()
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(ApiToken, nameof(ApiToken));
+		ArgumentException.ThrowIfNullOrWhiteSpace(BaseUrl, nameof(BaseUrl));
+	}
 
+	private void ValidateTimeouts()
+	{
 		if (RequestTimeout <= TimeSpan.Zero)
 		{
 			throw new ArgumentException("RequestTimeout must be greater than zero.", nameof(RequestTimeout));
@@ -107,7 +110,10 @@ public class CodacyClientOptions
 		{
 			throw new ArgumentException("MaxRetryDelay must be greater than or equal to RetryDelay.", nameof(MaxRetryDelay));
 		}
+	}
 
+	private void ValidateHttpClientConfiguration()
+	{
 		// Only one of HttpClient or HttpClientFactory can be provided
 		if (HttpClient != null && HttpClientFactory != null)
 		{

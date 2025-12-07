@@ -33,31 +33,23 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 		var provider = Enum.Parse<Provider>(GetTestProvider());
 		var orgName = GetTestOrganization();
 
-		// First, list standards to get an ID
-		var standards = await client.CodingStandards.ListCodingStandardsAsync(
-			provider,
-			orgName,
-			CancellationToken);
-
-		if (standards.Data.Count == 0)
+		var standardId = await GetFirstStandardIdAsync(client, provider, orgName);
+		if (standardId == null)
 		{
-			Output.WriteLine("No coding standards available - skipping test");
 			return;
 		}
-
-		var standardId = standards.Data[0].Id;
 
 		// Act
 		var response = await client.CodingStandards.GetCodingStandardAsync(
 			provider,
 			orgName,
-			standardId,
+			standardId.Value,
 			CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
-		response.Data.Id.Should().Be(standardId);
+		response.Data.Id.Should().Be(standardId.Value);
 	}
 
 	[Fact]
@@ -68,25 +60,17 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 		var provider = Enum.Parse<Provider>(GetTestProvider());
 		var orgName = GetTestOrganization();
 
-		// First, list standards to get an ID
-		var standards = await client.CodingStandards.ListCodingStandardsAsync(
-			provider,
-			orgName,
-			CancellationToken);
-
-		if (standards.Data.Count == 0)
+		var standardId = await GetFirstStandardIdAsync(client, provider, orgName);
+		if (standardId == null)
 		{
-			Output.WriteLine("No coding standards available - skipping test");
 			return;
 		}
-
-		var standardId = standards.Data[0].Id;
 
 		// Act
 		var response = await client.CodingStandards.ListCodingStandardToolsAsync(
 			provider,
 			orgName,
-			standardId,
+			standardId.Value,
 			CancellationToken);
 
 		// Assert
@@ -102,56 +86,14 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 		var provider = Enum.Parse<Provider>(GetTestProvider());
 		var orgName = GetTestOrganization();
 
-		// First, list standards and tools
-		var standards = await client.CodingStandards.ListCodingStandardsAsync(
-			provider,
-			orgName,
-			CancellationToken);
-
-		if (standards.Data.Count == 0)
+		var (standardId, toolUuid) = await GetStandardAndToolAsync(client, provider, orgName);
+		if (standardId == null || toolUuid == null)
 		{
-			Output.WriteLine("No coding standards available - skipping test");
-			return;
-		}
-
-		var standardId = standards.Data[0].Id;
-		var tools = await client.CodingStandards.ListCodingStandardToolsAsync(
-			provider,
-			orgName,
-			standardId,
-			CancellationToken);
-
-		if (tools.Data.Count == 0)
-		{
-			Output.WriteLine("No tools available - skipping test");
-			return;
-		}
-
-		var toolUuid = tools.Data[0].Uuid;
-		if (string.IsNullOrEmpty(toolUuid))
-		{
-			Output.WriteLine("Tool UUID is null or empty - skipping test");
 			return;
 		}
 
 		// Act
-		var response = await client.CodingStandards.ListCodingStandardPatternsAsync(
-			provider,
-			orgName,
-			standardId,
-			toolUuid,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			CancellationToken);
+		var response = await ListPatternsAsync(client, provider, orgName, standardId.Value, toolUuid, null);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -167,56 +109,14 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 		var orgName = GetTestOrganization();
 		const int limit = 10;
 
-		// First, list standards and tools
-		var standards = await client.CodingStandards.ListCodingStandardsAsync(
-			provider,
-			orgName,
-			CancellationToken);
-
-		if (standards.Data.Count == 0)
+		var (standardId, toolUuid) = await GetStandardAndToolAsync(client, provider, orgName);
+		if (standardId == null || toolUuid == null)
 		{
-			Output.WriteLine("No coding standards available - skipping test");
-			return;
-		}
-
-		var standardId = standards.Data[0].Id;
-		var tools = await client.CodingStandards.ListCodingStandardToolsAsync(
-			provider,
-			orgName,
-			standardId,
-			CancellationToken);
-
-		if (tools.Data.Count == 0)
-		{
-			Output.WriteLine("No tools available - skipping test");
-			return;
-		}
-
-		var toolUuid = tools.Data[0].Uuid;
-		if (string.IsNullOrEmpty(toolUuid))
-		{
-			Output.WriteLine("Tool UUID is null or empty - skipping test");
 			return;
 		}
 
 		// Act
-		var response = await client.CodingStandards.ListCodingStandardPatternsAsync(
-			provider,
-			orgName,
-			standardId,
-			toolUuid,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			limit,
-			CancellationToken);
+		var response = await ListPatternsAsync(client, provider, orgName, standardId.Value, toolUuid, limit);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -232,25 +132,17 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 		var provider = Enum.Parse<Provider>(GetTestProvider());
 		var orgName = GetTestOrganization();
 
-		// First, list standards to get an ID
-		var standards = await client.CodingStandards.ListCodingStandardsAsync(
-			provider,
-			orgName,
-			CancellationToken);
-
-		if (standards.Data.Count == 0)
+		var standardId = await GetFirstStandardIdAsync(client, provider, orgName);
+		if (standardId == null)
 		{
-			Output.WriteLine("No coding standards available - skipping test");
 			return;
 		}
-
-		var standardId = standards.Data[0].Id;
 
 		// Act
 		var response = await client.CodingStandards.ListCodingStandardRepositoriesAsync(
 			provider,
 			orgName,
-			standardId,
+			standardId.Value,
 			null,
 			null,
 			CancellationToken);
@@ -259,5 +151,79 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
 	}
+
+	#region Helper Methods
+
+	private async Task<long?> GetFirstStandardIdAsync(
+		CodacyClient client,
+		Provider provider,
+		string orgName)
+	{
+		var standards = await client.CodingStandards.ListCodingStandardsAsync(
+			provider,
+			orgName,
+			CancellationToken);
+
+		if (standards.Data.Count == 0)
+		{
+			Output.WriteLine("No coding standards available - skipping test");
+			return null;
+		}
+
+		return standards.Data[0].Id;
+	}
+
+	private async Task<(long? StandardId, string? ToolUuid)> GetStandardAndToolAsync(
+		CodacyClient client,
+		Provider provider,
+		string orgName)
+	{
+		var standardId = await GetFirstStandardIdAsync(client, provider, orgName);
+		if (standardId == null)
+		{
+			return (null, null);
+		}
+
+		var tools = await client.CodingStandards.ListCodingStandardToolsAsync(
+			provider,
+			orgName,
+			standardId.Value,
+			CancellationToken);
+
+		if (tools.Data.Count == 0)
+		{
+			Output.WriteLine("No tools available - skipping test");
+			return (null, null);
+		}
+
+		var toolUuid = tools.Data[0].Uuid;
+		if (string.IsNullOrEmpty(toolUuid))
+		{
+			Output.WriteLine("Tool UUID is null or empty - skipping test");
+			return (null, null);
+		}
+
+		return (standardId, toolUuid);
+	}
+
+	private async Task<ConfiguredPatternsListResponse> ListPatternsAsync(
+		CodacyClient client,
+		Provider provider,
+		string orgName,
+		long standardId,
+		string toolUuid,
+		int? limit)
+	{
+		return await client.CodingStandards.ListCodingStandardPatternsAsync(
+			provider,
+			orgName,
+			standardId,
+			toolUuid,
+			null, null, null, null, null, null, null, null, null, null,
+			limit,
+			CancellationToken);
+	}
+
+	#endregion
 }
 
