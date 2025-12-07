@@ -1,32 +1,44 @@
+using System.Text.Json.Serialization;
+
 namespace Codacy.Api.Models;
 
 /// <summary>
 /// Git provider
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter<Provider>))]
 public enum Provider
 {
 	/// <summary>
 	/// GitHub
 	/// </summary>
-	gh,
+	[JsonStringEnumMemberName("gh")]
+	Github,
 
 	/// <summary>
 	/// GitLab
 	/// </summary>
-	gl,
+	[JsonStringEnumMemberName("gl")]
+	Gitlab,
 
 	/// <summary>
 	/// Bitbucket
 	/// </summary>
-	bb,
+	[JsonStringEnumMemberName("bb")]
+	Bitbucket,
 
 	/// <summary>
 	/// GitHub Enterprise
 	/// </summary>
-	ghe,
+	[JsonStringEnumMemberName("ghe")]
+	GithubEnterprise,
 
-	/// <summary>GitLab Enterprise</summary>
-	gle,
+	/// <summary>
+	/// GitLab Enterprise
+	/// </summary>
+	[JsonStringEnumMemberName("gle")]
+	GitlabEnterprise,
+
 	/// <summary>Bitbucket Server</summary>
-	bbs
+	[JsonStringEnumMemberName("bbs")]
+	BitbucketServer
 }

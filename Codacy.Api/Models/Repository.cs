@@ -144,15 +144,3 @@ public enum AddedState
 	/// <summary>Repository being followed</summary>
 	Following
 }
-
-/// <summary>
-/// Repository list response
-/// </summary>
-public class RepositoryListResponse
-{
-	/// <summary>Pagination info</summary>
-	public PaginationInfo? Pagination { get; set; }
-
-	/// <summary>List of repositories</summary>
-	public required List<Repository> Data { get; set; }
-}

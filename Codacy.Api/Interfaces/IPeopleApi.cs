@@ -12,7 +12,7 @@ public interface IPeopleApi
 	/// List people in an organization
 	/// </summary>
 	[Get("/api/v3/organizations/{provider}/{remoteOrganizationName}/people")]
-	Task<ListPeopleResponse> ListPeopleFromOrganizationAsync(
+	Task<ListResponse<OrganizationPerson>> ListPeopleFromOrganizationAsync(
 		Provider provider,
 		string remoteOrganizationName,
 		[Query] string? cursor,
@@ -35,17 +35,17 @@ public interface IPeopleApi
 	/// Remove people from organization
 	/// </summary>
 	[Post("/api/v3/organizations/{provider}/{remoteOrganizationName}/people/remove")]
-	Task<RemovePeopleResponse> RemovePeopleFromOrganizationAsync(
+	Task<OrganizationRemovePeopleResponse> RemovePeopleFromOrganizationAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] RemovePeopleBody body,
+		[Body] OrganizationRemovePeopleBody body,
 		CancellationToken cancellationToken);
 
 	/// <summary>
 	/// List people suggestions for an organization
 	/// </summary>
 	[Get("/api/v3/organizations/{provider}/{remoteOrganizationName}/people/suggestions")]
-	Task<SuggestedAuthorsResponse> PeopleSuggestionsForOrganizationAsync(
+	Task<ListResponse<SuggestedAuthor>> PeopleSuggestionsForOrganizationAsync(
 		Provider provider,
 		string remoteOrganizationName,
 		[Query] string? cursor,
@@ -57,7 +57,7 @@ public interface IPeopleApi
 	/// List people suggestions for a repository
 	/// </summary>
 	[Get("/api/v3/organizations/{provider}/{remoteOrganizationName}/repositories/{repositoryName}/people/suggestions")]
-	Task<RepositorySuggestedAuthorsResponse> PeopleSuggestionsForRepositoryAsync(
+	Task<ListResponse<SuggestedAuthor>> PeopleSuggestionsForRepositoryAsync(
 		Provider provider,
 		string remoteOrganizationName,
 		string repositoryName,

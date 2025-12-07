@@ -73,6 +73,43 @@ namespace Codacy.Api
 }
 ```
 
+#### One Type Per File
+- **Each type (class, interface, enum, record, struct) should be in its own file**
+- File name should match the type name exactly (e.g., `UserResponse.cs` for `class UserResponse`)
+- Do not embed model classes inside interface files
+- Exception: Nested private types used only within a parent type may remain in the parent's file
+```csharp
+// Preferred: Separate files
+// UserResponse.cs
+namespace Codacy.Api.Models;
+
+public class UserResponse
+{
+    public required User Data { get; set; }
+}
+
+// User.cs
+namespace Codacy.Api.Models;
+
+public class User
+{
+    public required long Id { get; set; }
+    public string? Name { get; set; }
+}
+
+// Avoid: Multiple types in one file
+// IAccountApi.cs - DON'T DO THIS
+public interface IAccountApi { ... }
+public class UserResponse { ... }  // Should be in its own file
+public class User { ... }          // Should be in its own file
+```
+
+#### Namespace Organization
+- **Interfaces** go in `Codacy.Api.Interfaces` namespace (only interface definitions)
+- **Models/DTOs** go in `Codacy.Api.Models` namespace (classes, records, enums)
+- **Exceptions** go in `Codacy.Api.Exceptions` namespace
+- Do not mix models with interface definitions
+
 #### String Interpolation
 - Use string interpolation over concatenation:
 ```csharp
@@ -321,3 +358,5 @@ await client.Repositories.GetAsync("provider", "org", "repo", cancellationToken)
 - Test each API group thoroughly
 - Include both positive and negative test cases
 - Clean up test data where possible
+
+````````

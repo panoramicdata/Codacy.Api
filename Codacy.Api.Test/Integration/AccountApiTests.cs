@@ -219,7 +219,7 @@ public class AccountApiTests(ITestOutputHelper output) : TestBase(output)
 		//
 		// To avoid permanently modifying the user's data, we only test with
 		// ShouldDoClientQualification which is a toggle-able boolean setting.
-		var updateBody = new Interfaces.UserBody
+		var updateBody = new UserBody
 		{
 			ShouldDoClientQualification = originalUser.Data.ShouldDoClientQualification ?? false
 		};

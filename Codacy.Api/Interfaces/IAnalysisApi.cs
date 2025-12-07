@@ -12,7 +12,7 @@ public interface IAnalysisApi
 	/// List organization repositories with analysis information
 	/// </summary>
 	[Get("/api/v3/analysis/organizations/{provider}/{organizationName}/repositories")]
-	Task<RepositoryListResponse> ListOrganizationRepositoriesWithAnalysisAsync(
+	Task<ListResponse<Repository>> ListOrganizationRepositoriesWithAnalysisAsync(
 		Provider provider,
 		string organizationName,
 		[Query] string? cursor,
@@ -26,7 +26,7 @@ public interface IAnalysisApi
 	/// Search organization repositories with analysis information
 	/// </summary>
 	[Post("/api/v3/search/analysis/organizations/{provider}/{organizationName}/repositories")]
-	Task<RepositoryListResponse> SearchOrganizationRepositoriesWithAnalysisAsync(
+	Task<ListResponse<Repository>> SearchOrganizationRepositoriesWithAnalysisAsync(
 		Provider provider,
 		string organizationName,
 		[Body] SearchOrganizationRepositoriesRequest body,

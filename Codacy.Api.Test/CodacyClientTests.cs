@@ -122,7 +122,7 @@ public class CodacyClientTests
 		using var client = new TestableCodacyClientWithRealCreation(options);
 
 		// Assert
-		Assert.Equal(timeout, client.HttpClientTimeout);
+		client.HttpClientTimeout.Should().Be(timeout);
 	}
 
 	[Fact]

@@ -18,7 +18,7 @@ public interface ICommitsApi
 	// - ListCommitLogsAsync
 	// - ListCommitFilesAsync
 	// - GetPullRequestCommitsAsync
-	
+
 	/// <summary>
 	/// Placeholder method to satisfy Refit interface requirements
 	/// </summary>

@@ -15,6 +15,7 @@
     <File Path="nuget-key.txt" />
     <File Path="Publish.ps1" />
     <File Path="README.md" />
+    <File Path="swagger.yaml" />
     <File Path="version.json" />
   </Folder>
   <Project Path="Codacy.Api.Test/Codacy.Api.Test.csproj" />

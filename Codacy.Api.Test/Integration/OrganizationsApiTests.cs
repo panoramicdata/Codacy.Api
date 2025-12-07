@@ -20,10 +20,11 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
+		response.Data.Organization.Should().NotBeNull();
 
-		// Verify organization details directly on the Data object (flat structure)
-		response.Data.Name.Should().Be(orgName);
-		response.Data.Provider.Should().Be(provider);
+		// Verify organization details from the nested Organization object
+		response.Data.Organization!.Name.Should().Be(orgName);
+		response.Data.Organization.Provider.Should().Be(provider);
 	}
 
 	[Fact]

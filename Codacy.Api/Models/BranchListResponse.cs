@@ -1,13 +1,13 @@
 namespace Codacy.Api.Models;
 
 /// <summary>
-/// API token list response
+/// Branch list response
 /// </summary>
-public class ApiTokenListResponse
+public class BranchListResponse
 {
 	/// <summary>Pagination info</summary>
 	public PaginationInfo? Pagination { get; set; }
 
-	/// <summary>API tokens</summary>
-	public required List<ApiToken> Data { get; set; }
+	/// <summary>Branches</summary>
+	public required List<Branch> Data { get; set; }
 }

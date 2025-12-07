@@ -11,6 +11,7 @@ A comprehensive, modern .NET library for interacting with the [Codacy](https://w
 
 - **API Documentation**: [https://docs.codacy.com/codacy-api/](https://docs.codacy.com/codacy-api/)
 - **API Reference**: [https://app.codacy.com/api/api-docs](https://app.codacy.com/api/api-docs)
+- **OpenAPI Specification**: [swagger.yaml](swagger.yaml) (local copy) | [Live Version](https://api.codacy.com/api/api-docs/swagger.yaml)
 - **Codacy Official Site**: [https://www.codacy.com/](https://www.codacy.com/)
 
 ## Features

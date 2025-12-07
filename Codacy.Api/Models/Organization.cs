@@ -70,20 +70,6 @@ public enum JoinStatus
 }
 
 /// <summary>
-/// Organization list response
-/// </summary>
-public class OrganizationListResponse
-{
-	/// <summary>Pagination info</summary>
-	[JsonPropertyName("pagination")]
-	public PaginationInfo? Pagination { get; set; }
-
-	/// <summary>Organizations</summary>
-	[JsonPropertyName("data")]
-	public required List<Organization> Data { get; set; }
-}
-
-/// <summary>
 /// Organization response wrapper containing the full organization details
 /// </summary>
 public class OrganizationResponse
@@ -98,46 +84,58 @@ public class OrganizationResponse
 /// </summary>
 public class OrganizationData
 {
-	/// <summary>The organization details</summary>
+	/// <summary>The organization details (nested structure)</summary>
 	[JsonPropertyName("organization")]
 	public Organization? Organization { get; set; }
 
-	// Convenience accessors for backward compatibility
+	// Properties that can be directly deserialized from flat API response
 	/// <summary>Organization identifier</summary>
-	public long? Identifier => Organization?.Identifier;
+	[JsonPropertyName("identifier")]
+	public long? Identifier { get; set; }
 
 	/// <summary>Remote identifier on Git provider</summary>
-	public string? RemoteIdentifier => Organization?.RemoteIdentifier;
+	[JsonPropertyName("remoteIdentifier")]
+	public string? RemoteIdentifier { get; set; }
 
 	/// <summary>Organization name</summary>
-	public string? Name => Organization?.Name;
+	[JsonPropertyName("name")]
+	public string? Name { get; set; }
 
 	/// <summary>Avatar URL</summary>
-	public string? Avatar => Organization?.Avatar;
+	[JsonPropertyName("avatar")]
+	public string? Avatar { get; set; }
 
 	/// <summary>Creation timestamp</summary>
-	public DateTimeOffset? Created => Organization?.Created;
+	[JsonPropertyName("created")]
+	public DateTimeOffset? Created { get; set; }
 
 	/// <summary>Git provider</summary>
-	public Provider? Provider => Organization?.Provider;
+	[JsonPropertyName("provider")]
+	public Provider? Provider { get; set; }
 
 	/// <summary>Join mode</summary>
-	public JoinMode? JoinMode => Organization?.JoinMode;
+	[JsonPropertyName("joinMode")]
+	public JoinMode? JoinMode { get; set; }
 
 	/// <summary>Organization type</summary>
-	public OrganizationType? Type => Organization?.Type;
+	[JsonPropertyName("type")]
+	public OrganizationType? Type { get; set; }
 
 	/// <summary>Join status</summary>
-	public JoinStatus? JoinStatus => Organization?.JoinStatus;
+	[JsonPropertyName("joinStatus")]
+	public JoinStatus? JoinStatus { get; set; }
 
 	/// <summary>Single provider login</summary>
-	public bool? SingleProviderLogin => Organization?.SingleProviderLogin;
+	[JsonPropertyName("singleProviderLogin")]
+	public bool? SingleProviderLogin { get; set; }
 
 	/// <summary>Has DAST access</summary>
-	public bool? HasDastAccess => Organization?.HasDastAccess;
+	[JsonPropertyName("hasDastAccess")]
+	public bool? HasDastAccess { get; set; }
 
 	/// <summary>Has SCA enabled</summary>
-	public bool? HasScaEnabled => Organization?.HasScaEnabled;
+	[JsonPropertyName("hasScaEnabled")]
+	public bool? HasScaEnabled { get; set; }
 
 	// Additional OrganizationData properties
 	/// <summary>User membership information for this organization</summary>

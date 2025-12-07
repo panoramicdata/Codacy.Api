@@ -30,7 +30,7 @@ public interface IAccountApi
 	/// List user organizations
 	/// </summary>
 	[Get("/api/v3/user/organizations")]
-	Task<OrganizationListResponse> ListUserOrganizationsAsync(
+	Task<ListResponse<Organization>> ListUserOrganizationsAsync(
 		[Query] string? cursor,
 		[Query] int? limit,
 		CancellationToken cancellationToken);
@@ -39,7 +39,7 @@ public interface IAccountApi
 	/// List organizations for a provider
 	/// </summary>
 	[Get("/api/v3/user/organizations/{provider}")]
-	Task<OrganizationListResponse> ListOrganizationsAsync(
+	Task<ListResponse<Organization>> ListOrganizationsAsync(
 		Provider provider,
 		[Query] string? cursor,
 		[Query] int? limit,
@@ -92,7 +92,7 @@ public interface IAccountApi
 	/// List user integrations
 	/// </summary>
 	[Get("/api/v3/user/integrations")]
-	Task<IntegrationListResponse> ListUserIntegrationsAsync(
+	Task<ListResponse<Integration>> ListUserIntegrationsAsync(
 		[Query] string? cursor,
 		[Query] int? limit,
 		CancellationToken cancellationToken);
@@ -109,7 +109,7 @@ public interface IAccountApi
 	/// Get user API tokens
 	/// </summary>
 	[Get("/api/v3/user/tokens")]
-	Task<ApiTokenListResponse> GetUserApiTokensAsync(
+	Task<ListResponse<ApiToken>> GetUserApiTokensAsync(
 		[Query] string? cursor,
 		[Query] int? limit,
 		CancellationToken cancellationToken);
@@ -129,49 +129,4 @@ public interface IAccountApi
 	Task DeleteUserApiTokenAsync(
 		long tokenId,
 		CancellationToken cancellationToken);
-}
-
-/// <summary>
-/// User response
-/// </summary>
-public class UserResponse
-{
-	/// <summary>User data</summary>
-	public required User Data { get; set; }
-}
-
-/// <summary>
-/// User information
-/// </summary>
-public class User
-{
-	/// <summary>User ID</summary>
-	public required long Id { get; set; }
-
-	/// <summary>Name</summary>
-	public string? Name { get; set; }
-
-	/// <summary>Main email</summary>
-	public required string MainEmail { get; set; }
-
-	/// <summary>Other emails</summary>
-	public required List<string> OtherEmails { get; set; }
-
-	/// <summary>Is admin</summary>
-	public required bool IsAdmin { get; set; }
-
-	/// <summary>Is active</summary>
-	public required bool IsActive { get; set; }
-
-	/// <summary>Created timestamp</summary>
-	public required DateTimeOffset Created { get; set; }
-
-	/// <summary>Intercom hash</summary>
-	public string? IntercomHash { get; set; }
-
-	/// <summary>Zendesk hash</summary>
-	public string? ZendeskHash { get; set; }
-
-	/// <summary>Should do client qualification</summary>
-	public bool? ShouldDoClientQualification { get; set; }
 }
