@@ -1,0 +1,5 @@
+# This file lists patterns that GitHub Secret Scanning should ignore
+# These are example/placeholder values in the OpenAPI specification (swagger.yaml), not real secrets
+
+# Slack webhook URL examples in API schema
+https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
