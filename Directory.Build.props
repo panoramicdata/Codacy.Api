@@ -10,7 +10,7 @@
         <AnalysisLevel>latest-recommended</AnalysisLevel>
         <Authors>Panoramic Data Limited</Authors>
         <Company>Panoramic Data Limited</Company>
-        <Copyright>Copyright © $([System.DateTime]::Now.Year) $(Company)</Copyright>
+        <Copyright>Copyright © Panoramic Data Limited $([System.DateTime]::Now.Year)</Copyright>
         <NuGetAuditMode>all</NuGetAuditMode>
     </PropertyGroup>
 
