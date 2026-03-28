@@ -1,18 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>latest</LangVersion>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<WarningsAsErrors />
 		<WarningsNotAsErrors>VSSpell001</WarningsNotAsErrors>
-		<AnalysisLevel>latest-recommended</AnalysisLevel>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Codacy.Api</PackageId>
-		<Authors>Panoramic Data Limited</Authors>
-		<Copyright>Panoramic Data Limited 2025</Copyright>
 		<PackageProjectUrl>https://github.com/panoramicdata/Codacy.Api</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/panoramicdata/Codacy.Api</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +13,6 @@
 		<PackageReleaseNotes>Changelog can be found at https://github.com/panoramicdata/Codacy.Api/blob/main/CHANGELOG.md</PackageReleaseNotes>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<Company>Panoramic Data Limited</Company>
 		<Product>Codacy API</Product>
 		<NeutralLanguage>en</NeutralLanguage>
 		<IncludeSymbols>true</IncludeSymbols>

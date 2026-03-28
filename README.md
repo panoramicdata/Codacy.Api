@@ -1,8 +1,9 @@
-﻿# Codacy API .NET Library
+# Codacy API .NET Library
 
 [![NuGet Version](https://img.shields.io/nuget/v/Codacy.Api)](https://www.nuget.org/packages/Codacy.Api)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Codacy.Api)](https://www.nuget.org/packages/Codacy.Api)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/panoramicdata/Codacy.Api/publish-nuget.yml)](https://github.com/panoramicdata/Codacy.Api/actions)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/panoramicdata_Codacy.Api)](https://app.codacy.com/gh/panoramicdata/Codacy.Api/dashboard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A comprehensive, modern .NET library for interacting with the [Codacy](https://www.codacy.com/) API. This library provides full coverage of the Codacy API with a clean, intuitive interface using modern C# patterns and best practices.
