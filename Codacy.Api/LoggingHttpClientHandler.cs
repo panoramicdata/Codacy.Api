@@ -68,8 +68,13 @@ public partial class LoggingHttpClientHandler : DelegatingHandler
 	private async Task LogRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 	{
 		LogRequestStart();
-		LogRequestMethod(request.Method.ToString());
-		LogRequestUri(request.RequestUri?.ToString() ?? "(null)");
+		if (_logger.IsEnabled(LogLevel.Debug))
+		{
+#pragma warning disable CA1873 // Guarded by IsEnabled check above
+			LogRequestMethod(request.Method.ToString());
+			LogRequestUri(request.RequestUri?.ToString() ?? "(null)");
+#pragma warning restore CA1873
+		}
 		LogRequestHeadersStart();
 
 		foreach (var header in request.Headers)
