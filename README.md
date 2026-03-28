@@ -2,7 +2,7 @@
 
 [![NuGet Version](https://img.shields.io/nuget/v/Codacy.Api)](https://www.nuget.org/packages/Codacy.Api)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Codacy.Api)](https://www.nuget.org/packages/Codacy.Api)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/panoramicdata/Codacy.Api/publish-nuget.yml)](https://github.com/panoramicdata/Codacy.Api/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/panoramicdata/Codacy.Api/ci.yml)](https://github.com/panoramicdata/Codacy.Api/actions)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/panoramicdata_Codacy.Api)](https://app.codacy.com/gh/panoramicdata/Codacy.Api/dashboard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -18,7 +18,7 @@ A comprehensive, modern .NET library for interacting with the [Codacy](https://w
 ## Features
 
 - 🎯 **Complete API Coverage** - Full support for all Codacy endpoints
-- 🚀 **Modern .NET** - Built for .NET 9 with modern C# features
+- 🚀 **Modern .NET** - Built for .NET 10 with modern C# features
 - 🔒 **Type Safety** - Strongly typed models and responses
 - 📝 **Comprehensive Logging** - Built-in logging and request/response interception
 - 🔄 **Retry Logic** - Automatic retry with exponential backoff
@@ -296,7 +296,7 @@ We welcome contributions from the community! Here's how you can help:
    cd Codacy.Api
    ```
 
-2. **Install .NET 9 SDK**:
+2. **Install .NET 10 SDK**:
    Download from [dotnet.microsoft.com](https://dotnet.microsoft.com/download)
 
 3. **Set up User Secrets for testing**:
@@ -352,7 +352,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Copyright
 
-Copyright © 2025 Panoramic Data Limited. All rights reserved.
+Copyright © Panoramic Data Limited. All rights reserved.
 
 ## Changelog
 
