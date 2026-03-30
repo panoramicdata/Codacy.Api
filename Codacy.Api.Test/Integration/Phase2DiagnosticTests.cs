@@ -19,7 +19,7 @@ public class Phase2DiagnosticTests(ITestOutputHelper output) : TestBase(output)
 		Output.WriteLine("=== Repository State Diagnostic ===\n");
 
 		// Run diagnostic checks
-		var testRepo = await CheckOrganizationListAsync(client, provider, orgName, repoName);
+		await CheckOrganizationListAsync(client, provider, orgName, repoName);
 		await CheckDirectAccessAsync(client, provider, orgName, repoName);
 		await CheckFollowOptionsAsync(client, provider, orgName, repoName);
 
