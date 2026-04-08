@@ -139,10 +139,13 @@ public class Phase2SetupTests(ITestOutputHelper output) : TestBase(output)
 		LogPrerequisiteChecks(status);
 		LogPrerequisiteSummary(status);
 
-		// Final assertion
-		status.IsReady.Should().BeTrue(
-			"Environment must be ready before running Phase 2 tests. " +
-			"See test output for specific issues.");
+		// Skip instead of fail when prerequisites are not met
+		if (!status.IsReady)
+		{
+			Assert.Skip(
+				"Environment must be ready before running Phase 2 tests. " +
+				"See test output for specific issues.");
+		}
 	}
 
 	private void LogPrerequisiteHeader(TestEnvironmentStatus status)
