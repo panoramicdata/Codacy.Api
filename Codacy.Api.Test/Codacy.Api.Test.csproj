@@ -1,53 +1,50 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<IsPackable>false</IsPackable>
-		<IsTestProject>true</IsTestProject>
-		<WarningsNotAsErrors>VSSpell001;CA1873</WarningsNotAsErrors>
-		<UserSecretsId>5c6b597f-752g-5b55-c694-5520ecc675b0</UserSecretsId>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="AwesomeAssertions" />
-		<PackageReference Include="AwesomeAssertions.Analyzers">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" />
-		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
-		<PackageReference Include="Microsoft.Extensions.Logging" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Console" />
-		<PackageReference Include="Moq" />
-		<PackageReference Include="Polly" />
-		<PackageReference Include="xunit.v3" />
-		<PackageReference Include="Xunit.Microsoft.DependencyInjection" />
-		<PackageReference Include="xunit.runner.visualstudio">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="coverlet.collector">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\Codacy.Api\Codacy.Api.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="secrets.example.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Using Include="Xunit" />
-		<Using Include="Microsoft.Extensions.Logging" />
-		<Using Include="Moq" />
-	</ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <WarningsNotAsErrors>VSSpell001;CA1873</WarningsNotAsErrors>
+    <UserSecretsId>5c6b597f-752g-5b55-c694-5520ecc675b0</UserSecretsId>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="AwesomeAssertions.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="Polly" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="Xunit.Microsoft.DependencyInjection" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Codacy.Api\Codacy.Api.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="secrets.example.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Moq" />
+  </ItemGroup>
 </Project>

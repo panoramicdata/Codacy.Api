@@ -1,8 +1,9 @@
 {
-	"version": "3.0",
-	"versionHeightOffset": 0,
-	"publicReleaseRefSpec": [
-		"^refs/heads/main$",
-		"^refs/tags/v1\\.\\d+\\.\\d+"
-	]
+  "version": "3.0",
+  "versionHeightOffset": 0,
+  "publicReleaseRefSpec": [
+    "^refs/heads/main$",
+    "^refs/tags/v1\\.\\d\u002B\\.\\d\u002B",
+    "^refs/tags/\\d\u002B\\.\\d\u002B\\.\\d\u002B$"
+  ]
 }

@@ -1,54 +1,52 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<WarningsNotAsErrors>VSSpell001</WarningsNotAsErrors>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageId>Codacy.Api</PackageId>
-		<PackageProjectUrl>https://github.com/panoramicdata/Codacy.Api</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/panoramicdata/Codacy.Api</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<Description>A comprehensive, well-maintained .NET library for the Codacy API that follows .NET best practices and provides full API coverage with modern C# patterns.</Description>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageTags>Codacy;API;Code;Quality;Analysis;Static;REST;HTTP;Client;DevOps;CI;CD</PackageTags>
-		<PackageReleaseNotes>Changelog can be found at https://github.com/panoramicdata/Codacy.Api/blob/main/CHANGELOG.md</PackageReleaseNotes>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<Product>Codacy API</Product>
-		<NeutralLanguage>en</NeutralLanguage>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIcon>Icon.png</PackageIcon>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Nerdbank.GitVersioning">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.SourceLink.GitHub">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Refit" />
-		<PackageReference Include="Refit.HttpClientFactory" />
-		<PackageReference Include="Microsoft.Extensions.Http" />
-		<PackageReference Include="Microsoft.Extensions.Logging" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\README.md" Pack="true" PackagePath="\" />
-		<None Include="Icon.png" Pack="true" PackagePath="\" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<InternalsVisibleTo Include="Codacy.Api.Test" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<AdditionalFiles Include="CustomDictionary.xml" />
-	</ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <WarningsNotAsErrors>VSSpell001</WarningsNotAsErrors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Codacy.Api</PackageId>
+    <PackageProjectUrl>https://github.com/panoramicdata/Codacy.Api</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/panoramicdata/Codacy.Api</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>A comprehensive, well-maintained .NET library for the Codacy API that follows .NET best practices and provides full API coverage with modern C# patterns.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Codacy;API;Code;Quality;Analysis;Static;REST;HTTP;Client;DevOps;CI;CD</PackageTags>
+    <PackageReleaseNotes>Changelog can be found at https://github.com/panoramicdata/Codacy.Api/blob/main/CHANGELOG.md</PackageReleaseNotes>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <Product>Codacy API</Product>
+    <NeutralLanguage>en</NeutralLanguage>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>Icon.png</PackageIcon>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Nerdbank.GitVersioning">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Refit" />
+    <PackageReference Include="Refit.HttpClientFactory" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="Icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Codacy.Api.Test" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="CustomDictionary.xml" />
+  </ItemGroup>
 </Project>

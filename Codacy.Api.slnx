@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Solution>
   <Folder Name="/.github/">
     <File Path=".github/workflows/publish-nuget.yml" />
@@ -17,6 +18,9 @@
     <File Path="README.md" />
     <File Path="swagger.yaml" />
     <File Path="version.json" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="SECURITY.md" />
   </Folder>
   <Project Path="Codacy.Api.Test/Codacy.Api.Test.csproj" />
   <Project Path="Codacy.Api/Codacy.Api.csproj" />
