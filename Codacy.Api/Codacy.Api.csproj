@@ -47,6 +47,7 @@
     <InternalsVisibleTo Include="Codacy.Api.Test" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
     <AdditionalFiles Include="CustomDictionary.xml" />
   </ItemGroup>
 </Project>
