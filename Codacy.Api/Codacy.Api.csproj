@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <WarningsNotAsErrors>VSSpell001</WarningsNotAsErrors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Codacy.Api</PackageId>
     <PackageProjectUrl>https://github.com/panoramicdata/Codacy.Api</PackageProjectUrl>

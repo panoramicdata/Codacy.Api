@@ -91,11 +91,16 @@ public class TestDataManager : IDisposable
 
 	private ValueTask LogRetryAttempt(OnRetryArguments<object> args, int maxRetries)
 	{
-		_logger?.LogWarning(
-			args.Outcome.Exception,
-			"Request failed. Retry {RetryCount} of {MaxRetries} after {Delay}ms. Error: {Message}",
-			args.AttemptNumber, maxRetries, args.RetryDelay.TotalMilliseconds,
-			args.Outcome.Exception?.Message ?? "Unknown error");
+		if (_logger?.IsEnabled(LogLevel.Warning) == true)
+		{
+			_logger.LogWarning(
+				args.Outcome.Exception,
+				"Request failed. Retry {RetryCount} of {MaxRetries} after {Delay}ms. Error: {Message}",
+				args.AttemptNumber,
+				maxRetries,
+				args.RetryDelay.TotalMilliseconds,
+				args.Outcome.Exception?.Message ?? "Unknown error");
+		}
 		return ValueTask.CompletedTask;
 	}
 
@@ -120,9 +125,13 @@ public class TestDataManager : IDisposable
 				return response.Data != null;
 			}, cancellationToken);
 
-			_logger?.LogInformation(
-				"Repository {Organization}/{Repository} verified in Codacy",
-				_testOrganization, _testRepository);
+			if (_logger?.IsEnabled(LogLevel.Information) == true)
+			{
+				_logger.LogInformation(
+					"Repository {Organization}/{Repository} verified in Codacy",
+					_testOrganization,
+					_testRepository);
+			}
 			return true;
 		}
 		catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -161,9 +170,13 @@ public class TestDataManager : IDisposable
 
 			if (hasFiles)
 			{
-				_logger?.LogInformation(
-					"Repository {Organization}/{Repository} has analysis data",
-					_testOrganization, _testRepository);
+				if (_logger?.IsEnabled(LogLevel.Information) == true)
+				{
+					_logger.LogInformation(
+						"Repository {Organization}/{Repository} has analysis data",
+						_testOrganization,
+						_testRepository);
+				}
 			}
 			else
 			{
@@ -210,9 +223,13 @@ public class TestDataManager : IDisposable
 
 			if (hasBranches)
 			{
-				_logger?.LogInformation(
-					"Repository {Organization}/{Repository} has branches",
-					_testOrganization, _testRepository);
+				if (_logger?.IsEnabled(LogLevel.Information) == true)
+				{
+					_logger.LogInformation(
+						"Repository {Organization}/{Repository} has branches",
+						_testOrganization,
+						_testRepository);
+				}
 			}
 			else
 			{
@@ -403,7 +420,10 @@ public class TestDataManager : IDisposable
 		}
 
 		_cleanupActions.Add(cleanupAction);
-		_logger?.LogDebug("Registered cleanup action. Total cleanup actions: {Count}", _cleanupActions.Count);
+		if (_logger?.IsEnabled(LogLevel.Debug) == true)
+		{
+			_logger.LogDebug("Registered cleanup action. Total cleanup actions: {Count}", _cleanupActions.Count);
+		}
 	}
 
 	/// <summary>
@@ -411,7 +431,10 @@ public class TestDataManager : IDisposable
 	/// </summary>
 	public void ExecuteCleanup()
 	{
-		_logger?.LogInformation("Executing {Count} cleanup actions", _cleanupActions.Count);
+		if (_logger?.IsEnabled(LogLevel.Information) == true)
+		{
+			_logger.LogInformation("Executing {Count} cleanup actions", _cleanupActions.Count);
+		}
 
 		foreach (var action in _cleanupActions)
 		{
@@ -449,17 +472,24 @@ public class TestDataManager : IDisposable
 		var interval = pollingInterval ?? TimeSpan.FromSeconds(10);
 		var startTime = DateTime.UtcNow;
 
-		_logger?.LogInformation(
-			"Waiting for repository analysis (max {MaxWait}s, polling every {Interval}s)",
-			maxWait.TotalSeconds, interval.TotalSeconds);
+		if (_logger?.IsEnabled(LogLevel.Information) == true)
+		{
+			_logger.LogInformation(
+				"Waiting for repository analysis (max {MaxWait}s, polling every {Interval}s)",
+				maxWait.TotalSeconds,
+				interval.TotalSeconds);
+		}
 
 		while (DateTime.UtcNow - startTime < maxWait)
 		{
 			if (await VerifyRepositoryAnalyzedAsync(cancellationToken))
 			{
-				_logger?.LogInformation(
-					"Repository analysis completed after {Elapsed}s",
-					(DateTime.UtcNow - startTime).TotalSeconds);
+				if (_logger?.IsEnabled(LogLevel.Information) == true)
+				{
+					_logger.LogInformation(
+						"Repository analysis completed after {Elapsed}s",
+						(DateTime.UtcNow - startTime).TotalSeconds);
+				}
 				return true;
 			}
 
