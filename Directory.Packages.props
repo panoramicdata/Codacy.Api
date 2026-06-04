@@ -14,7 +14,7 @@
         <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.7" />
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.7" />
         <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7" />
-        <PackageVersion Include="Refit" Version="10.1.6" />
+        <PackageVersion Include="Refit" Version="11.0.0" />
         <PackageVersion Include="Refit.HttpClientFactory" Version="10.1.6" />
 
         <!-- Test dependencies -->
