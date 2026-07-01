@@ -221,22 +221,7 @@ public class TestDataManager : IDisposable
 				return response.Data?.Count > 0;
 			}, cancellationToken);
 
-			if (hasBranches)
-			{
-				if (_logger?.IsEnabled(LogLevel.Information) == true)
-				{
-					_logger.LogInformation(
-						"Repository {Organization}/{Repository} has branches",
-						_testOrganization,
-						_testRepository);
-				}
-			}
-			else
-			{
-				_logger?.LogWarning(
-					"Repository {Organization}/{Repository} has no branches",
-					_testOrganization, _testRepository);
-			}
+			LogBranchesResult(hasBranches);
 
 			return hasBranches;
 		}
@@ -248,6 +233,26 @@ public class TestDataManager : IDisposable
 				"Repository {Organization}/{Repository} branches not available: {Message}",
 				_testOrganization, _testRepository, ex.Message);
 			return false;
+		}
+	}
+
+	private void LogBranchesResult(bool hasBranches)
+	{
+		if (hasBranches)
+		{
+			if (_logger?.IsEnabled(LogLevel.Information) == true)
+			{
+				_logger.LogInformation(
+					"Repository {Organization}/{Repository} has branches",
+					_testOrganization,
+					_testRepository);
+			}
+		}
+		else
+		{
+			_logger?.LogWarning(
+				"Repository {Organization}/{Repository} has no branches",
+				_testOrganization, _testRepository);
 		}
 	}
 
@@ -472,24 +477,13 @@ public class TestDataManager : IDisposable
 		var interval = pollingInterval ?? TimeSpan.FromSeconds(10);
 		var startTime = DateTime.UtcNow;
 
-		if (_logger?.IsEnabled(LogLevel.Information) == true)
-		{
-			_logger.LogInformation(
-				"Waiting for repository analysis (max {MaxWait}s, polling every {Interval}s)",
-				maxWait.TotalSeconds,
-				interval.TotalSeconds);
-		}
+		LogWaitStart(maxWait, interval);
 
 		while (DateTime.UtcNow - startTime < maxWait)
 		{
 			if (await VerifyRepositoryAnalyzedAsync(cancellationToken))
 			{
-				if (_logger?.IsEnabled(LogLevel.Information) == true)
-				{
-					_logger.LogInformation(
-						"Repository analysis completed after {Elapsed}s",
-						(DateTime.UtcNow - startTime).TotalSeconds);
-				}
+				LogAnalysisCompleted(DateTime.UtcNow - startTime);
 				return true;
 			}
 
@@ -500,6 +494,27 @@ public class TestDataManager : IDisposable
 			"Repository analysis did not complete within {MaxWait}s",
 			maxWait.TotalSeconds);
 		return false;
+	}
+
+	private void LogWaitStart(TimeSpan maxWait, TimeSpan interval)
+	{
+		if (_logger?.IsEnabled(LogLevel.Information) == true)
+		{
+			_logger.LogInformation(
+				"Waiting for repository analysis (max {MaxWait}s, polling every {Interval}s)",
+				maxWait.TotalSeconds,
+				interval.TotalSeconds);
+		}
+	}
+
+	private void LogAnalysisCompleted(TimeSpan elapsed)
+	{
+		if (_logger?.IsEnabled(LogLevel.Information) == true)
+		{
+			_logger.LogInformation(
+				"Repository analysis completed after {Elapsed}s",
+				elapsed.TotalSeconds);
+		}
 	}
 
 	/// <summary>

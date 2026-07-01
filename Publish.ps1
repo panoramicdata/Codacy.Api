@@ -33,7 +33,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 $version = ($buildOutput | Select-Object -Last 1).ToString().Trim()
-Write-Host "Version: $version"
+Write-Information "Version: $version" -InformationAction Continue
 
 # Check if tag already exists
 $existingTag = git tag -l $version
@@ -45,4 +45,4 @@ if ($existingTag) {
 # Create and push tag
 git tag $version
 git push origin $version
-Write-Host "Tag $version pushed. CI will publish the package."
+Write-Information "Tag $version pushed. CI will publish the package." -InformationAction Continue
