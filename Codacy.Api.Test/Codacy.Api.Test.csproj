@@ -6,7 +6,12 @@
     <UserSecretsId>5c6b597f-752g-5b55-c694-5520ecc675b0</UserSecretsId>
     <ImplicitUsings>enable</ImplicitUsings>
     <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AwesomeAssertions" />
     <PackageReference Include="AwesomeAssertions.Analyzers">
@@ -24,10 +29,6 @@
     <PackageReference Include="Polly" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="Xunit.Microsoft.DependencyInjection" />
-    <PackageReference Include="xunit.runner.visualstudio">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Codacy.Api\Codacy.Api.csproj" />
