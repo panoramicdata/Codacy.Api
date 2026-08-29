@@ -65,13 +65,23 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		}
 	}
 
-	[Fact(Skip = "Requires direct repository API access - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task ListRepositoryTools_ReturnsTools()
 	{
-		// This test requires direct repository API access which returns 404
-		// The Analysis API endpoint /api/v3/analysis/{provider}/{org}/{repo}/tools
-		// requires repository-level access that isn't available with current API token
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Analysis.ListRepositoryToolsAsync(
+			provider, orgName, repoName, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
+		response.Data.Should().NotBeEmpty();
 	}
 
 	[Fact]
@@ -99,13 +109,22 @@ public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 		}
 	}
 
-	[Fact(Skip = "Requires direct repository API access - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task ListCategoryOverviews_ReturnsCategories()
 	{
-		// This test requires direct repository API access which returns 404
-		// The Analysis API endpoint /api/v3/analysis/{provider}/{org}/{repo}/categories
-		// requires repository-level access that isn't available with current API token
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Analysis.ListCategoryOverviewsAsync(
+			provider, orgName, repoName, null, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
 	}
 
 	[Fact]

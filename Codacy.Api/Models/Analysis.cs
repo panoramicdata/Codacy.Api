@@ -507,16 +507,39 @@ public class CategoryOverviewListResponse
 /// <summary>
 /// Category overview
 /// </summary>
+/// <remarks>
+/// Shaped from the API's actual response. The previous shape — a category string with issue and
+/// file counts — did not describe anything Codacy returns, but the test covering it was skipped, so
+/// nothing deserialised it.
+/// </remarks>
 public class CategoryOverview
 {
-	/// <summary>Category</summary>
-	public required string Category { get; set; }
+	/// <summary>Identifier of the commit these figures were measured on</summary>
+	public required long CommitId { get; set; }
 
-	/// <summary>Issue count</summary>
-	public required int IssueCount { get; set; }
+	/// <summary>The issue category being summarised</summary>
+	public required IssueCategory Category { get; set; }
 
-	/// <summary>File count</summary>
-	public required int FileCount { get; set; }
+	/// <summary>Percentage of the grade this category accounts for, 0 to 100</summary>
+	public required double Percentage { get; set; }
+
+	/// <summary>Number of issues found in this category</summary>
+	public required int TotalResults { get; set; }
+}
+
+/// <summary>
+/// An issue category, as Codacy names it
+/// </summary>
+public class IssueCategory
+{
+	/// <summary>Machine-readable category, such as <c>BestPractice</c></summary>
+	public required string CategoryType { get; set; }
+
+	/// <summary>Display name, such as <c>Best Practice</c></summary>
+	public required string Name { get; set; }
+
+	/// <summary>Longer description of the category</summary>
+	public required string Description { get; set; }
 }
 
 /// <summary>

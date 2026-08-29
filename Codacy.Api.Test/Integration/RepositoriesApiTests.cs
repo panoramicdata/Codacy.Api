@@ -5,71 +5,188 @@ namespace Codacy.Api.Test.Integration;
 /// <summary>
 /// Integration tests for Repositories API
 /// </summary>
+/// <remarks>
+/// These were long skipped as an "API token limitation", on the strength of a 404 from
+/// <c>/api/v3/repositories/{provider}/{org}/{repo}</c>. The 404 meant the route did not exist:
+/// repositories are addressed under their organization. The routes work, so the tests run.
+/// </remarks>
 [Trait("Category", "Integration")]
 public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 {
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task GetRepository_ReturnsRepositoryDetails()
 	{
-		// This test requires direct repository API access which returns 404
-		// The Codacy API token doesn't provide access to /api/v3/repositories/{provider}/{org}/{repo}
-		// Organization endpoints work fine, but direct repository endpoints are not accessible
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.GetRepositoryAsync(provider, orgName, repoName, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
+		response.Data.Name.Should().Be(repoName);
+		response.Data.Provider.Should().Be(provider);
 	}
 
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task ListRepositoryBranches_ReturnsBranches()
 	{
-		// This test requires direct repository API access which returns 404
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.ListRepositoryBranchesAsync(
+			provider, orgName, repoName, null, null, null, null, null, null, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
+		response.Data.Should().NotBeEmpty();
+		response.Data!.Should().AllSatisfy(branch => branch.Name.Should().NotBeNullOrWhiteSpace());
+
+		// Every repository Codacy analyses has exactly one default branch.
+		response.Data.Count(branch => branch.IsDefault).Should().Be(1);
 	}
 
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task ListRepositoryBranches_WithPagination_ReturnsLimitedResults()
 	{
-		// This test requires direct repository API access which returns 404
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.ListRepositoryBranchesAsync(
+			provider, orgName, repoName, null, null, 1, null, null, null, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
+		response.Data!.Count.Should().BeLessThanOrEqualTo(1);
 	}
 
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
-	public async Task GetQualitySettingsForRepository_ReturnsSettings()
+	[Fact]
+	public async Task ListRepositoryBranches_EnabledOnly_ReturnsOnlyEnabledBranches()
 	{
-		// This test requires direct repository API access which returns 404
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// A bool reaching the query string as "True" rather than "true" was silently ignored by the
+		// API, so this filter used to return every branch.
+
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.ListRepositoryBranchesAsync(
+			provider, orgName, repoName, true, null, null, null, null, null, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
+		response.Data!.Should().AllSatisfy(branch => branch.IsEnabled.Should().BeTrue());
 	}
 
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task GetCommitQualitySettings_ReturnsSettings()
 	{
-		// This test requires direct repository API access which returns 404
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.GetCommitQualitySettingsAsync(
+			provider, orgName, repoName, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
 	}
 
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task GetPullRequestQualitySettings_ReturnsSettings()
 	{
-		// This test requires direct repository API access which returns 404
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.GetPullRequestQualitySettingsAsync(
+			provider, orgName, repoName, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
 	}
 
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task ListFiles_ReturnsFiles()
 	{
-		// This test requires direct repository API access which returns 404
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.ListFilesAsync(
+			provider, orgName, repoName, null, null, null, null, null, null, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
+		response.Data.Should().NotBeEmpty();
+		response.Data!.Should().AllSatisfy(file => file.Path.Should().NotBeNullOrWhiteSpace());
 	}
 
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task ListFiles_WithPagination_ReturnsLimitedResults()
 	{
-		// This test requires direct repository API access which returns 404
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.ListFilesAsync(
+			provider, orgName, repoName, null, null, null, null, null, 3, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
+		response.Data!.Count.Should().BeLessThanOrEqualTo(3);
 	}
 
-	[Fact(Skip = "Direct repository API endpoints return 404 - API token limitation. See CODACY_API_ACCESS_LIMITATION.md")]
+	[Fact]
 	public async Task ListFiles_WithSearch_FiltersResults()
 	{
-		// This test requires direct repository API access which returns 404
-		// See CODACY_API_ACCESS_LIMITATION.md for details
+		// Arrange
+		using var client = GetClient();
+		var provider = Enum.Parse<Provider>(GetTestProvider());
+		var orgName = GetTestOrganization();
+		var repoName = GetTestRepository();
+
+		// Act
+		var response = await client.Repositories.ListFilesAsync(
+			provider, orgName, repoName, null, "cs", null, null, null, null, CancellationToken);
+
+		// Assert
+		response.Should().NotBeNull();
+		response.Data.Should().NotBeNull();
+		response.Data!.Should().AllSatisfy(file => file.Path.Should().Contain("cs"));
 	}
 }

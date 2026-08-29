@@ -152,19 +152,22 @@ public class TestDataManagerExampleTests(ITestOutputHelper output) : TestBase(ou
 		cleanupExecuted.Should().BeTrue();
 	}
 
-	[Fact(Skip = "Long running test - only run manually to verify wait functionality")]
+	[Fact]
 	public async Task TestDataManager_WaitForAnalysis_WaitsForCompletion()
 	{
+		// The test repository is already analysed, so this returns on the first poll. The short
+		// bound keeps the test honest: if waiting stops working, it fails rather than hangs.
+
 		// Arrange
 		using var testDataManager = GetTestDataManager();
 
 		// Act
 		var analyzed = await testDataManager.WaitForRepositoryAnalysisAsync(
-			maxWaitTime: TimeSpan.FromMinutes(2),
-			pollingInterval: TimeSpan.FromSeconds(10),
+			maxWaitTime: TimeSpan.FromSeconds(30),
+			pollingInterval: TimeSpan.FromSeconds(5),
 			cancellationToken: CancellationToken);
 
 		// Assert
-		Output.WriteLine($"Repository analyzed: {analyzed}");
+		analyzed.Should().BeTrue();
 	}
 }

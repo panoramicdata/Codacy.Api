@@ -131,34 +131,120 @@
 ### Objectives
 - ? Fix all accessible Repository API tests  
 - ? Fix all accessible Analysis API tests
-- ? Document API access limitations
+- ? Correct the repository route prefix
 
 ### Final Status
 - Setup infrastructure: ? 100% COMPLETE
 - Test quality improvements: ? 100% COMPLETE
 - Documentation: ? 100% COMPLETE  
-- **RESOLVED**: Documented API access limitation
+- **RESOLVED**: routes corrected
 
-### Critical Finding & Resolution
+### Critical Finding & Correction
 
-**API Access Limitation Identified and Documented**
+**The "API access limitation" was a misdiagnosis. The routes were wrong.**
 
-All 13 originally failing tests were caused by a single root cause: **The Codacy API token doesn't provide access to direct repository endpoints.**
+13 tests were skipped on the theory that the Codacy API token could not reach repository
+endpoints. It could. The client addressed repositories as
+`/api/v3/repositories/{provider}/{org}/{repo}`, which is not a route Codacy serves; repositories
+live under their organization, at
+`/api/v3/organizations/{provider}/{org}/repositories/{repo}`. A 404 from a route that does not
+exist reads exactly like a 404 from a resource you may not see, and the difference was never
+tested.
 
-**Resolution**: Tests properly categorized
-- ? Accessible endpoints: All tests passing
-- ?? Inaccessible endpoints: Tests skipped with clear documentation
-- ? See: `CODACY_API_ACCESS_LIMITATION.md` for complete details
+**Evidence**: probing every candidate route with a deliberately invalid token separates the two
+cases — a route that exists answers 401, and only a route that does not exist answers 404. Under
+that probe the organization-nested family answers 401 throughout, and the flat family answers 404
+for every repository, including ones the same token lists successfully.
 
-**Evidence**:
-- ? Organization API endpoints work (list repos, billing, people)
-- ? Direct repository API endpoints return 404 for ALL repositories
-- ? Multiple repositories tested, all show same pattern
-- Root Cause: API token/account limitation (not a code issue)
+**Two further defects the wrong prefix had masked**, both in URL formatting:
+- `Provider` reached the path as `Github` where the API wants `gh`. The
+  `JsonStringEnumMemberNameAttribute` that declares the short code governs JSON bodies, not URLs.
+- Booleans reached query strings as `True` where the API wants `true`, so filters such as
+  `?enabled=true` were silently ignored and returned unfiltered results.
 
-**Workaround**: Use organization-level endpoints instead of direct repository access
+Both are fixed by `CodacyUrlParameterFormatter`, which Refit now uses for URL substitution.
 
-See: `CODACY_API_ACCESS_LIMITATION.md`, `PHASE_2_FINAL_STATUS.md`, and `TEST_SUITE_FINAL_STATUS.md` for complete analysis.
+**Resolution**: routes corrected, the formatter added, and all 13 tests unskipped and given real
+assertions. Three endpoints that never existed under any prefix were removed or re-expressed:
+`set-default` (the default branch is a property set through the branch `PATCH`), the parent
+`settings/quality` route (only the per-gate `commits` and `pull-requests` routes are real), and
+`reanalyze`.
+
+### Tasks
+
+#### 1.1 Codacy Test Repository Setup [DONE] ?
+- [x] Create or configure a dedicated test repository in Codacy
+  - Repository: `panoramicdata/Codacy.Api.TestRepo` [CREATED] ?
+  - Created with GitHub CLI
+  - Multiple branches (main, develop, feature/test)
+  - Test files added with intentional code issues
+  - **Deliverable**: Repository ready at https://github.com/panoramicdata/Codacy.Api.TestRepo ?
+
+#### 1.2 Test Data Configuration [DONE] ?
+- [x] Updated `secrets.json` configuration
+  ```json
+  {
+    "CodacyApi": {
+      "ApiToken": "***",
+      "BaseUrl": "https://app.codacy.com",
+      "TestOrganization": "panoramicdata",
+      "TestProvider": "gh",
+      "TestRepository": "Codacy.Api.TestRepo",
+      "TestBranch": "main",
+      "TestCommitSha": "1a25fd0edc2ac3c33130912fcdbace5908cecfbf",
+      "TestPullRequestNumber": 1
+    }
+  }
+  ```
+- [x] Test repository structure documented in repository README
+- **Deliverable**: Fully configured test environment [DONE] ?
+
+#### 1.3 Test Helper Utilities [DONE] ?
+- [x] Create `TestDataManager.cs` to manage test data lifecycle
+- [x] Implement test data seeding/cleanup
+- [x] Add retry logic for flaky API calls (Polly v8 with exponential backoff)
+- [x] Create example tests demonstrating usage
+- [x] Create comprehensive documentation guide
+- [x] **Deliverable**: Reusable test utilities ?
+
+**Exit Criteria**: 
+- [DONE] ? Test repository exists: https://github.com/panoramicdata/Codacy.Api.TestRepo
+- [DONE] ? Test configuration updated in user secrets
+- [DONE] ? Helper utilities created with full documentation
+
+**Status**: Phase 1 - FULLY COMPLETED! ???  
+**Completion Date**: 2025-01-20  
+**Next**: Phase 2 - Repository & Analysis API Coverage
+
+**Phase 1 Deliverables**:
+- ? Test repository created and configured
+- ? User secrets configuration documented
+- ? TestDataManager utility class (480+ lines)
+- ? Polly v8 integration for resilience
+- ? Example tests (7 scenarios)
+- ? Complete documentation (TEST_DATA_MANAGER_GUIDE.md)
+- ? Phase summary (PHASE_1_3_SUMMARY.md)
+- ? Zero compilation errors/warnings
+
+---
+
+## Phase 2: Repository & Analysis API Coverage (Weeks 3-5) [? COMPLETE WITH LIMITATIONS]
+
+### Objectives
+- ? Fix all accessible Repository API tests  
+- ? Fix all accessible Analysis API tests
+- ? Correct the repository route prefix
+
+### Final Status
+- Setup infrastructure: ? 100% COMPLETE
+- Test quality improvements: ? 100% COMPLETE
+- Documentation: ? 100% COMPLETE  
+- **RESOLVED**: routes corrected
+
+### Critical Finding & Correction
+
+The repository routes were wrong, not the token. See the correction above.
+
 
 ### Tasks
 
@@ -169,41 +255,41 @@ See: `CODACY_API_ACCESS_LIMITATION.md`, `PHASE_2_FINAL_STATUS.md`, and `TEST_SUI
 - [x] Create comprehensive diagnostic tools ?
 - [x] Document setup procedures (PHASE_2_SETUP_GUIDE.md) ?
 - [x] Document implementation steps (PHASE_2_IMPLEMENTATION_GUIDE.md) ?
-- [x] Identify and document root cause (CODACY_API_ACCESS_LIMITATION.md) ?
+- [x] Identify the real root cause: wrong route prefix, not token scope ?
 - [x] **Deliverable**: Complete Phase 2 test infrastructure ?
 
 #### 2.0.1 Test Quality Improvements [? DONE]
-- [x] Fixed Repository API tests to properly skip (not silently pass) ?
-- [x] Added clear skip messages referencing solution documentation ?
-- [x] Removed false positive test results ?
-- [x] Ensured all inaccessible endpoints properly skipped with documentation ?
-- [x] **Deliverable**: Properly categorized tests with actionable messages ?
+- [x] Corrected the repository routes to the organization-nested family ?
+- [x] Added `CodacyUrlParameterFormatter` for provider short codes and lower-case bools ?
+- [x] Removed three endpoints Codacy does not serve ?
+- [x] Unskipped all 13 tests and gave them real assertions ?
+- [x] **Deliverable**: tests that exercise the API rather than describe why they cannot ?
 
-**Result**: 
-- **Before**: Tests silently caught 404 and passed anyway (poor configuration)
-- **After**: Tests properly skip with message: "Requires direct repository API access - API token limitation. See CODACY_API_ACCESS_LIMITATION.md"
+**Result**:
+- **Before**: tests caught 404 and passed anyway, then were skipped citing a token limitation
+- **After**: tests call the real routes and assert on the responses
 
-#### 2.1 Repository API Tests (Priority P1) [? COMPLETE WITH SKIPS]
-- [x] `GetRepository_ReturnsRepositoryDetails` - ?? SKIPPED (API limitation)
-- [x] `ListRepositoryBranches_ReturnsBranches` - ?? SKIPPED (API limitation)
-- [x] `ListRepositoryBranches_WithPagination` - ?? SKIPPED (API limitation)
-- [x] `GetQualitySettingsForRepository` - ?? SKIPPED (API limitation)
-- [x] `GetCommitQualitySettings` - ?? SKIPPED (API limitation)
-- [x] `GetPullRequestQualitySettings` - ?? SKIPPED (API limitation)
-- [x] `ListFiles_ReturnsFiles` - ?? SKIPPED (API limitation)
-- [x] `ListFiles_WithPagination` - ?? SKIPPED (API limitation)
-- [x] `ListFiles_WithSearch_FiltersResults` - ?? SKIPPED (API limitation)
+#### 2.1 Repository API Tests (Priority P1) [? COMPLETE]
+- [x] `GetRepository_ReturnsRepositoryDetails` - PASSING
+- [x] `ListRepositoryBranches_ReturnsBranches` - PASSING
+- [x] `ListRepositoryBranches_WithPagination` - PASSING
+- [x] `ListRepositoryBranches_EnabledOnly_ReturnsOnlyEnabledBranches` - PASSING
+- [x] `GetCommitQualitySettings` - PASSING
+- [x] `GetPullRequestQualitySettings` - PASSING
+- [x] `ListFiles_ReturnsFiles` - PASSING
+- [x] `ListFiles_WithPagination` - PASSING
+- [x] `ListFiles_WithSearch_FiltersResults` - PASSING
 - [x] **Deliverable**: 9/9 Repository tests properly handled ?
 
-#### 2.2 Analysis API Tests (Priority P2) [? COMPLETE WITH SKIPS]
-- [x] `ListRepositoryTools` - ?? SKIPPED (API limitation)
-- [x] `ListCategoryOverviews` - ?? SKIPPED (API limitation)
+#### 2.2 Analysis API Tests (Priority P2) [? COMPLETE]
+- [x] `ListRepositoryTools` - PASSING
+- [x] `ListCategoryOverviews` - PASSING
 - [x] All other Analysis tests - ? PASSING
-- [x] **Deliverable**: 10/12 Analysis tests passing, 2 skipped ?
+- [x] **Deliverable**: all 12 Analysis tests passing ?
 
-#### 2.3 People API Tests [? COMPLETE WITH SKIPS]
-- [x] `PeopleSuggestionsForRepository` - ?? SKIPPED (API limitation)
-- [x] `PeopleSuggestionsForRepository_WithPagination` - ?? SKIPPED (API limitation)
+#### 2.3 People API Tests [? COMPLETE]
+- [x] `PeopleSuggestionsForRepository` - PASSING
+- [x] `PeopleSuggestionsForRepository_WithPagination` - PASSING
 - [x] All other People tests - ? PASSING
 - [x] **Deliverable**: 7/9 People tests passing, 2 skipped ?
 
@@ -211,7 +297,7 @@ See: `CODACY_API_ACCESS_LIMITATION.md`, `PHASE_2_FINAL_STATUS.md`, and `TEST_SUI
 - [x] Setup tests created ?
 - [x] Documentation complete ?
 - [x] Tests properly categorized (pass/skip) ?
-- [x] API limitation documented ?
+- [x] Root cause corrected in code ?
 - [x] Workarounds provided ?
 - [x] Phase 2 complete ?
 
@@ -226,7 +312,6 @@ See: `CODACY_API_ACCESS_LIMITATION.md`, `PHASE_2_FINAL_STATUS.md`, and `TEST_SUI
 - ? `Codacy.Api.Test/Integration/Phase2DiagnosticTests.cs` (100+ lines)
 - ? `Codacy.Api.Test/Integration/QuickDiagnosticTests.cs` (60+ lines)
 - ? `Codacy.Api.Test/Integration/DebugRepositoryAccessTests.cs` (150+ lines)
-- ? `CODACY_API_ACCESS_LIMITATION.md` (PRIMARY - 400+ lines)
 - ? `TEST_SUITE_FINAL_STATUS.md` (300+ lines)
 - ? `PHASE_2_FINAL_STATUS.md` (400+ lines)
 - ? `PHASE_2_SETUP_GUIDE.md` (150+ lines)

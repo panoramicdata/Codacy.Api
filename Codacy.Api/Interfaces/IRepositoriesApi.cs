@@ -11,7 +11,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Get a repository
 	/// </summary>
-	[Get("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}")]
+	[Get("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}")]
 	Task<RepositoryResponse> GetRepositoryAsync(
 		Provider provider,
 		string organizationName,
@@ -21,7 +21,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Delete a repository
 	/// </summary>
-	[Delete("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}")]
+	[Delete("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}")]
 	Task DeleteRepositoryAsync(
 		Provider provider,
 		string organizationName,
@@ -31,7 +31,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Follow a repository
 	/// </summary>
-	[Post("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/follow")]
+	[Post("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/follow")]
 	Task<AddedStateResponse> FollowRepositoryAsync(
 		Provider provider,
 		string organizationName,
@@ -41,7 +41,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Unfollow a repository
 	/// </summary>
-	[Post("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/unfollow")]
+	[Delete("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/follow")]
 	Task UnfollowRepositoryAsync(
 		Provider provider,
 		string organizationName,
@@ -51,7 +51,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// List repository branches
 	/// </summary>
-	[Get("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/branches")]
+	[Get("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/branches")]
 	Task<BranchListResponse> ListRepositoryBranchesAsync(
 		Provider provider,
 		string organizationName,
@@ -67,7 +67,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Update repository branch configuration
 	/// </summary>
-	[Patch("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/branches/{branchName}")]
+	[Patch("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/branches/{branchName}")]
 	Task UpdateRepositoryBranchConfigurationAsync(
 		Provider provider,
 		string organizationName,
@@ -79,39 +79,29 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Set branch as default
 	/// </summary>
-	[Post("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/branches/{branchName}/set-default")]
+	/// <remarks>
+	/// There is no set-default route. The API models the default branch as a property of the branch,
+	/// so this delegates to <see cref="UpdateRepositoryBranchConfigurationAsync"/>. Declared as a
+	/// default implementation rather than an operation, so Refit leaves it alone.
+	/// </remarks>
 	Task SetRepositoryBranchAsDefaultAsync(
 		Provider provider,
 		string organizationName,
 		string repositoryName,
 		string branchName,
-		CancellationToken cancellationToken);
-
-	/// <summary>
-	/// Get quality settings for repository
-	/// </summary>
-	[Get("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/settings/quality")]
-	Task<RepositoryQualitySettingsResponse> GetQualitySettingsForRepositoryAsync(
-		Provider provider,
-		string organizationName,
-		string repositoryName,
-		CancellationToken cancellationToken);
-
-	/// <summary>
-	/// Update quality settings for repository
-	/// </summary>
-	[Patch("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/settings/quality")]
-	Task<RepositoryQualitySettingsResponse> UpdateRepositoryQualitySettingsAsync(
-		Provider provider,
-		string organizationName,
-		string repositoryName,
-		[Body] RepositoryQualitySettings settings,
-		CancellationToken cancellationToken);
+		CancellationToken cancellationToken)
+		=> UpdateRepositoryBranchConfigurationAsync(
+			provider,
+			organizationName,
+			repositoryName,
+			branchName,
+			new UpdateRepositoryBranchConfigurationBody { IsDefault = true },
+			cancellationToken);
 
 	/// <summary>
 	/// Get commit quality settings
 	/// </summary>
-	[Get("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/settings/quality/commits")]
+	[Get("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/settings/quality/commits")]
 	Task<QualitySettingsResponse> GetCommitQualitySettingsAsync(
 		Provider provider,
 		string organizationName,
@@ -121,7 +111,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Update commit quality settings
 	/// </summary>
-	[Patch("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/settings/quality/commits")]
+	[Put("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/settings/quality/commits")]
 	Task<QualitySettingsResponse> UpdateCommitQualitySettingsAsync(
 		Provider provider,
 		string organizationName,
@@ -132,7 +122,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Get pull request quality settings
 	/// </summary>
-	[Get("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/settings/quality/pullrequests")]
+	[Get("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/settings/quality/pull-requests")]
 	Task<QualitySettingsResponse> GetPullRequestQualitySettingsAsync(
 		Provider provider,
 		string organizationName,
@@ -142,7 +132,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Update pull request quality settings
 	/// </summary>
-	[Patch("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/settings/quality/pullrequests")]
+	[Put("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/settings/quality/pull-requests")]
 	Task<QualitySettingsResponse> UpdatePullRequestQualitySettingsAsync(
 		Provider provider,
 		string organizationName,
@@ -153,7 +143,7 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// List repository files
 	/// </summary>
-	[Get("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/files")]
+	[Get("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/files")]
 	Task<FileListResponse> ListFilesAsync(
 		Provider provider,
 		string organizationName,
@@ -169,24 +159,12 @@ public interface IRepositoriesApi
 	/// <summary>
 	/// Get file with analysis
 	/// </summary>
-	[Get("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/files/{fileId}")]
+	[Get("/api/v3/organizations/{provider}/{organizationName}/repositories/{repositoryName}/files/{fileId}")]
 	Task<FileInformationWithAnalysis> GetFileWithAnalysisAsync(
 		Provider provider,
 		string organizationName,
 		string repositoryName,
 		long fileId,
-		CancellationToken cancellationToken);
-
-	/// <summary>
-	/// Reanalyze a commit
-	/// </summary>
-	[Post("/api/v3/repositories/{provider}/{organizationName}/{repositoryName}/commits/{commitUuid}/reanalyze")]
-	Task ReanalyzeCommitAsync(
-		Provider provider,
-		string organizationName,
-		string repositoryName,
-		string commitUuid,
-		[Query] bool cleanCache,
 		CancellationToken cancellationToken);
 
 	/// <summary>

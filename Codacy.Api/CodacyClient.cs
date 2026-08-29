@@ -39,7 +39,10 @@ public class CodacyClient : ICodacyClient, IDisposable
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 					PropertyNameCaseInsensitive = true,
 					Converters = { new JsonStringEnumConverter() }
-				})
+				}),
+			// Without this, Provider reaches the URL as "Github" rather than "gh", and bools as
+			// "True" rather than "true".
+			UrlParameterFormatter = new CodacyUrlParameterFormatter()
 		};
 
 		// Initialize API modules using Refit
