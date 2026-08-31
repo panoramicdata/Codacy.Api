@@ -10,14 +10,11 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	public async Task ListCodingStandards_ReturnsStandards()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.CodingStandards.ListCodingStandardsAsync(
-			provider,
-			orgName,
+		var response = await Client.CodingStandards.ListCodingStandardsAsync(
+			TestProvider,
+			TestOrganization,
 			CancellationToken);
 
 		// Assert
@@ -29,20 +26,17 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	public async Task GetCodingStandard_ReturnsStandardDetails()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		var standardId = await GetFirstStandardIdAsync(client, provider, orgName);
+		var standardId = await GetFirstStandardIdAsync(Client, TestProvider, TestOrganization);
 		if (standardId == null)
 		{
 			return;
 		}
 
 		// Act
-		var response = await client.CodingStandards.GetCodingStandardAsync(
-			provider,
-			orgName,
+		var response = await Client.CodingStandards.GetCodingStandardAsync(
+			TestProvider,
+			TestOrganization,
 			standardId.Value,
 			CancellationToken);
 
@@ -56,20 +50,17 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	public async Task ListCodingStandardTools_ReturnsTools()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		var standardId = await GetFirstStandardIdAsync(client, provider, orgName);
+		var standardId = await GetFirstStandardIdAsync(Client, TestProvider, TestOrganization);
 		if (standardId == null)
 		{
 			return;
 		}
 
 		// Act
-		var response = await client.CodingStandards.ListCodingStandardToolsAsync(
-			provider,
-			orgName,
+		var response = await Client.CodingStandards.ListCodingStandardToolsAsync(
+			TestProvider,
+			TestOrganization,
 			standardId.Value,
 			CancellationToken);
 
@@ -82,18 +73,15 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	public async Task ListCodingStandardPatterns_ReturnsPatterns()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		var (standardId, toolUuid) = await GetStandardAndToolAsync(client, provider, orgName);
+		var (standardId, toolUuid) = await GetStandardAndToolAsync(Client, TestProvider, TestOrganization);
 		if (standardId == null || toolUuid == null)
 		{
 			return;
 		}
 
 		// Act
-		var response = await ListPatternsAsync(client, provider, orgName, standardId.Value, toolUuid, null);
+		var response = await ListPatternsAsync(Client, TestProvider, TestOrganization, standardId.Value, toolUuid, null);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -104,19 +92,16 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	public async Task ListCodingStandardPatterns_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 		const int limit = 10;
 
-		var (standardId, toolUuid) = await GetStandardAndToolAsync(client, provider, orgName);
+		var (standardId, toolUuid) = await GetStandardAndToolAsync(Client, TestProvider, TestOrganization);
 		if (standardId == null || toolUuid == null)
 		{
 			return;
 		}
 
 		// Act
-		var response = await ListPatternsAsync(client, provider, orgName, standardId.Value, toolUuid, limit);
+		var response = await ListPatternsAsync(Client, TestProvider, TestOrganization, standardId.Value, toolUuid, limit);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -128,20 +113,17 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	public async Task ListCodingStandardRepositories_ReturnsRepositories()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		var standardId = await GetFirstStandardIdAsync(client, provider, orgName);
+		var standardId = await GetFirstStandardIdAsync(Client, TestProvider, TestOrganization);
 		if (standardId == null)
 		{
 			return;
 		}
 
 		// Act
-		var response = await client.CodingStandards.ListCodingStandardRepositoriesAsync(
-			provider,
-			orgName,
+		var response = await Client.CodingStandards.ListCodingStandardRepositoriesAsync(
+			TestProvider,
+			TestOrganization,
 			standardId.Value,
 			null,
 			null,
@@ -157,11 +139,11 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	private async Task<long?> GetFirstStandardIdAsync(
 		CodacyClient client,
 		Provider provider,
-		string orgName)
+		string organization)
 	{
 		var standards = await client.CodingStandards.ListCodingStandardsAsync(
 			provider,
-			orgName,
+			organization,
 			CancellationToken);
 
 		if (standards.Data.Count == 0)
@@ -176,9 +158,9 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	private async Task<(long? StandardId, string? ToolUuid)> GetStandardAndToolAsync(
 		CodacyClient client,
 		Provider provider,
-		string orgName)
+		string organization)
 	{
-		var standardId = await GetFirstStandardIdAsync(client, provider, orgName);
+		var standardId = await GetFirstStandardIdAsync(client, provider, organization);
 		if (standardId == null)
 		{
 			return (null, null);
@@ -186,7 +168,7 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 
 		var tools = await client.CodingStandards.ListCodingStandardToolsAsync(
 			provider,
-			orgName,
+			organization,
 			standardId.Value,
 			CancellationToken);
 
@@ -209,14 +191,14 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 	private async Task<ConfiguredPatternsListResponse> ListPatternsAsync(
 		CodacyClient client,
 		Provider provider,
-		string orgName,
+		string organization,
 		long standardId,
 		string toolUuid,
 		int? limit)
 	{
 		return await client.CodingStandards.ListCodingStandardPatternsAsync(
 			provider,
-			orgName,
+			organization,
 			standardId,
 			toolUuid,
 			null, null, null, null, null, null, null, null, null, null,
@@ -226,4 +208,3 @@ public class CodingStandardsApiTests(ITestOutputHelper output) : TestBase(output
 
 	#endregion
 }
-

@@ -10,12 +10,9 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListPeopleFromOrganization_ReturnsPeople()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.People.ListPeopleFromOrganizationAsync(provider, orgName, null, null, null, null, CancellationToken);
+		var response = await Client.People.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -31,13 +28,10 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListPeopleFromOrganization_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 		const int limit = 5;
 
 		// Act
-		var response = await client.People.ListPeopleFromOrganizationAsync(provider, orgName, null, limit, null, null, CancellationToken);
+		var response = await Client.People.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, limit, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -49,12 +43,9 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListPeopleFromOrganization_WithSearch_FiltersResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Get all people first to find a search term
-		var allPeople = await client.People.ListPeopleFromOrganizationAsync(provider, orgName, null, null, null, null, CancellationToken);
+		var allPeople = await Client.People.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, null, CancellationToken);
 
 		if (allPeople.Data.Count == 0)
 		{
@@ -64,7 +55,7 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 		var searchTerm = allPeople.Data[0].Email[..Math.Min(3, allPeople.Data[0].Email.Length)];
 
 		// Act
-		var response = await client.People.ListPeopleFromOrganizationAsync(provider, orgName, null, null, searchTerm, null, CancellationToken);
+		var response = await Client.People.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, searchTerm, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -75,16 +66,12 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task PeopleSuggestionsForOrganization_ReturnsSuggestions()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.People.PeopleSuggestionsForOrganizationAsync(provider, orgName, null, null, null, CancellationToken);
+		var response = await Client.People.PeopleSuggestionsForOrganizationAsync(TestProvider, TestOrganization, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
 	}
 }
-

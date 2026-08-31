@@ -1,17 +1,27 @@
 ﻿using Microsoft.Extensions.Configuration;
 
+using Refit;
+using System.Net;
+
 namespace Codacy.Api.Test;
 
 /// <summary>
 /// Base class for integration tests that require API credentials
 /// </summary>
-public abstract class TestBase(ITestOutputHelper output)
+public abstract class TestBase(ITestOutputHelper output) : IDisposable
 {
+	private CodacyClient? _client;
+	private Provider? _testProvider;
+
 	protected IConfiguration Configuration { get; } = new ConfigurationBuilder()
 			.AddJsonFile("secrets.example.json", optional: true)
 			.AddUserSecrets<TestBase>()
 			.Build();
 	protected ITestOutputHelper Output { get; } = output;
+	protected CodacyClient Client => _client ??= GetClient();
+	protected Provider TestProvider => _testProvider ??= Enum.Parse<Provider>(GetTestProvider());
+	protected string TestOrganization => field ??= GetTestOrganization();
+	protected string TestRepository => field ??= GetTestRepository();
 
 	protected static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 
@@ -107,5 +117,30 @@ public abstract class TestBase(ITestOutputHelper output)
 			repository,
 			provider,
 			logger);
+	}
+
+	protected async Task RunWhenAvailableAsync(
+		Func<Task> test,
+		string unavailableMessage,
+		params HttpStatusCode[] unavailableStatuses)
+	{
+		var statuses = unavailableStatuses.Length == 0
+			? new[] { HttpStatusCode.NotFound }
+			: unavailableStatuses;
+
+		try
+		{
+			await test();
+		}
+		catch (ApiException ex) when (statuses.Contains(ex.StatusCode))
+		{
+			Output.WriteLine($"{unavailableMessage}: {ex.Message}");
+		}
+	}
+
+	public void Dispose()
+	{
+		_client?.Dispose();
+		GC.SuppressFinalize(this);
 	}
 }

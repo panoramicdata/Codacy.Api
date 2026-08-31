@@ -1,9 +1,9 @@
 #pragma warning disable CA1848 // Use LoggerMessage delegates for improved performance
+#pragma warning disable CA1873 // Test diagnostics favor readability over deferred argument evaluation
 #pragma warning disable CA1510 // Use ArgumentNullException.ThrowIfNull
 #pragma warning disable S2360 // Optional parameters should not be used - This is a test helper class where optional parameters improve usability
 
 using Polly;
-using Polly.Retry;
 using Refit;
 using System.Net;
 
@@ -17,7 +17,7 @@ public class TestDataManager : IDisposable
 	private readonly CodacyClient _client;
 	private readonly ILogger? _logger;
 	private readonly ResiliencePipeline _retryPipeline;
-	private readonly List<Action> _cleanupActions = [];
+	private readonly TestCleanupRegistry _cleanupRegistry;
 	private bool _disposed;
 
 	// Test data configuration
@@ -54,54 +54,8 @@ public class TestDataManager : IDisposable
 		_testRepository = testRepository ?? throw new ArgumentNullException(nameof(testRepository));
 		_testProvider = testProvider;
 		_logger = logger;
-		_retryPipeline = BuildRetryPipeline(maxRetries);
-	}
-
-	private ResiliencePipeline BuildRetryPipeline(int maxRetries)
-	{
-		return new ResiliencePipelineBuilder()
-			.AddRetry(CreateRetryOptions(maxRetries))
-			.Build();
-	}
-
-	private RetryStrategyOptions CreateRetryOptions(int maxRetries)
-	{
-		return new RetryStrategyOptions
-		{
-			MaxRetryAttempts = maxRetries,
-			Delay = TimeSpan.FromMilliseconds(DefaultRetryDelayMs),
-			BackoffType = DelayBackoffType.Exponential,
-			UseJitter = true,
-			ShouldHandle = new PredicateBuilder()
-				.Handle<ApiException>(IsTransientError)
-				.Handle<HttpRequestException>()
-				.Handle<TaskCanceledException>(),
-			OnRetry = args => LogRetryAttempt(args, maxRetries)
-		};
-	}
-
-	private static bool IsTransientError(ApiException ex)
-	{
-		return ex.StatusCode == HttpStatusCode.TooManyRequests ||
-			ex.StatusCode == HttpStatusCode.ServiceUnavailable ||
-			ex.StatusCode == HttpStatusCode.GatewayTimeout ||
-			ex.StatusCode == HttpStatusCode.RequestTimeout ||
-			(int)ex.StatusCode >= 500;
-	}
-
-	private ValueTask LogRetryAttempt(OnRetryArguments<object> args, int maxRetries)
-	{
-		if (_logger?.IsEnabled(LogLevel.Warning) == true)
-		{
-			_logger.LogWarning(
-				args.Outcome.Exception,
-				"Request failed. Retry {RetryCount} of {MaxRetries} after {Delay}ms. Error: {Message}",
-				args.AttemptNumber,
-				maxRetries,
-				args.RetryDelay.TotalMilliseconds,
-				args.Outcome.Exception?.Message ?? "Unknown error");
-		}
-		return ValueTask.CompletedTask;
+		_cleanupRegistry = new TestCleanupRegistry(logger);
+		_retryPipeline = TestRetryPipelineFactory.Create(logger, maxRetries);
 	}
 
 	#region Test Data Verification
@@ -125,13 +79,10 @@ public class TestDataManager : IDisposable
 				return response.Data != null;
 			}, cancellationToken);
 
-			if (_logger?.IsEnabled(LogLevel.Information) == true)
-			{
-				_logger.LogInformation(
-					"Repository {Organization}/{Repository} verified in Codacy",
-					_testOrganization,
-					_testRepository);
-			}
+			_logger?.LogInformation(
+				"Repository {Organization}/{Repository} verified in Codacy",
+				_testOrganization,
+				_testRepository);
 			return true;
 		}
 		catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -170,13 +121,10 @@ public class TestDataManager : IDisposable
 
 			if (hasFiles)
 			{
-				if (_logger?.IsEnabled(LogLevel.Information) == true)
-				{
-					_logger.LogInformation(
-						"Repository {Organization}/{Repository} has analysis data",
-						_testOrganization,
-						_testRepository);
-				}
+				_logger?.LogInformation(
+					"Repository {Organization}/{Repository} has analysis data",
+					_testOrganization,
+					_testRepository);
 			}
 			else
 			{
@@ -240,13 +188,10 @@ public class TestDataManager : IDisposable
 	{
 		if (hasBranches)
 		{
-			if (_logger?.IsEnabled(LogLevel.Information) == true)
-			{
-				_logger.LogInformation(
-					"Repository {Organization}/{Repository} has branches",
-					_testOrganization,
-					_testRepository);
-			}
+			_logger?.LogInformation(
+				"Repository {Organization}/{Repository} has branches",
+				_testOrganization,
+				_testRepository);
 		}
 		else
 		{
@@ -418,44 +363,13 @@ public class TestDataManager : IDisposable
 	/// </summary>
 	/// <param name="cleanupAction">Cleanup action to register</param>
 	public void RegisterCleanupAction(Action cleanupAction)
-	{
-		if (cleanupAction == null)
-		{
-			throw new ArgumentNullException(nameof(cleanupAction));
-		}
-
-		_cleanupActions.Add(cleanupAction);
-		if (_logger?.IsEnabled(LogLevel.Debug) == true)
-		{
-			_logger.LogDebug("Registered cleanup action. Total cleanup actions: {Count}", _cleanupActions.Count);
-		}
-	}
+		=> _cleanupRegistry.Register(cleanupAction);
 
 	/// <summary>
 	/// Executes all registered cleanup actions
 	/// </summary>
 	public void ExecuteCleanup()
-	{
-		if (_logger?.IsEnabled(LogLevel.Information) == true)
-		{
-			_logger.LogInformation("Executing {Count} cleanup actions", _cleanupActions.Count);
-		}
-
-		foreach (var action in _cleanupActions)
-		{
-			try
-			{
-				action();
-			}
-			catch (Exception ex)
-			{
-				_logger?.LogError(ex, "Error executing cleanup action: {Message}", ex.Message);
-			}
-		}
-
-		_cleanupActions.Clear();
-		_logger?.LogInformation("Cleanup completed");
-	}
+		=> _cleanupRegistry.Execute();
 
 	#endregion
 
@@ -498,23 +412,17 @@ public class TestDataManager : IDisposable
 
 	private void LogWaitStart(TimeSpan maxWait, TimeSpan interval)
 	{
-		if (_logger?.IsEnabled(LogLevel.Information) == true)
-		{
-			_logger.LogInformation(
-				"Waiting for repository analysis (max {MaxWait}s, polling every {Interval}s)",
-				maxWait.TotalSeconds,
-				interval.TotalSeconds);
-		}
+		_logger?.LogInformation(
+			"Waiting for repository analysis (max {MaxWait}s, polling every {Interval}s)",
+			maxWait.TotalSeconds,
+			interval.TotalSeconds);
 	}
 
 	private void LogAnalysisCompleted(TimeSpan elapsed)
 	{
-		if (_logger?.IsEnabled(LogLevel.Information) == true)
-		{
-			_logger.LogInformation(
-				"Repository analysis completed after {Elapsed}s",
-				elapsed.TotalSeconds);
-		}
+		_logger?.LogInformation(
+			"Repository analysis completed after {Elapsed}s",
+			elapsed.TotalSeconds);
 	}
 
 	/// <summary>
@@ -593,56 +501,3 @@ public class TestDataManager : IDisposable
 
 	#endregion
 }
-
-/// <summary>
-/// Test environment status information
-/// </summary>
-public class TestEnvironmentStatus
-{
-	/// <summary>Organization name</summary>
-	public required string Organization { get; init; }
-
-	/// <summary>Repository name</summary>
-	public required string Repository { get; init; }
-
-	/// <summary>Provider</summary>
-	public required Provider Provider { get; init; }
-
-	/// <summary>Whether the repository exists in Codacy</summary>
-	public bool RepositoryExists { get; set; }
-
-	/// <summary>Whether the repository has analysis data</summary>
-	public bool HasAnalysisData { get; set; }
-
-	/// <summary>Whether the repository has branches</summary>
-	public bool HasBranches { get; set; }
-
-	/// <summary>Number of branches</summary>
-	public int BranchCount { get; set; }
-
-	/// <summary>Number of files</summary>
-	public int FileCount { get; set; }
-
-	/// <summary>Error message if status check failed</summary>
-	public string? ErrorMessage { get; set; }
-
-	/// <summary>Whether the environment is ready for testing</summary>
-	public bool IsReady => RepositoryExists && HasAnalysisData && HasBranches;
-
-	/// <summary>Gets a summary of the environment status</summary>
-	public override string ToString()
-	{
-		if (!string.IsNullOrEmpty(ErrorMessage))
-		{
-			return $"Error: {ErrorMessage}";
-		}
-
-		return $"Repository: {Provider}/{Organization}/{Repository} | " +
-			   $"Exists: {RepositoryExists} | " +
-			   $"Analyzed: {HasAnalysisData} | " +
-			   $"Branches: {BranchCount} | " +
-			   $"Files: {FileCount} | " +
-			   $"Ready: {IsReady}";
-	}
-}
-

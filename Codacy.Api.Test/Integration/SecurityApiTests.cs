@@ -10,18 +10,15 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task SearchSecurityItems_ReturnsItems()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		try
 		{
 			// Act
-			var response = await client
+			var response = await Client
 				.Security
 				.SearchSecurityItemsAsync(
-					provider,
-					orgName,
+					TestProvider,
+					TestOrganization,
 					null,
 					null,
 					null,
@@ -45,15 +42,12 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task SearchSecurityItems_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 		const int limit = 10;
 
 		try
 		{
 			// Act
-			var response = await client.Security.SearchSecurityItemsAsync(provider, orgName, null, null, limit, null, null, CancellationToken);
+			var response = await Client.Security.SearchSecurityItemsAsync(TestProvider, TestOrganization, null, null, limit, null, null, CancellationToken);
 
 			// Assert
 			response.Should().NotBeNull();
@@ -72,14 +66,11 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task SearchSecurityDashboard_ReturnsDashboardMetrics()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.SearchSecurityDashboardAsync(
-			provider,
-			orgName,
+		var response = await Client.Security.SearchSecurityDashboardAsync(
+			TestProvider,
+			TestOrganization,
 			body: new SearchSRMDashboard(),
 			cancellationToken: CancellationToken);
 
@@ -92,14 +83,11 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task SearchSecurityDashboardRepositories_ReturnsRepositories()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.SearchSecurityDashboardRepositoriesAsync(
-			provider,
-			orgName,
+		var response = await Client.Security.SearchSecurityDashboardRepositoriesAsync(
+			TestProvider,
+			TestOrganization,
 			body: new SearchSRMDashboardRepositories(),
 			cancellationToken: CancellationToken);
 
@@ -112,14 +100,11 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task SearchSecurityDashboardHistory_ReturnsHistory()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.SearchSecurityDashboardHistoryAsync(
-			provider,
-			orgName,
+		var response = await Client.Security.SearchSecurityDashboardHistoryAsync(
+			TestProvider,
+			TestOrganization,
 			body: new SearchSRMDashboardHistory(),
 			cancellationToken: CancellationToken);
 
@@ -132,14 +117,11 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task SearchSecurityDashboardCategories_ReturnsCategories()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.SearchSecurityDashboardCategoriesAsync(
-			provider,
-			orgName,
+		var response = await Client.Security.SearchSecurityDashboardCategoriesAsync(
+			TestProvider,
+			TestOrganization,
 			body: new SearchSRMDashboardCategories(),
 			cancellationToken: CancellationToken);
 
@@ -152,12 +134,9 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListSecurityManagers_ReturnsManagers()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.ListSecurityManagersAsync(provider, orgName, null, null, CancellationToken);
+		var response = await Client.Security.ListSecurityManagersAsync(TestProvider, TestOrganization, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -168,12 +147,9 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListSecurityRepositories_ReturnsRepositoriesWithIssues()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.ListSecurityRepositoriesAsync(provider, orgName, null, null, null, CancellationToken);
+		var response = await Client.Security.ListSecurityRepositoriesAsync(TestProvider, TestOrganization, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -184,14 +160,11 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task GetSLAConfig_ReturnsConfiguration()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.GetSLAConfigAsync(
-			provider,
-			orgName,
+		var response = await Client.Security.GetSLAConfigAsync(
+			TestProvider,
+			TestOrganization,
 			CancellationToken);
 
 		// Assert
@@ -202,16 +175,12 @@ public class SecurityApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListSecurityCategories_ReturnsCategoriesWithFindings()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Security.ListSecurityCategoriesAsync(provider, orgName, null, null, CancellationToken);
+		var response = await Client.Security.ListSecurityCategoriesAsync(TestProvider, TestOrganization, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
 	}
 }
-

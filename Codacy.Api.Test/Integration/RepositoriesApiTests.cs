@@ -17,33 +17,25 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task GetRepository_ReturnsRepositoryDetails()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.GetRepositoryAsync(provider, orgName, repoName, CancellationToken);
+		var response = await Client.Repositories.GetRepositoryAsync(TestProvider, TestOrganization, TestRepository, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
-		response.Data.Name.Should().Be(repoName);
-		response.Data.Provider.Should().Be(provider);
+		response.Data.Name.Should().Be(TestRepository);
+		response.Data.Provider.Should().Be(TestProvider);
 	}
 
 	[Fact]
 	public async Task ListRepositoryBranches_ReturnsBranches()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.ListRepositoryBranchesAsync(
-			provider, orgName, repoName, null, null, null, null, null, null, CancellationToken);
+		var response = await Client.Repositories.ListRepositoryBranchesAsync(
+			TestProvider, TestOrganization, TestRepository, null, null, null, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -59,14 +51,10 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListRepositoryBranches_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.ListRepositoryBranchesAsync(
-			provider, orgName, repoName, null, null, 1, null, null, null, CancellationToken);
+		var response = await Client.Repositories.ListRepositoryBranchesAsync(
+			TestProvider, TestOrganization, TestRepository, null, null, 1, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -81,14 +69,10 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 		// API, so this filter used to return every branch.
 
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.ListRepositoryBranchesAsync(
-			provider, orgName, repoName, true, null, null, null, null, null, CancellationToken);
+		var response = await Client.Repositories.ListRepositoryBranchesAsync(
+			TestProvider, TestOrganization, TestRepository, true, null, null, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -100,14 +84,10 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task GetCommitQualitySettings_ReturnsSettings()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.GetCommitQualitySettingsAsync(
-			provider, orgName, repoName, CancellationToken);
+		var response = await Client.Repositories.GetCommitQualitySettingsAsync(
+			TestProvider, TestOrganization, TestRepository, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -118,14 +98,10 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task GetPullRequestQualitySettings_ReturnsSettings()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.GetPullRequestQualitySettingsAsync(
-			provider, orgName, repoName, CancellationToken);
+		var response = await Client.Repositories.GetPullRequestQualitySettingsAsync(
+			TestProvider, TestOrganization, TestRepository, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -136,14 +112,10 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListFiles_ReturnsFiles()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.ListFilesAsync(
-			provider, orgName, repoName, null, null, null, null, null, null, CancellationToken);
+		var response = await Client.Repositories.ListFilesAsync(
+			TestProvider, TestOrganization, TestRepository, null, null, null, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -156,14 +128,10 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListFiles_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.ListFilesAsync(
-			provider, orgName, repoName, null, null, null, null, null, 3, CancellationToken);
+		var response = await Client.Repositories.ListFilesAsync(
+			TestProvider, TestOrganization, TestRepository, null, null, null, null, null, 3, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -175,14 +143,10 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListFiles_WithSearch_FiltersResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
 
 		// Act
-		var response = await client.Repositories.ListFilesAsync(
-			provider, orgName, repoName, null, "cs", null, null, null, null, CancellationToken);
+		var response = await Client.Repositories.ListFilesAsync(
+			TestProvider, TestOrganization, TestRepository, null, "cs", null, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();

@@ -82,62 +82,12 @@ public class OrganizationResponse
 /// <summary>
 /// Organization data containing organization details and related information
 /// </summary>
-public class OrganizationData
+public class OrganizationData : Organization
 {
 	/// <summary>The organization details (nested structure)</summary>
 	[JsonPropertyName("organization")]
 	public Organization? Organization { get; set; }
 
-	// Properties that can be directly deserialized from flat API response
-	/// <summary>Organization identifier</summary>
-	[JsonPropertyName("identifier")]
-	public long? Identifier { get; set; }
-
-	/// <summary>Remote identifier on Git provider</summary>
-	[JsonPropertyName("remoteIdentifier")]
-	public string? RemoteIdentifier { get; set; }
-
-	/// <summary>Organization name</summary>
-	[JsonPropertyName("name")]
-	public string? Name { get; set; }
-
-	/// <summary>Avatar URL</summary>
-	[JsonPropertyName("avatar")]
-	public string? Avatar { get; set; }
-
-	/// <summary>Creation timestamp</summary>
-	[JsonPropertyName("created")]
-	public DateTimeOffset? Created { get; set; }
-
-	/// <summary>Git provider</summary>
-	[JsonPropertyName("provider")]
-	public Provider? Provider { get; set; }
-
-	/// <summary>Join mode</summary>
-	[JsonPropertyName("joinMode")]
-	public JoinMode? JoinMode { get; set; }
-
-	/// <summary>Organization type</summary>
-	[JsonPropertyName("type")]
-	public OrganizationType? Type { get; set; }
-
-	/// <summary>Join status</summary>
-	[JsonPropertyName("joinStatus")]
-	public JoinStatus? JoinStatus { get; set; }
-
-	/// <summary>Single provider login</summary>
-	[JsonPropertyName("singleProviderLogin")]
-	public bool? SingleProviderLogin { get; set; }
-
-	/// <summary>Has DAST access</summary>
-	[JsonPropertyName("hasDastAccess")]
-	public bool? HasDastAccess { get; set; }
-
-	/// <summary>Has SCA enabled</summary>
-	[JsonPropertyName("hasScaEnabled")]
-	public bool? HasScaEnabled { get; set; }
-
-	// Additional OrganizationData properties
 	/// <summary>User membership information for this organization</summary>
 	[JsonPropertyName("membership")]
 	public OrganizationMembership? Membership { get; set; }

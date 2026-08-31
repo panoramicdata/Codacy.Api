@@ -1,21 +1,15 @@
 namespace Codacy.Api.Models;
 
 /// <summary>
-/// Issue information
+/// Properties shared by active and ignored issues
 /// </summary>
-public class Issue
+public abstract class IssueMetadata
 {
 	/// <summary>Issue ID</summary>
 	public required string IssueId { get; set; }
 
-	/// <summary>Stable result data ID</summary>
-	public required long ResultDataId { get; set; }
-
 	/// <summary>File path</summary>
 	public required string FilePath { get; set; }
-
-	/// <summary>File ID</summary>
-	public required long FileId { get; set; }
 
 	/// <summary>Pattern information</summary>
 	public required PatternDetails PatternInfo { get; set; }
@@ -23,14 +17,8 @@ public class Issue
 	/// <summary>Tool information</summary>
 	public required ToolReference ToolInfo { get; set; }
 
-	/// <summary>Line number</summary>
-	public required long LineNumber { get; set; }
-
 	/// <summary>Issue message</summary>
 	public required string Message { get; set; }
-
-	/// <summary>Suggestion</summary>
-	public string? Suggestion { get; set; }
 
 	/// <summary>Programming language</summary>
 	public required string Language { get; set; }
@@ -46,6 +34,24 @@ public class Issue
 
 	/// <summary>False positive reason</summary>
 	public string? FalsePositiveReason { get; set; }
+}
+
+/// <summary>
+/// Issue information
+/// </summary>
+public class Issue : IssueMetadata
+{
+	/// <summary>Stable result data ID</summary>
+	public required long ResultDataId { get; set; }
+
+	/// <summary>File ID</summary>
+	public required long FileId { get; set; }
+
+	/// <summary>Line number</summary>
+	public required long LineNumber { get; set; }
+
+	/// <summary>Suggestion</summary>
+	public string? Suggestion { get; set; }
 
 	/// <summary>False positive threshold</summary>
 	public required int FalsePositiveThreshold { get; set; }

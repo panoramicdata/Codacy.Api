@@ -9,130 +9,72 @@ public class CoverageApiTests(ITestOutputHelper output) : TestBase(output)
 	[Fact]
 	public async Task GetRepositoryPullRequestCoverage_ReturnsCoverageData()
 	{
-		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
-
-		try
+		await VerifyPullRequestCoverageAsync(async pullRequestNumber =>
 		{
-			// First, get a list of pull requests to find one to test
-			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(provider, orgName, repoName, 1, null, null, false, CancellationToken);
-
-			if (pullRequests.Data.Count == 0)
-			{
-				// Skip test if no pull requests
-				Output.WriteLine("No pull requests available for coverage testing");
-				return;
-			}
-
-			var prNumber = pullRequests.Data[0].PullRequest.Number;
-
-			// Act
-			var response = await client.Coverage.GetRepositoryPullRequestCoverageAsync(
-				provider,
-				orgName,
-				repoName,
-				prNumber,
+			var response = await Client.Coverage.GetRepositoryPullRequestCoverageAsync(
+				TestProvider,
+				TestOrganization,
+				TestRepository,
+				pullRequestNumber,
 				CancellationToken);
 
-			// Assert
 			response.Should().NotBeNull();
 			response.Data.Should().NotBeNull();
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-											 ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			// PR may not have coverage data - skip test
-			Output.WriteLine($"Pull request coverage not available: {ex.Message}");
-		}
+		}, "Pull request coverage");
 	}
 
 	[Fact]
 	public async Task GetRepositoryPullRequestFilesCoverage_ReturnsFileCoverage()
 	{
-		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
-
-		try
+		await VerifyPullRequestCoverageAsync(async pullRequestNumber =>
 		{
-			// First, get a list of pull requests
-			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(provider, orgName, repoName, 1, null, null, false, CancellationToken);
-
-			if (pullRequests.Data.Count == 0)
-			{
-				// Skip test if no pull requests
-				Output.WriteLine("No pull requests available for file coverage testing");
-				return;
-			}
-
-			var prNumber = pullRequests.Data[0].PullRequest.Number;
-
-			// Act
-			var response = await client.Coverage.GetRepositoryPullRequestFilesCoverageAsync(
-				provider,
-				orgName,
-				repoName,
-				prNumber,
+			var response = await Client.Coverage.GetRepositoryPullRequestFilesCoverageAsync(
+				TestProvider,
+				TestOrganization,
+				TestRepository,
+				pullRequestNumber,
 				CancellationToken);
 
-			// Assert
 			response.Should().NotBeNull();
 			response.Data.Should().NotBeNull();
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-											 ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			// PR may not have file coverage data - skip test
-			Output.WriteLine($"Pull request file coverage not available: {ex.Message}");
-		}
+		}, "Pull request file coverage");
 	}
 
 	[Fact]
 	public async Task GetPullRequestCoverageReports_ReturnsReportStatus()
 	{
-		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var repoName = GetTestRepository();
-
-		try
+		await VerifyPullRequestCoverageAsync(async pullRequestNumber =>
 		{
-			// First, get a list of pull requests
-			var pullRequests = await client.Analysis.ListRepositoryPullRequestsAsync(provider, orgName, repoName, 1, null, null, false, CancellationToken);
-
-			if (pullRequests.Data.Count == 0)
-			{
-				// Skip test if no pull requests
-				Output.WriteLine("No pull requests available for coverage reports testing");
-				return;
-			}
-
-			var prNumber = pullRequests.Data[0].PullRequest.Number;
-
-			// Act
-			var response = await client.Coverage.GetPullRequestCoverageReportsAsync(
-				provider,
-				orgName,
-				repoName,
-				prNumber,
+			var response = await Client.Coverage.GetPullRequestCoverageReportsAsync(
+				TestProvider,
+				TestOrganization,
+				TestRepository,
+				pullRequestNumber,
 				CancellationToken);
 
-			// Assert
 			response.Should().NotBeNull();
 			response.Data.Should().NotBeNull();
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-											 ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+		}, "Pull request coverage reports");
+	}
+
+	private async Task VerifyPullRequestCoverageAsync(
+		Func<int, Task> verifyCoverage,
+		string coverageDescription)
+	{
+		var pullRequests = await Client.Analysis.ListRepositoryPullRequestsAsync(
+			TestProvider, TestOrganization, TestRepository, 1, null, null, false, CancellationToken);
+
+		if (pullRequests.Data.Count == 0)
 		{
-			// PR may not have coverage reports - skip test
-			Output.WriteLine($"Pull request coverage reports not available: {ex.Message}");
+			Output.WriteLine("No pull requests available for coverage testing");
+			return;
 		}
+
+		var pullRequestNumber = pullRequests.Data[0].PullRequest.Number;
+		await RunWhenAvailableAsync(
+			() => verifyCoverage(pullRequestNumber),
+			$"{coverageDescription} not available",
+			System.Net.HttpStatusCode.BadRequest,
+			System.Net.HttpStatusCode.NotFound);
 	}
 }
-

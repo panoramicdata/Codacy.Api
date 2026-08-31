@@ -13,18 +13,15 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 	public async Task AddTestRepository_ToCodacy_Succeeds()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		Output.WriteLine($"Adding test repository: {orgName}/{TestRepoName}");
+		Output.WriteLine($"Adding test repository: {TestOrganization}/{TestRepoName}");
 
 		try
 		{
 			// Act - Try to get repository (should fail if not added)
-			var response = await client.Repositories.GetRepositoryAsync(
-				provider,
-				orgName,
+			var response = await Client.Repositories.GetRepositoryAsync(
+				TestProvider,
+				TestOrganization,
 				TestRepoName,
 				CancellationToken);
 
@@ -43,10 +40,10 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 			Output.WriteLine($"Please add the repository manually:");
 			Output.WriteLine($"1. Go to https://app.codacy.com");
 			Output.WriteLine($"2. Click 'Add Repository'");
-			Output.WriteLine($"3. Select: {orgName}/{TestRepoName}");
+			Output.WriteLine($"3. Select: {TestOrganization}/{TestRepoName}");
 			Output.WriteLine($"4. Wait for initial analysis to complete");
 			Output.WriteLine("");
-			Output.WriteLine($"Repository URL: https://github.com/{orgName}/{TestRepoName}");
+			Output.WriteLine($"Repository URL: https://github.com/{TestOrganization}/{TestRepoName}");
 
 			// Skip test - repository needs to be added manually
 			// Note: Codacy API doesn't currently support adding repositories via API
@@ -57,18 +54,15 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 	public async Task VerifyTestRepository_HasBranches_Succeeds()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		Output.WriteLine($"Verifying branches for: {orgName}/{TestRepoName}");
+		Output.WriteLine($"Verifying branches for: {TestOrganization}/{TestRepoName}");
 
 		try
 		{
 			// Act - Get repository branches from repositories endpoint
-			var response = await client.Repositories.ListRepositoryBranchesAsync(
-				provider,
-				orgName,
+			var response = await Client.Repositories.ListRepositoryBranchesAsync(
+				TestProvider,
+				TestOrganization,
 				TestRepoName,
 				null,
 				null,
@@ -102,18 +96,15 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 	public async Task VerifyTestRepository_HasFiles_Succeeds()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		Output.WriteLine($"Verifying files for: {orgName}/{TestRepoName}");
+		Output.WriteLine($"Verifying files for: {TestOrganization}/{TestRepoName}");
 
 		try
 		{
 			// Act - Get repository files
-			var response = await client.Repositories.ListFilesAsync(
-				provider,
-				orgName,
+			var response = await Client.Repositories.ListFilesAsync(
+				TestProvider,
+				TestOrganization,
 				TestRepoName,
 				null,
 				null,
@@ -152,18 +143,15 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 	public async Task VerifyTestRepository_HasIssues_Succeeds()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		Output.WriteLine($"Verifying issues for: {orgName}/{TestRepoName}");
+		Output.WriteLine($"Verifying issues for: {TestOrganization}/{TestRepoName}");
 
 		try
 		{
 			// Act - Search for issues
-			var response = await client.Issues.SearchRepositoryIssuesAsync(
-				provider,
-				orgName,
+			var response = await Client.Issues.SearchRepositoryIssuesAsync(
+				TestProvider,
+				TestOrganization,
 				TestRepoName,
 				new SearchRepositoryIssuesBody(),
 				null,
@@ -195,18 +183,15 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 	public async Task VerifyTestRepository_HasAnalysisTools_Succeeds()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		Output.WriteLine($"Verifying analysis tools for: {orgName}/{TestRepoName}");
+		Output.WriteLine($"Verifying analysis tools for: {TestOrganization}/{TestRepoName}");
 
 		try
 		{
 			// Act - Get repository tools
-			var response = await client.Analysis.ListRepositoryToolsAsync(
-				provider,
-				orgName,
+			var response = await Client.Analysis.ListRepositoryToolsAsync(
+				TestProvider,
+				TestOrganization,
 				TestRepoName,
 				cancellationToken: CancellationToken);
 
@@ -234,18 +219,15 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 	public async Task GetTestRepository_Details_Succeeds()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		Output.WriteLine($"Getting repository details for: {orgName}/{TestRepoName}");
+		Output.WriteLine($"Getting repository details for: {TestOrganization}/{TestRepoName}");
 
 		try
 		{
 			// Act - Get repository with full analysis data
-			var response = await client.Analysis.GetRepositoryWithAnalysisAsync(
-				provider,
-				orgName,
+			var response = await Client.Analysis.GetRepositoryWithAnalysisAsync(
+				TestProvider,
+				TestOrganization,
 				TestRepoName,
 				null,
 				CancellationToken);
@@ -275,18 +257,15 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 	public async Task ListOrganizationRepositories_IncludesTestRepo_Succeeds()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		Output.WriteLine($"Listing all repositories in organization: {orgName}");
+		Output.WriteLine($"Listing all repositories in organization: {TestOrganization}");
 
 		try
 		{
 			// Act - List all organization repositories
-			var response = await client.Organizations.ListOrganizationRepositoriesAsync(
-				provider,
-				orgName,
+			var response = await Client.Organizations.ListOrganizationRepositoriesAsync(
+				TestProvider,
+				TestOrganization,
 				null,
 				null,
 				null,
@@ -332,18 +311,15 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 	public async Task ConfigureTestRepository_Settings_Succeeds()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
-		Output.WriteLine($"Checking repository settings for: {orgName}/{TestRepoName}");
+		Output.WriteLine($"Checking repository settings for: {TestOrganization}/{TestRepoName}");
 
 		try
 		{
 			// Act - Get pull request quality settings
-			var response = await client.Repositories.GetPullRequestQualitySettingsAsync(
-				provider,
-				orgName,
+			var response = await Client.Repositories.GetPullRequestQualitySettingsAsync(
+				TestProvider,
+				TestOrganization,
 				TestRepoName,
 				CancellationToken);
 
@@ -367,4 +343,3 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 		}
 	}
 }
-

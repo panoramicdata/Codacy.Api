@@ -10,12 +10,9 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task GetOrganization_ReturnsOrganizationDetails()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Organizations.GetOrganizationAsync(provider, orgName, CancellationToken);
+		var response = await Client.Organizations.GetOrganizationAsync(TestProvider, TestOrganization, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -23,20 +20,17 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		response.Data.Organization.Should().NotBeNull();
 
 		// Verify organization details from the nested Organization object
-		response.Data.Organization!.Name.Should().Be(orgName);
-		response.Data.Organization.Provider.Should().Be(provider);
+		response.Data.Organization!.Name.Should().Be(TestOrganization);
+		response.Data.Organization.Provider.Should().Be(TestProvider);
 	}
 
 	[Fact]
 	public async Task ListOrganizationRepositories_ReturnsRepositories()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Organizations.ListOrganizationRepositoriesAsync(provider, orgName, null, null, null, null, null, null, CancellationToken);
+		var response = await Client.Organizations.ListOrganizationRepositoriesAsync(TestProvider, TestOrganization, null, null, null, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -46,8 +40,8 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		foreach (var repo in response.Data)
 		{
 			repo.Name.Should().NotBeNull();
-			repo.Provider.Should().Be(provider);
-			repo.Owner.Should().Be(orgName);
+			repo.Provider.Should().Be(TestProvider);
+			repo.Owner.Should().Be(TestOrganization);
 		}
 	}
 
@@ -55,13 +49,10 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListOrganizationRepositories_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 		const int limit = 10;
 
 		// Act
-		var response = await client.Organizations.ListOrganizationRepositoriesAsync(provider, orgName, null, limit, null, null, null, null, CancellationToken);
+		var response = await Client.Organizations.ListOrganizationRepositoriesAsync(TestProvider, TestOrganization, null, limit, null, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -73,13 +64,10 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListOrganizationRepositories_WithSearch_FiltersResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
-		var searchTerm = GetTestRepository()[..Math.Min(3, GetTestRepository().Length)];
+		var searchTerm = TestRepository[..Math.Min(3, TestRepository.Length)];
 
 		// Act
-		var response = await client.Organizations.ListOrganizationRepositoriesAsync(provider, orgName, null, null, searchTerm, null, null, null, CancellationToken);
+		var response = await Client.Organizations.ListOrganizationRepositoriesAsync(TestProvider, TestOrganization, null, null, searchTerm, null, null, null, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -96,14 +84,11 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task GetOrganizationBilling_ReturnsBillingInformation()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Organizations.GetOrganizationBillingAsync(
-			provider,
-			orgName,
+		var response = await Client.Organizations.GetOrganizationBillingAsync(
+			TestProvider,
+			TestOrganization,
 			cancellationToken: CancellationToken);
 
 		// Assert
@@ -117,12 +102,9 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListPeopleFromOrganization_ReturnsPeople()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Organizations.ListPeopleFromOrganizationAsync(provider, orgName, null, null, null, false, CancellationToken);
+		var response = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, false, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -139,12 +121,9 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListPeopleFromOrganization_OnlyMembers_ReturnsOnlyMembers()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Act
-		var response = await client.Organizations.ListPeopleFromOrganizationAsync(provider, orgName, null, null, null, true, CancellationToken);
+		var response = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, true, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -156,13 +135,10 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListPeopleFromOrganization_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 		const int limit = 5;
 
 		// Act
-		var response = await client.Organizations.ListPeopleFromOrganizationAsync(provider, orgName, null, limit, null, false, CancellationToken);
+		var response = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, limit, null, false, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
@@ -174,12 +150,9 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	public async Task ListPeopleFromOrganization_WithSearch_FiltersResults()
 	{
 		// Arrange
-		using var client = GetClient();
-		var provider = Enum.Parse<Provider>(GetTestProvider());
-		var orgName = GetTestOrganization();
 
 		// Get all people first to find a search term
-		var allPeople = await client.Organizations.ListPeopleFromOrganizationAsync(provider, orgName, null, null, null, false, CancellationToken);
+		var allPeople = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, false, CancellationToken);
 		if (allPeople.Data.Count == 0)
 		{
 			return; // Skip test if no people
@@ -195,11 +168,10 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		var searchTerm = firstPersonName[..Math.Min(2, firstPersonName.Length)];
 
 		// Act
-		var response = await client.Organizations.ListPeopleFromOrganizationAsync(provider, orgName, null, null, searchTerm, false, CancellationToken);
+		var response = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, searchTerm, false, CancellationToken);
 
 		// Assert
 		response.Should().NotBeNull();
 		response.Data.Should().NotBeNull();
 	}
 }
-
