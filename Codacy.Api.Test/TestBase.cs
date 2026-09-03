@@ -119,6 +119,13 @@ public abstract class TestBase(ITestOutputHelper output) : IDisposable
 			logger);
 	}
 
+	/// <summary>
+	/// Runs a test that needs a repository Codacy has already analysed, tolerating the
+	/// repository being absent or its analysis not having produced the data yet.
+	/// </summary>
+	protected Task RunWhenRepositoryAvailableAsync(Func<Task> test)
+		=> RunWhenAvailableAsync(test, "Repository not found or not analyzed");
+
 	protected async Task RunWhenAvailableAsync(
 		Func<Task> test,
 		string unavailableMessage,

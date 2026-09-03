@@ -9,40 +9,29 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 	[Fact]
 	public async Task GetOrganization_ReturnsOrganizationDetails()
 	{
-		// Arrange
-
 		// Act
 		var response = await Client.Organizations.GetOrganizationAsync(TestProvider, TestOrganization, CancellationToken);
 
-		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data.Organization.Should().NotBeNull();
-
-		// Verify organization details from the nested Organization object
-		response.Data.Organization!.Name.Should().Be(TestOrganization);
-		response.Data.Organization.Provider.Should().Be(TestProvider);
+		// Assert - the details live on a nested Organization object
+		var organization = response.ShouldHaveData(r => r.Data.Organization);
+		organization.Name.Should().Be(TestOrganization);
+		organization.Provider.Should().Be(TestProvider);
 	}
 
 	[Fact]
 	public async Task ListOrganizationRepositories_ReturnsRepositories()
 	{
-		// Arrange
-
 		// Act
-		var response = await Client.Organizations.ListOrganizationRepositoriesAsync(TestProvider, TestOrganization, null, null, null, null, null, null, CancellationToken);
+		var response = await ListRepositoriesAsync();
 
-		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		// Should have at least the test repository
-		response.Data.Should().NotBeEmpty();
-		foreach (var repo in response.Data)
+		// Assert - the organization owns at least the test repository
+		var repositories = response.ShouldHaveNonEmptyData(r => r.Data);
+		repositories.Should().AllSatisfy(repository =>
 		{
-			repo.Name.Should().NotBeNull();
-			repo.Provider.Should().Be(TestProvider);
-			repo.Owner.Should().Be(TestOrganization);
-		}
+			repository.Name.Should().NotBeNull();
+			repository.Provider.Should().Be(TestProvider);
+			repository.Owner.Should().Be(TestOrganization);
+		});
 	}
 
 	[Fact]
@@ -52,12 +41,10 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		const int limit = 10;
 
 		// Act
-		var response = await Client.Organizations.ListOrganizationRepositoriesAsync(TestProvider, TestOrganization, null, limit, null, null, null, null, CancellationToken);
+		var response = await ListRepositoriesAsync(limit: limit);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		(response.Data.Count <= limit).Should().BeTrue($"Should return at most {limit} repositories");
+		response.ShouldHavePageOfAtMost(limit, r => r.Data);
 	}
 
 	[Fact]
@@ -67,24 +54,17 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		var searchTerm = TestRepository[..Math.Min(3, TestRepository.Length)];
 
 		// Act
-		var response = await Client.Organizations.ListOrganizationRepositoriesAsync(TestProvider, TestOrganization, null, null, searchTerm, null, null, null, CancellationToken);
+		var response = await ListRepositoriesAsync(search: searchTerm);
 
-		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		// All returned repos should match the search term
-		foreach (var repo in response.Data)
-		{
-			repo.Name.Should().NotBeNull();
-			repo.Name!.ToLowerInvariant().Should().Contain(searchTerm.ToLowerInvariant());
-		}
+		// Assert - every returned repository matches the search term
+		var repositories = response.ShouldHaveData(r => r.Data);
+		repositories.Should().AllSatisfy(repository =>
+			repository.Name.Should().ContainEquivalentOf(searchTerm));
 	}
 
 	[Fact]
 	public async Task GetOrganizationBilling_ReturnsBillingInformation()
 	{
-		// Arrange
-
 		// Act
 		var response = await Client.Organizations.GetOrganizationBillingAsync(
 			TestProvider,
@@ -92,43 +72,29 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 			cancellationToken: CancellationToken);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		// Billing info should have seat information
-		(response.Data.NumberOfSeats >= 0).Should().BeTrue();
+		var billing = response.ShouldHaveData(r => r.Data);
+		billing.NumberOfSeats.Should().BeGreaterThanOrEqualTo(0);
 	}
 
 	[Fact]
 	public async Task ListPeopleFromOrganization_ReturnsPeople()
 	{
-		// Arrange
-
 		// Act
-		var response = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, false, CancellationToken);
+		var response = await ListPeopleAsync();
 
-		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		// Should have at least the authenticated user
-		response.Data.Should().NotBeEmpty();
-		foreach (var person in response.Data)
-		{
-			person.Email.Should().NotBeNull();
-		}
+		// Assert - the authenticated user is a member, so there is always at least one person
+		var people = response.ShouldHaveNonEmptyData(r => r.Data);
+		people.Should().AllSatisfy(person => person.Email.Should().NotBeNull());
 	}
 
 	[Fact]
 	public async Task ListPeopleFromOrganization_OnlyMembers_ReturnsOnlyMembers()
 	{
-		// Arrange
-
 		// Act
-		var response = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, true, CancellationToken);
+		var response = await ListPeopleAsync(onlyMembers: true);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data.Should().NotBeEmpty();
+		response.ShouldHaveNonEmptyData(r => r.Data);
 	}
 
 	[Fact]
@@ -138,40 +104,40 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		const int limit = 5;
 
 		// Act
-		var response = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, limit, null, false, CancellationToken);
+		var response = await ListPeopleAsync(limit: limit);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		(response.Data.Count <= limit).Should().BeTrue($"Should return at most {limit} people");
+		response.ShouldHavePageOfAtMost(limit, r => r.Data);
 	}
 
 	[Fact]
 	public async Task ListPeopleFromOrganization_WithSearch_FiltersResults()
 	{
-		// Arrange
-
-		// Get all people first to find a search term
-		var allPeople = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, false, CancellationToken);
-		if (allPeople.Data.Count == 0)
-		{
-			return; // Skip test if no people
-		}
-
-		// Safely get search term with null check
-		var firstPersonName = allPeople.Data[0].Name;
+		// Arrange - the search term has to come from the organization's own people
+		var allPeople = (await ListPeopleAsync()).Data;
+		var firstPersonName = allPeople.Count == 0 ? null : allPeople[0].Name;
 		if (string.IsNullOrEmpty(firstPersonName))
 		{
-			return; // Skip if first person has no name
+			return; // Nothing to search for
 		}
 
 		var searchTerm = firstPersonName[..Math.Min(2, firstPersonName.Length)];
 
 		// Act
-		var response = await Client.Organizations.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, searchTerm, false, CancellationToken);
+		var response = await ListPeopleAsync(search: searchTerm);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
+		response.ShouldHaveData(r => r.Data);
 	}
+
+	private Task<ListResponse<Repository>> ListRepositoriesAsync(int? limit = null, string? search = null)
+		=> Client.Organizations.ListOrganizationRepositoriesAsync(
+			TestProvider, TestOrganization, null, limit, search, null, null, null, CancellationToken);
+
+	private Task<ListResponse<OrganizationPerson>> ListPeopleAsync(
+		int? limit = null,
+		string? search = null,
+		bool onlyMembers = false)
+		=> Client.Organizations.ListPeopleFromOrganizationAsync(
+			TestProvider, TestOrganization, null, limit, search, onlyMembers, CancellationToken);
 }

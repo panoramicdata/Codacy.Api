@@ -4,62 +4,43 @@ namespace Codacy.Api.Test.Integration;
 /// Integration tests for repository management using Codacy API
 /// Tests adding, configuring, and removing test repositories
 /// </summary>
+/// <remarks>
+/// Every test here works against <see cref="TestRepoName"/>, which has to be onboarded onto
+/// Codacy by hand: the Codacy API has no endpoint for adding a repository. Until the repository
+/// is there and its first analysis has finished, the API answers 404, so each test reports what
+/// is missing rather than failing.
+/// </remarks>
 [Trait("Category", "Integration")]
 public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(output)
 {
 	private const string TestRepoName = "Codacy.Api.TestRepo";
 
+	private const string NotOnboardedMessage =
+		$"{TestRepoName} is not on Codacy yet, or its analysis has not finished. Add it at " +
+		$"https://app.codacy.com ('Add Repository'), then wait for the initial analysis";
+
 	[Fact]
-	public async Task AddTestRepository_ToCodacy_Succeeds()
-	{
-		// Arrange
-
-		Output.WriteLine($"Adding test repository: {TestOrganization}/{TestRepoName}");
-
-		try
+	public Task AddTestRepository_ToCodacy_Succeeds()
+		=> RunAgainstTestRepoAsync("Looking for the test repository", async () =>
 		{
-			// Act - Try to get repository (should fail if not added)
+			// Act
 			var response = await Client.Repositories.GetRepositoryAsync(
 				TestProvider,
 				TestOrganization,
 				TestRepoName,
 				CancellationToken);
 
-			// If we get here, repository already exists
-			Output.WriteLine($"? Repository already exists in Codacy");
-			Output.WriteLine($"Repository ID: {response.Data.RepositoryId}");
-			Output.WriteLine($"Repository Name: {response.Data.Name}");
-
-			response.Should().NotBeNull();
-			response.Data.Should().NotBeNull();
-			response.Data.Name.Should().Be(TestRepoName);
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			Output.WriteLine($"?? Repository not found in Codacy");
-			Output.WriteLine($"Please add the repository manually:");
-			Output.WriteLine($"1. Go to https://app.codacy.com");
-			Output.WriteLine($"2. Click 'Add Repository'");
-			Output.WriteLine($"3. Select: {TestOrganization}/{TestRepoName}");
-			Output.WriteLine($"4. Wait for initial analysis to complete");
-			Output.WriteLine("");
-			Output.WriteLine($"Repository URL: https://github.com/{TestOrganization}/{TestRepoName}");
-
-			// Skip test - repository needs to be added manually
-			// Note: Codacy API doesn't currently support adding repositories via API
-		}
-	}
+			// Assert
+			var repository = response.ShouldHaveData(r => r.Data);
+			Output.WriteLine($"Already on Codacy as repository {repository.RepositoryId} ({repository.Name})");
+			repository.Name.Should().Be(TestRepoName);
+		});
 
 	[Fact]
-	public async Task VerifyTestRepository_HasBranches_Succeeds()
-	{
-		// Arrange
-
-		Output.WriteLine($"Verifying branches for: {TestOrganization}/{TestRepoName}");
-
-		try
+	public Task VerifyTestRepository_HasBranches_Succeeds()
+		=> RunAgainstTestRepoAsync("Verifying branches", async () =>
 		{
-			// Act - Get repository branches from repositories endpoint
+			// Act
 			var response = await Client.Repositories.ListRepositoryBranchesAsync(
 				TestProvider,
 				TestOrganization,
@@ -73,35 +54,16 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				CancellationToken);
 
 			// Assert
-			response.Should().NotBeNull();
-			response.Data.Should().NotBeNull();
-
-			Output.WriteLine($"? Found {response.Data.Count} branches:");
-			foreach (var branch in response.Data)
-			{
-				Output.WriteLine($"  - {branch.Name}");
-			}
-
-			// Verify we have at least the main branch
-			response.Data.Should().Contain(b => b.Name == "main");
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			Output.WriteLine($"?? Repository not found or not analyzed yet");
-			Output.WriteLine($"Please ensure repository is added to Codacy and analysis has completed");
-		}
-	}
+			var branches = response.ShouldHaveData(r => r.Data);
+			LogAll("branches", branches, branch => branch.Name);
+			branches.Should().Contain(branch => branch.Name == "main");
+		});
 
 	[Fact]
-	public async Task VerifyTestRepository_HasFiles_Succeeds()
-	{
-		// Arrange
-
-		Output.WriteLine($"Verifying files for: {TestOrganization}/{TestRepoName}");
-
-		try
+	public Task VerifyTestRepository_HasFiles_Succeeds()
+		=> RunAgainstTestRepoAsync("Verifying files", async () =>
 		{
-			// Act - Get repository files
+			// Act
 			var response = await Client.Repositories.ListFilesAsync(
 				TestProvider,
 				TestOrganization,
@@ -115,40 +77,16 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				CancellationToken);
 
 			// Assert
-			response.Should().NotBeNull();
-			response.Data.Should().NotBeNull();
-
-			Output.WriteLine($"? Found {response.Data.Count} files:");
-			foreach (var file in response.Data.Take(10))
-			{
-				Output.WriteLine($"  - {file.Path}");
-			}
-
-			if (response.Data.Count > 10)
-			{
-				Output.WriteLine($"  ... and {response.Data.Count - 10} more files");
-			}
-
-			// Verify we have some C# files
-			response.Data.Should().Contain(f => f.Path != null && f.Path.EndsWith(".cs"));
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			Output.WriteLine($"?? Repository not found or files not indexed yet");
-			Output.WriteLine($"Please ensure repository analysis has completed");
-		}
-	}
+			var files = response.ShouldHaveData(r => r.Data);
+			LogAll("files", files, file => file.Path);
+			files.Should().Contain(file => file.Path != null && file.Path.EndsWith(".cs"));
+		});
 
 	[Fact]
-	public async Task VerifyTestRepository_HasIssues_Succeeds()
-	{
-		// Arrange
-
-		Output.WriteLine($"Verifying issues for: {TestOrganization}/{TestRepoName}");
-
-		try
+	public Task VerifyTestRepository_HasIssues_Succeeds()
+		=> RunAgainstTestRepoAsync("Verifying issues", async () =>
 		{
-			// Act - Search for issues
+			// Act
 			var response = await Client.Issues.SearchRepositoryIssuesAsync(
 				TestProvider,
 				TestOrganization,
@@ -159,36 +97,18 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				CancellationToken);
 
 			// Assert
-			response.Should().NotBeNull();
-			response.Data.Should().NotBeNull();
+			var issues = response.ShouldHaveData(r => r.Data);
+			LogAll("issues", issues, issue => $"[{issue.PatternInfo.SeverityLevel}] {issue.Message} ({issue.FilePath}:{issue.LineNumber})");
 
-			Output.WriteLine($"? Found {response.Data.Count} issues (showing first 10):");
-			foreach (var issue in response.Data)
-			{
-				Output.WriteLine($"  - [{issue.PatternInfo.SeverityLevel}] {issue.Message}");
-				Output.WriteLine($"    File: {issue.FilePath}:{issue.LineNumber}");
-			}
-
-			// We expect issues since we intentionally added code with problems
-			response.Data.Should().NotBeEmpty("Test repository should have intentional code quality issues");
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			Output.WriteLine($"?? Repository not found or not analyzed yet");
-			Output.WriteLine($"Please ensure repository analysis has completed");
-		}
-	}
+			// The test repository carries deliberate code quality problems
+			issues.Should().NotBeEmpty("Test repository should have intentional code quality issues");
+		});
 
 	[Fact]
-	public async Task VerifyTestRepository_HasAnalysisTools_Succeeds()
-	{
-		// Arrange
-
-		Output.WriteLine($"Verifying analysis tools for: {TestOrganization}/{TestRepoName}");
-
-		try
+	public Task VerifyTestRepository_HasAnalysisTools_Succeeds()
+		=> RunAgainstTestRepoAsync("Verifying analysis tools", async () =>
 		{
-			// Act - Get repository tools
+			// Act
 			var response = await Client.Analysis.ListRepositoryToolsAsync(
 				TestProvider,
 				TestOrganization,
@@ -196,35 +116,16 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				cancellationToken: CancellationToken);
 
 			// Assert
-			response.Should().NotBeNull();
-			response.Data.Should().NotBeNull();
-
-			Output.WriteLine($"? Found {response.Data.Count} configured tools:");
-			foreach (var tool in response.Data)
-			{
-				Output.WriteLine($"  - {tool.Name}");
-			}
-
-			// We expect at least some tools to be configured
-			response.Data.Should().NotBeEmpty("Test repository should have analysis tools configured");
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			Output.WriteLine($"?? Repository not found or tools not configured yet");
-			Output.WriteLine($"Please ensure repository has completed initial analysis");
-		}
-	}
+			var tools = response.ShouldHaveData(r => r.Data);
+			LogAll("configured tools", tools, tool => tool.Name);
+			tools.Should().NotBeEmpty("Test repository should have analysis tools configured");
+		});
 
 	[Fact]
-	public async Task GetTestRepository_Details_Succeeds()
-	{
-		// Arrange
-
-		Output.WriteLine($"Getting repository details for: {TestOrganization}/{TestRepoName}");
-
-		try
+	public Task GetTestRepository_Details_Succeeds()
+		=> RunAgainstTestRepoAsync("Getting repository details", async () =>
 		{
-			// Act - Get repository with full analysis data
+			// Act
 			var response = await Client.Analysis.GetRepositoryWithAnalysisAsync(
 				TestProvider,
 				TestOrganization,
@@ -233,113 +134,74 @@ public class RepositoryManagementTests(ITestOutputHelper output) : TestBase(outp
 				CancellationToken);
 
 			// Assert
-			response.Should().NotBeNull();
-			response.Data.Should().NotBeNull();
-
-			Output.WriteLine($"");
-			Output.WriteLine($"Repository Details:");
-			Output.WriteLine($"==================");
-			Output.WriteLine($"Name: {response.Data.Repository?.Name}");
-			Output.WriteLine($"Provider: {response.Data.Repository?.Provider}");
-			Output.WriteLine($"");
-
-			// Verify basic properties
-			response.Data.Repository?.Name.Should().Be(TestRepoName);
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-		{
-			Output.WriteLine($"?? Repository not found or not fully analyzed");
-			Output.WriteLine($"Please ensure repository has been added to Codacy");
-		}
-	}
+			var repository = response.ShouldHaveData(r => r.Data.Repository);
+			Output.WriteLine($"Name: {repository.Name}, provider: {repository.Provider}");
+			repository.Name.Should().Be(TestRepoName);
+		});
 
 	[Fact]
 	public async Task ListOrganizationRepositories_IncludesTestRepo_Succeeds()
 	{
-		// Arrange
-
+		// Arrange - unlike the tests above this one reaches the organization, not the test
+		// repository, so a failure here is a real failure rather than a missing repository
 		Output.WriteLine($"Listing all repositories in organization: {TestOrganization}");
 
-		try
-		{
-			// Act - List all organization repositories
-			var response = await Client.Organizations.ListOrganizationRepositoriesAsync(
-				TestProvider,
-				TestOrganization,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				CancellationToken);
+		// Act
+		var response = await Client.Organizations.ListOrganizationRepositoriesAsync(
+			TestProvider,
+			TestOrganization,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			CancellationToken);
 
-			// Assert
-			response.Should().NotBeNull();
-			response.Data.Should().NotBeNull();
+		// Assert
+		var repositories = response.ShouldHaveData(r => r.Data);
+		LogAll("repositories", repositories, repository => repository.Name);
 
-			Output.WriteLine($"? Found {response.Data.Count} repositories:");
-			foreach (var repo in response.Data)
-			{
-				var marker = repo.Name == TestRepoName ? "??" : "  ";
-				Output.WriteLine($"{marker} {repo.Name}");
-			}
-
-			// Verify test repository is in the list
-			var testRepo = response.Data.FirstOrDefault(r => r.Name == TestRepoName);
-			if (testRepo != null)
-			{
-				Output.WriteLine($"");
-				Output.WriteLine($"? Test repository found in organization!");
-				testRepo.Should().NotBeNull();
-			}
-			else
-			{
-				Output.WriteLine($"");
-				Output.WriteLine($"?? Test repository NOT found in organization");
-				Output.WriteLine($"Please add {TestRepoName} to Codacy");
-			}
-		}
-		catch (Refit.ApiException ex)
-		{
-			Output.WriteLine($"? Error listing repositories: {ex.StatusCode} - {ex.Message}");
-			throw;
-		}
+		Output.WriteLine(repositories.Any(repository => repository.Name == TestRepoName)
+			? $"{TestRepoName} found in the organization"
+			: $"{TestRepoName} NOT found in the organization - {NotOnboardedMessage}");
 	}
 
 	[Fact]
-	public async Task ConfigureTestRepository_Settings_Succeeds()
-	{
-		// Arrange
-
-		Output.WriteLine($"Checking repository settings for: {TestOrganization}/{TestRepoName}");
-
-		try
+	public Task ConfigureTestRepository_Settings_Succeeds()
+		=> RunAgainstTestRepoAsync("Checking pull request quality settings", async () =>
 		{
-			// Act - Get pull request quality settings
+			// Act
 			var response = await Client.Repositories.GetPullRequestQualitySettingsAsync(
 				TestProvider,
 				TestOrganization,
 				TestRepoName,
 				CancellationToken);
 
-			// Assert
-			response.Should().NotBeNull();
-			response.Data.Should().NotBeNull();
+			// Assert - retrieving the settings at all is what is under test
+			response.ShouldHaveData(r => r.Data);
+		});
 
-			Output.WriteLine($"");
-			Output.WriteLine($"Pull Request Quality Settings:");
-			Output.WriteLine($"==============================");
-			Output.WriteLine($"Settings Retrieved Successfully");
-			Output.WriteLine($"");
+	/// <summary>
+	/// Runs a test against the manually onboarded test repository, reporting what is missing
+	/// instead of failing when Codacy does not know about the repository yet.
+	/// </summary>
+	private Task RunAgainstTestRepoAsync(string what, Func<Task> test)
+	{
+		Output.WriteLine($"{what} for {TestOrganization}/{TestRepoName}");
 
-			// Just verify we can retrieve settings
-			response.Data.Should().NotBeNull();
-		}
-		catch (Refit.ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+		return RunWhenAvailableAsync(test, NotOnboardedMessage);
+	}
+
+	/// <summary>
+	/// Writes every item to the test output, so a failure can be read against what the API returned.
+	/// </summary>
+	private void LogAll<T>(string what, List<T> items, Func<T, string?> describe)
+	{
+		Output.WriteLine($"Found {items.Count} {what}:");
+		foreach (var item in items)
 		{
-			Output.WriteLine($"?? Repository settings not available");
-			Output.WriteLine($"This is expected if repository hasn't been added to Codacy yet");
+			Output.WriteLine($"  - {describe(item)}");
 		}
 	}
 }

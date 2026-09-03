@@ -7,214 +7,118 @@ namespace Codacy.Api.Test.Integration;
 public class AnalysisApiTests(ITestOutputHelper output) : TestBase(output)
 {
 	[Fact]
-	public async Task ListOrganizationRepositoriesWithAnalysis_ReturnsRepositories()
-	{
-		// Arrange
-
-		await RunWhenAvailableAsync(
+	public Task ListOrganizationRepositoriesWithAnalysis_ReturnsRepositories()
+		=> RunWhenAvailableAsync(
 			async () =>
 			{
 				// Act
-				var response = await Client
-					.Analysis
-					.ListOrganizationRepositoriesWithAnalysisAsync(
-						TestProvider,
-						TestOrganization,
-						null,
-						null,
-						null,
-						null,
-						null,
-						CancellationToken);
+				var response = await Client.Analysis.ListOrganizationRepositoriesWithAnalysisAsync(
+					TestProvider, TestOrganization, null, null, null, null, null, CancellationToken);
 
 				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
+				response.ShouldHaveData(r => r.Data);
 			},
 			"Organization or repositories not found");
-	}
 
 	[Fact]
-	public async Task GetRepositoryWithAnalysis_ReturnsAnalysisData()
-	{
-		// Arrange
+	public Task GetRepositoryWithAnalysis_ReturnsAnalysisData()
+		=> RunWhenRepositoryAvailableAsync(async () =>
+		{
+			// Act
+			var response = await Client.Analysis.GetRepositoryWithAnalysisAsync(
+				TestProvider, TestOrganization, TestRepository, null, CancellationToken);
 
-		await RunWhenAvailableAsync(
-			async () =>
-			{
-				// Act
-				var response = await Client.Analysis.GetRepositoryWithAnalysisAsync(TestProvider, TestOrganization, TestRepository, null, CancellationToken);
-
-				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
-			},
-			"Repository not found or not analyzed");
-	}
+			// Assert
+			response.ShouldHaveData(r => r.Data);
+		});
 
 	[Fact]
 	public async Task ListRepositoryTools_ReturnsTools()
 	{
-		// Arrange
-
 		// Act
 		var response = await Client.Analysis.ListRepositoryToolsAsync(
 			TestProvider, TestOrganization, TestRepository, CancellationToken);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data.Should().NotBeEmpty();
+		response.ShouldHaveNonEmptyData(r => r.Data);
 	}
 
 	[Fact]
-	public async Task ListCommitAnalysisStats_ReturnsStatistics()
-	{
-		// Arrange
+	public Task ListCommitAnalysisStats_ReturnsStatistics()
+		=> RunWhenRepositoryAvailableAsync(async () =>
+		{
+			// Act
+			var response = await Client.Analysis.ListCommitAnalysisStatsAsync(
+				TestProvider, TestOrganization, TestRepository, null, 31, CancellationToken);
 
-		await RunWhenAvailableAsync(
-			async () =>
-			{
-				// Act
-				var response = await Client.Analysis.ListCommitAnalysisStatsAsync(TestProvider, TestOrganization, TestRepository, null, 31, CancellationToken);
-
-				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
-			},
-			"Repository not found");
-	}
+			// Assert
+			response.ShouldHaveData(r => r.Data);
+		});
 
 	[Fact]
 	public async Task ListCategoryOverviews_ReturnsCategories()
 	{
-		// Arrange
-
 		// Act
 		var response = await Client.Analysis.ListCategoryOverviewsAsync(
 			TestProvider, TestOrganization, TestRepository, null, CancellationToken);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
+		response.ShouldHaveData(r => r.Data);
 	}
+
+	[Theory]
+	[InlineData(null)]
+	[InlineData(5)]
+	public Task ListRepositoryCommits_ReturnsCommits(int? limit)
+		=> RunWhenRepositoryAvailableAsync(async () =>
+		{
+			// Act
+			var response = await Client.Analysis.ListRepositoryCommitsAsync(
+				TestProvider, TestOrganization, TestRepository, null, null, limit, CancellationToken);
+
+			// Assert
+			response.ShouldHavePageOfAtMost(limit, r => r.Data);
+		});
 
 	[Fact]
-	public async Task ListRepositoryCommits_ReturnsCommits()
-	{
-		// Arrange
+	public Task SearchRepositoryIssues_ReturnsIssues()
+		=> RunWhenRepositoryAvailableAsync(async () =>
+		{
+			// Act
+			var response = await Client.Analysis.SearchRepositoryIssuesAsync(
+				TestProvider, TestOrganization, TestRepository, new SearchRepositoryIssuesBody(), null, null, CancellationToken);
 
-		await RunWhenAvailableAsync(
-			async () =>
-			{
-				// Act
-				var response = await Client.Analysis.ListRepositoryCommitsAsync(TestProvider, TestOrganization, TestRepository, null, null, null, CancellationToken);
-
-				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
-			},
-			"Repository not found");
-	}
+			// Assert
+			response.ShouldHaveData(r => r.Data);
+		});
 
 	[Fact]
-	public async Task ListRepositoryCommits_WithPagination_ReturnsLimitedResults()
-	{
-		// Arrange
-		const int limit = 5;
+	public Task GetIssuesOverview_ReturnsOverview()
+		=> RunWhenRepositoryAvailableAsync(async () =>
+		{
+			// Act
+			var response = await Client.Analysis.GetIssuesOverviewAsync(
+				TestProvider,
+				TestOrganization,
+				TestRepository,
+				body: new SearchRepositoryIssuesBody(),
+				cancellationToken: CancellationToken);
 
-		await RunWhenAvailableAsync(
-			async () =>
-			{
-				// Act
-				var response = await Client.Analysis.ListRepositoryCommitsAsync(TestProvider, TestOrganization, TestRepository, null, null, limit, CancellationToken);
+			// Assert
+			response.ShouldHaveData(r => r.Data);
+		});
 
-				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
-				(response.Data.Count <= limit).Should().BeTrue($"Should return at most {limit} commits");
-			},
-			"Repository not found");
-	}
+	[Theory]
+	[InlineData(null)]
+	[InlineData(10)]
+	public Task ListRepositoryPullRequests_ReturnsPullRequests(int? limit)
+		=> RunWhenRepositoryAvailableAsync(async () =>
+		{
+			// Act
+			var response = await Client.Analysis.ListRepositoryPullRequestsAsync(
+				TestProvider, TestOrganization, TestRepository, limit, null, null, false, CancellationToken);
 
-	[Fact]
-	public async Task SearchRepositoryIssues_ReturnsIssues()
-	{
-		// Arrange
-
-		await RunWhenAvailableAsync(
-			async () =>
-			{
-				// Act
-				var response = await Client
-					.Analysis
-					.SearchRepositoryIssuesAsync(TestProvider, TestOrganization, TestRepository, new SearchRepositoryIssuesBody(), null, null, CancellationToken);
-
-				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
-			},
-			"Repository not found or not analyzed");
-	}
-
-	[Fact]
-	public async Task GetIssuesOverview_ReturnsOverview()
-	{
-		// Arrange
-
-		await RunWhenAvailableAsync(
-			async () =>
-			{
-				// Act
-				var response = await Client.Analysis.GetIssuesOverviewAsync(
-					TestProvider,
-					TestOrganization,
-					TestRepository,
-					body: new SearchRepositoryIssuesBody(),
-					cancellationToken: CancellationToken);
-
-				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
-			},
-			"Repository not found or not analyzed");
-	}
-
-	[Fact]
-	public async Task ListRepositoryPullRequests_ReturnsPullRequests()
-	{
-		// Arrange
-
-		await RunWhenAvailableAsync(
-			async () =>
-			{
-				// Act
-				var response = await Client.Analysis.ListRepositoryPullRequestsAsync(TestProvider, TestOrganization, TestRepository, null, null, null, false, CancellationToken);
-
-				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
-			},
-			"Repository not found");
-	}
-
-	[Fact]
-	public async Task ListRepositoryPullRequests_WithPagination_ReturnsLimitedResults()
-	{
-		// Arrange
-		const int limit = 10;
-
-		await RunWhenAvailableAsync(
-			async () =>
-			{
-				// Act
-				var response = await Client.Analysis.ListRepositoryPullRequestsAsync(TestProvider, TestOrganization, TestRepository, limit, null, null, false, CancellationToken);
-
-				// Assert
-				response.Should().NotBeNull();
-				response.Data.Should().NotBeNull();
-				(response.Data.Count <= limit).Should().BeTrue($"Should return at most {limit} pull requests");
-			},
-			"Repository not found");
-	}
+			// Assert
+			response.ShouldHavePageOfAtMost(limit, r => r.Data);
+		});
 }

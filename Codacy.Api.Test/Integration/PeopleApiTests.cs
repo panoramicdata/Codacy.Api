@@ -9,19 +9,12 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 	[Fact]
 	public async Task ListPeopleFromOrganization_ReturnsPeople()
 	{
-		// Arrange
-
 		// Act
-		var response = await Client.People.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, null, CancellationToken);
+		var response = await ListPeopleAsync();
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data.Should().NotBeEmpty();
-		foreach (var person in response.Data)
-		{
-			person.Email.Should().NotBeNull();
-		}
+		var people = response.ShouldHaveNonEmptyData(r => r.Data);
+		people.Should().AllSatisfy(person => person.Email.Should().NotBeNull());
 	}
 
 	[Fact]
@@ -31,47 +24,44 @@ public class PeopleApiTests(ITestOutputHelper output) : TestBase(output)
 		const int limit = 5;
 
 		// Act
-		var response = await Client.People.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, limit, null, null, CancellationToken);
+		var response = await ListPeopleAsync(limit: limit);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		(response.Data.Count <= limit).Should().BeTrue($"Should return at most {limit} people");
+		response.ShouldHavePageOfAtMost(limit, r => r.Data);
 	}
 
 	[Fact]
 	public async Task ListPeopleFromOrganization_WithSearch_FiltersResults()
 	{
-		// Arrange
-
-		// Get all people first to find a search term
-		var allPeople = await Client.People.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, null, null, CancellationToken);
-
-		if (allPeople.Data.Count == 0)
+		// Arrange - the search term has to come from the organization's own people
+		var allPeople = (await ListPeopleAsync()).Data;
+		if (allPeople.Count == 0)
 		{
-			return; // Skip test if no people
+			return; // Nothing to search for
 		}
 
-		var searchTerm = allPeople.Data[0].Email[..Math.Min(3, allPeople.Data[0].Email.Length)];
+		var email = allPeople[0].Email;
+		var searchTerm = email[..Math.Min(3, email.Length)];
 
 		// Act
-		var response = await Client.People.ListPeopleFromOrganizationAsync(TestProvider, TestOrganization, null, null, searchTerm, null, CancellationToken);
+		var response = await ListPeopleAsync(search: searchTerm);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
+		response.ShouldHaveData(r => r.Data);
 	}
 
 	[Fact]
 	public async Task PeopleSuggestionsForOrganization_ReturnsSuggestions()
 	{
-		// Arrange
-
 		// Act
-		var response = await Client.People.PeopleSuggestionsForOrganizationAsync(TestProvider, TestOrganization, null, null, null, CancellationToken);
+		var response = await Client.People.PeopleSuggestionsForOrganizationAsync(
+			TestProvider, TestOrganization, null, null, null, CancellationToken);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
+		response.ShouldHaveData(r => r.Data);
 	}
+
+	private Task<ListResponse<OrganizationPerson>> ListPeopleAsync(int? limit = null, string? search = null)
+		=> Client.People.ListPeopleFromOrganizationAsync(
+			TestProvider, TestOrganization, null, limit, search, null, CancellationToken);
 }

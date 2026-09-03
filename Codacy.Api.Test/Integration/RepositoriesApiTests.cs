@@ -16,50 +16,40 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 	[Fact]
 	public async Task GetRepository_ReturnsRepositoryDetails()
 	{
-		// Arrange
-
 		// Act
 		var response = await Client.Repositories.GetRepositoryAsync(TestProvider, TestOrganization, TestRepository, CancellationToken);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data.Name.Should().Be(TestRepository);
-		response.Data.Provider.Should().Be(TestProvider);
+		var repository = response.ShouldHaveData(r => r.Data);
+		repository.Name.Should().Be(TestRepository);
+		repository.Provider.Should().Be(TestProvider);
 	}
 
 	[Fact]
 	public async Task ListRepositoryBranches_ReturnsBranches()
 	{
-		// Arrange
-
 		// Act
-		var response = await Client.Repositories.ListRepositoryBranchesAsync(
-			TestProvider, TestOrganization, TestRepository, null, null, null, null, null, null, CancellationToken);
+		var response = await ListBranchesAsync();
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data.Should().NotBeEmpty();
-		response.Data!.Should().AllSatisfy(branch => branch.Name.Should().NotBeNullOrWhiteSpace());
+		var branches = response.ShouldHaveNonEmptyData(r => r.Data);
+		branches.Should().AllSatisfy(branch => branch.Name.Should().NotBeNullOrWhiteSpace());
 
 		// Every repository Codacy analyses has exactly one default branch.
-		response.Data.Count(branch => branch.IsDefault).Should().Be(1);
+		branches.Count(branch => branch.IsDefault).Should().Be(1);
 	}
 
 	[Fact]
 	public async Task ListRepositoryBranches_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
+		const int limit = 1;
 
 		// Act
-		var response = await Client.Repositories.ListRepositoryBranchesAsync(
-			TestProvider, TestOrganization, TestRepository, null, null, 1, null, null, null, CancellationToken);
+		var response = await ListBranchesAsync(limit: limit);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data!.Count.Should().BeLessThanOrEqualTo(1);
+		response.ShouldHavePageOfAtMost(limit, r => r.Data);
 	}
 
 	[Fact]
@@ -68,89 +58,79 @@ public class RepositoriesApiTests(ITestOutputHelper output) : TestBase(output)
 		// A bool reaching the query string as "True" rather than "true" was silently ignored by the
 		// API, so this filter used to return every branch.
 
-		// Arrange
-
 		// Act
-		var response = await Client.Repositories.ListRepositoryBranchesAsync(
-			TestProvider, TestOrganization, TestRepository, true, null, null, null, null, null, CancellationToken);
+		var response = await ListBranchesAsync(enabled: true);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data!.Should().AllSatisfy(branch => branch.IsEnabled.Should().BeTrue());
+		var branches = response.ShouldHaveData(r => r.Data);
+		branches.Should().AllSatisfy(branch => branch.IsEnabled.Should().BeTrue());
 	}
 
 	[Fact]
 	public async Task GetCommitQualitySettings_ReturnsSettings()
 	{
-		// Arrange
-
 		// Act
 		var response = await Client.Repositories.GetCommitQualitySettingsAsync(
 			TestProvider, TestOrganization, TestRepository, CancellationToken);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
+		response.ShouldHaveData(r => r.Data);
 	}
 
 	[Fact]
 	public async Task GetPullRequestQualitySettings_ReturnsSettings()
 	{
-		// Arrange
-
 		// Act
 		var response = await Client.Repositories.GetPullRequestQualitySettingsAsync(
 			TestProvider, TestOrganization, TestRepository, CancellationToken);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
+		response.ShouldHaveData(r => r.Data);
 	}
 
 	[Fact]
 	public async Task ListFiles_ReturnsFiles()
 	{
-		// Arrange
-
 		// Act
-		var response = await Client.Repositories.ListFilesAsync(
-			TestProvider, TestOrganization, TestRepository, null, null, null, null, null, null, CancellationToken);
+		var response = await ListFilesAsync();
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data.Should().NotBeEmpty();
-		response.Data!.Should().AllSatisfy(file => file.Path.Should().NotBeNullOrWhiteSpace());
+		var files = response.ShouldHaveNonEmptyData(r => r.Data);
+		files.Should().AllSatisfy(file => file.Path.Should().NotBeNullOrWhiteSpace());
 	}
 
 	[Fact]
 	public async Task ListFiles_WithPagination_ReturnsLimitedResults()
 	{
 		// Arrange
+		const int limit = 3;
 
 		// Act
-		var response = await Client.Repositories.ListFilesAsync(
-			TestProvider, TestOrganization, TestRepository, null, null, null, null, null, 3, CancellationToken);
+		var response = await ListFilesAsync(limit: limit);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data!.Count.Should().BeLessThanOrEqualTo(3);
+		response.ShouldHavePageOfAtMost(limit, r => r.Data);
 	}
 
 	[Fact]
 	public async Task ListFiles_WithSearch_FiltersResults()
 	{
 		// Arrange
+		const string searchTerm = "cs";
 
 		// Act
-		var response = await Client.Repositories.ListFilesAsync(
-			TestProvider, TestOrganization, TestRepository, null, "cs", null, null, null, null, CancellationToken);
+		var response = await ListFilesAsync(search: searchTerm);
 
 		// Assert
-		response.Should().NotBeNull();
-		response.Data.Should().NotBeNull();
-		response.Data!.Should().AllSatisfy(file => file.Path.Should().Contain("cs"));
+		var files = response.ShouldHaveData(r => r.Data);
+		files.Should().AllSatisfy(file => file.Path.Should().Contain(searchTerm));
 	}
+
+	private Task<BranchListResponse> ListBranchesAsync(bool? enabled = null, int? limit = null)
+		=> Client.Repositories.ListRepositoryBranchesAsync(
+			TestProvider, TestOrganization, TestRepository, enabled, null, limit, null, null, null, CancellationToken);
+
+	private Task<FileListResponse> ListFilesAsync(string? search = null, int? limit = null)
+		=> Client.Repositories.ListFilesAsync(
+			TestProvider, TestOrganization, TestRepository, null, search, null, null, null, limit, CancellationToken);
 }
