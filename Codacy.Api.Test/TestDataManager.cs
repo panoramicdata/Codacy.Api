@@ -1,7 +1,8 @@
 #pragma warning disable CA1848 // Use LoggerMessage delegates for improved performance
 #pragma warning disable CA1873 // Test diagnostics favor readability over deferred argument evaluation
-#pragma warning disable CA1510 // Use ArgumentNullException.ThrowIfNull
 #pragma warning disable S2360 // Optional parameters should not be used - This is a test helper class where optional parameters improve usability
+
+using Microsoft.Extensions.Logging.Abstractions;
 
 using Polly;
 using Refit;
@@ -12,10 +13,10 @@ namespace Codacy.Api.Test;
 /// <summary>
 /// Manages test data lifecycle for integration tests, including seeding, cleanup, and retry logic
 /// </summary>
-public class TestDataManager : IDisposable
+public sealed class TestDataManager : IDisposable
 {
 	private readonly CodacyClient _client;
-	private readonly ILogger? _logger;
+	private readonly ILogger _logger;
 	private readonly ResiliencePipeline _retryPipeline;
 	private readonly TestCleanupRegistry _cleanupRegistry;
 	private bool _disposed;
@@ -49,11 +50,15 @@ public class TestDataManager : IDisposable
 		ILogger? logger = null,
 		int maxRetries = DefaultMaxRetries)
 	{
-		_client = client ?? throw new ArgumentNullException(nameof(client));
-		_testOrganization = testOrganization ?? throw new ArgumentNullException(nameof(testOrganization));
-		_testRepository = testRepository ?? throw new ArgumentNullException(nameof(testRepository));
+		ArgumentNullException.ThrowIfNull(client);
+		ArgumentNullException.ThrowIfNull(testOrganization);
+		ArgumentNullException.ThrowIfNull(testRepository);
+
+		_client = client;
+		_testOrganization = testOrganization;
+		_testRepository = testRepository;
 		_testProvider = testProvider;
-		_logger = logger;
+		_logger = logger ?? NullLogger.Instance;
 		_cleanupRegistry = new TestCleanupRegistry(logger);
 		_retryPipeline = TestRetryPipelineFactory.Create(logger, maxRetries);
 	}
@@ -65,141 +70,37 @@ public class TestDataManager : IDisposable
 	/// </summary>
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>True if repository exists, false otherwise</returns>
-	public async Task<bool> VerifyRepositoryExistsAsync(CancellationToken cancellationToken = default)
-	{
-		try
-		{
-			await ExecuteWithRetryAsync(async () =>
-			{
-				var response = await _client.Repositories.GetRepositoryAsync(
-					_testProvider,
-					_testOrganization,
-					_testRepository,
-					cancellationToken);
-				return response.Data != null;
-			}, cancellationToken);
-
-			_logger?.LogInformation(
-				"Repository {Organization}/{Repository} verified in Codacy",
-				_testOrganization,
-				_testRepository);
-			return true;
-		}
-		catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-		{
-			_logger?.LogWarning(
-				"Repository {Organization}/{Repository} not found in Codacy",
-				_testOrganization, _testRepository);
-			return false;
-		}
-	}
+	public Task<bool> VerifyRepositoryExistsAsync(CancellationToken cancellationToken = default)
+		=> VerifyAsync(
+			"exists in Codacy",
+			async () => await GetRepositoryOrNullAsync(cancellationToken) is not null,
+			cancellationToken,
+			HttpStatusCode.NotFound);
 
 	/// <summary>
 	/// Verifies that the test repository has been analyzed
 	/// </summary>
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>True if repository has analysis data, false otherwise</returns>
-	public async Task<bool> VerifyRepositoryAnalyzedAsync(CancellationToken cancellationToken = default)
-	{
-		try
-		{
-			var hasFiles = await ExecuteWithRetryAsync(async () =>
-			{
-				var response = await _client.Repositories.ListFilesAsync(
-					_testProvider,
-					_testOrganization,
-					_testRepository,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					cancellationToken);
-				return response.Data?.Count > 0;
-			}, cancellationToken);
-
-			if (hasFiles)
-			{
-				_logger?.LogInformation(
-					"Repository {Organization}/{Repository} has analysis data",
-					_testOrganization,
-					_testRepository);
-			}
-			else
-			{
-				_logger?.LogWarning(
-					"Repository {Organization}/{Repository} has no analysis data",
-					_testOrganization, _testRepository);
-			}
-
-			return hasFiles;
-		}
-		catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-		{
-			_logger?.LogWarning(
-				"Repository {Organization}/{Repository} not found or not analyzed",
-				_testOrganization, _testRepository);
-			return false;
-		}
-	}
+	public Task<bool> VerifyRepositoryAnalyzedAsync(CancellationToken cancellationToken = default)
+		=> VerifyAsync(
+			"has analysis data",
+			async () => (await ListFilesAsync(null, null, cancellationToken)).Data.Count > 0,
+			cancellationToken,
+			HttpStatusCode.NotFound);
 
 	/// <summary>
 	/// Verifies that the test repository has branches
 	/// </summary>
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>True if repository has branches, false otherwise</returns>
-	public async Task<bool> VerifyRepositoryHasBranchesAsync(CancellationToken cancellationToken = default)
-	{
-		try
-		{
-			var hasBranches = await ExecuteWithRetryAsync(async () =>
-			{
-				var response = await _client.Repositories.ListRepositoryBranchesAsync(
-					_testProvider,
-					_testOrganization,
-					_testRepository,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					cancellationToken);
-				return response.Data?.Count > 0;
-			}, cancellationToken);
-
-			LogBranchesResult(hasBranches);
-
-			return hasBranches;
-		}
-		catch (ApiException ex) when (
-			ex.StatusCode == HttpStatusCode.NotFound ||
-			ex.StatusCode == HttpStatusCode.BadRequest)
-		{
-			_logger?.LogWarning(
-				"Repository {Organization}/{Repository} branches not available: {Message}",
-				_testOrganization, _testRepository, ex.Message);
-			return false;
-		}
-	}
-
-	private void LogBranchesResult(bool hasBranches)
-	{
-		if (hasBranches)
-		{
-			_logger?.LogInformation(
-				"Repository {Organization}/{Repository} has branches",
-				_testOrganization,
-				_testRepository);
-		}
-		else
-		{
-			_logger?.LogWarning(
-				"Repository {Organization}/{Repository} has no branches",
-				_testOrganization, _testRepository);
-		}
-	}
+	public Task<bool> VerifyRepositoryHasBranchesAsync(CancellationToken cancellationToken = default)
+		=> VerifyAsync(
+			"has branches",
+			async () => (await ListBranchesAsync(null, cancellationToken)).Data.Count > 0,
+			cancellationToken,
+			HttpStatusCode.NotFound,
+			HttpStatusCode.BadRequest);
 
 	#endregion
 
@@ -211,25 +112,12 @@ public class TestDataManager : IDisposable
 	/// <param name="cancellationToken">Cancellation token</param>
 	/// <returns>Repository details</returns>
 	public Task<Repository?> GetTestRepositoryAsync(CancellationToken cancellationToken = default)
-	{
-		return ExecuteWithRetryAsync(async () =>
-		{
-			try
-			{
-				var response = await _client.Repositories.GetRepositoryAsync(
-					_testProvider,
-					_testOrganization,
-					_testRepository,
-					cancellationToken);
-				return response.Data;
-			}
-			catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-			{
-				_logger?.LogWarning("Test repository not found in Codacy");
-				return null;
-			}
-		}, cancellationToken);
-	}
+		=> TryGetAsync(
+			"details",
+			() => GetRepositoryOrNullAsync(cancellationToken),
+			whenUnavailable: null,
+			cancellationToken,
+			HttpStatusCode.NotFound);
 
 	/// <summary>
 	/// Gets a list of branches for the test repository
@@ -240,33 +128,13 @@ public class TestDataManager : IDisposable
 	public Task<List<Branch>> GetTestRepositoryBranchesAsync(
 		int? limit = null,
 		CancellationToken cancellationToken = default)
-	{
-		return ExecuteWithRetryAsync(async () =>
-		{
-			try
-			{
-				var response = await _client.Repositories.ListRepositoryBranchesAsync(
-					_testProvider,
-					_testOrganization,
-					_testRepository,
-					null,
-					null,
-					limit,
-					null,
-					null,
-					null,
-					cancellationToken);
-				return response.Data ?? [];
-			}
-			catch (ApiException ex) when (
-				ex.StatusCode == HttpStatusCode.NotFound ||
-				ex.StatusCode == HttpStatusCode.BadRequest)
-			{
-				_logger?.LogWarning("Test repository branches not available: {Message}", ex.Message);
-				return [];
-			}
-		}, cancellationToken);
-	}
+		=> TryGetAsync(
+			"branches",
+			async () => (await ListBranchesAsync(limit, cancellationToken)).Data,
+			whenUnavailable: [],
+			cancellationToken,
+			HttpStatusCode.NotFound,
+			HttpStatusCode.BadRequest);
 
 	/// <summary>
 	/// Gets the default branch for the test repository
@@ -290,31 +158,49 @@ public class TestDataManager : IDisposable
 		string? branch = null,
 		int? limit = null,
 		CancellationToken cancellationToken = default)
+		=> TryGetAsync(
+			"files",
+			async () => (await ListFilesAsync(branch, limit, cancellationToken)).Data,
+			whenUnavailable: [],
+			cancellationToken,
+			HttpStatusCode.NotFound);
+
+	private async Task<Repository?> GetRepositoryOrNullAsync(CancellationToken cancellationToken)
 	{
-		return ExecuteWithRetryAsync(async () =>
-		{
-			try
-			{
-				var response = await _client.Repositories.ListFilesAsync(
-					_testProvider,
-					_testOrganization,
-					_testRepository,
-					branch,
-					null,
-					null,
-					null,
-					null,
-					limit,
-					cancellationToken);
-				return response.Data ?? [];
-			}
-			catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-			{
-				_logger?.LogWarning("Test repository files not available: {Message}", ex.Message);
-				return [];
-			}
-		}, cancellationToken);
+		var response = await _client.Repositories.GetRepositoryAsync(
+			_testProvider,
+			_testOrganization,
+			_testRepository,
+			cancellationToken);
+
+		return response.Data;
 	}
+
+	private Task<BranchListResponse> ListBranchesAsync(int? limit, CancellationToken cancellationToken)
+		=> _client.Repositories.ListRepositoryBranchesAsync(
+			_testProvider,
+			_testOrganization,
+			_testRepository,
+			null,
+			null,
+			limit,
+			null,
+			null,
+			null,
+			cancellationToken);
+
+	private Task<FileListResponse> ListFilesAsync(string? branch, int? limit, CancellationToken cancellationToken)
+		=> _client.Repositories.ListFilesAsync(
+			_testProvider,
+			_testOrganization,
+			_testRepository,
+			branch,
+			null,
+			null,
+			null,
+			null,
+			limit,
+			cancellationToken);
 
 	#endregion
 
@@ -354,6 +240,68 @@ public class TestDataManager : IDisposable
 		}, cancellationToken);
 	}
 
+	/// <summary>
+	/// Runs an operation against the test repository with retry, reading the tolerated statuses
+	/// as "the test environment does not have this yet" rather than as a failure.
+	/// </summary>
+	/// <typeparam name="T">Return type</typeparam>
+	/// <param name="what">What is being fetched, for the diagnostic message</param>
+	/// <param name="operation">Operation to execute</param>
+	/// <param name="whenUnavailable">Value to return when a tolerated status comes back</param>
+	/// <param name="cancellationToken">Cancellation token</param>
+	/// <param name="tolerated">Statuses that mean "not available" rather than "failed"</param>
+	private async Task<T> TryGetAsync<T>(
+		string what,
+		Func<Task<T>> operation,
+		T whenUnavailable,
+		CancellationToken cancellationToken,
+		params HttpStatusCode[] tolerated)
+	{
+		try
+		{
+			return await ExecuteWithRetryAsync(operation, cancellationToken);
+		}
+		catch (ApiException ex) when (tolerated.Contains(ex.StatusCode))
+		{
+			_logger.LogWarning(
+				"Repository {Organization}/{Repository} {What} not available ({Status}): {Message}",
+				_testOrganization,
+				_testRepository,
+				what,
+				ex.StatusCode,
+				ex.Message);
+
+			return whenUnavailable;
+		}
+	}
+
+	/// <summary>
+	/// Runs a check against the test repository and logs its outcome, reading a tolerated status
+	/// as a failed check rather than as an error.
+	/// </summary>
+	/// <param name="expectation">What is being checked, for the diagnostic message</param>
+	/// <param name="check">The check to run</param>
+	/// <param name="cancellationToken">Cancellation token</param>
+	/// <param name="tolerated">Statuses that mean the check failed rather than errored</param>
+	private async Task<bool> VerifyAsync(
+		string expectation,
+		Func<Task<bool>> check,
+		CancellationToken cancellationToken,
+		params HttpStatusCode[] tolerated)
+	{
+		var satisfied = await TryGetAsync(expectation, check, false, cancellationToken, tolerated);
+
+		_logger.Log(
+			satisfied ? LogLevel.Information : LogLevel.Warning,
+			"Repository {Organization}/{Repository} {Expectation}: {Satisfied}",
+			_testOrganization,
+			_testRepository,
+			expectation,
+			satisfied);
+
+		return satisfied;
+	}
+
 	#endregion
 
 	#region Test Data Cleanup
@@ -391,38 +339,28 @@ public class TestDataManager : IDisposable
 		var interval = pollingInterval ?? TimeSpan.FromSeconds(10);
 		var startTime = DateTime.UtcNow;
 
-		LogWaitStart(maxWait, interval);
+		_logger.LogInformation(
+			"Waiting for repository analysis (max {MaxWait}s, polling every {Interval}s)",
+			maxWait.TotalSeconds,
+			interval.TotalSeconds);
 
 		while (DateTime.UtcNow - startTime < maxWait)
 		{
 			if (await VerifyRepositoryAnalyzedAsync(cancellationToken))
 			{
-				LogAnalysisCompleted(DateTime.UtcNow - startTime);
+				_logger.LogInformation(
+					"Repository analysis completed after {Elapsed}s",
+					(DateTime.UtcNow - startTime).TotalSeconds);
 				return true;
 			}
 
 			await Task.Delay(interval, cancellationToken);
 		}
 
-		_logger?.LogWarning(
+		_logger.LogWarning(
 			"Repository analysis did not complete within {MaxWait}s",
 			maxWait.TotalSeconds);
 		return false;
-	}
-
-	private void LogWaitStart(TimeSpan maxWait, TimeSpan interval)
-	{
-		_logger?.LogInformation(
-			"Waiting for repository analysis (max {MaxWait}s, polling every {Interval}s)",
-			maxWait.TotalSeconds,
-			interval.TotalSeconds);
-	}
-
-	private void LogAnalysisCompleted(TimeSpan elapsed)
-	{
-		_logger?.LogInformation(
-			"Repository analysis completed after {Elapsed}s",
-			elapsed.TotalSeconds);
 	}
 
 	/// <summary>
@@ -446,23 +384,26 @@ public class TestDataManager : IDisposable
 
 			if (status.RepositoryExists)
 			{
-				status.HasAnalysisData = await VerifyRepositoryAnalyzedAsync(cancellationToken);
-				status.HasBranches = await VerifyRepositoryHasBranchesAsync(cancellationToken);
-
-				var branches = await GetTestRepositoryBranchesAsync(cancellationToken: cancellationToken);
-				status.BranchCount = branches.Count;
-
-				var files = await GetTestRepositoryFilesAsync(cancellationToken: cancellationToken);
-				status.FileCount = files.Count;
+				await PopulateAnalysisStatusAsync(status, cancellationToken);
 			}
 		}
 		catch (Exception ex)
 		{
-			_logger?.LogError(ex, "Error getting environment status: {Message}", ex.Message);
+			_logger.LogError(ex, "Error getting environment status: {Message}", ex.Message);
 			status.ErrorMessage = ex.Message;
 		}
 
 		return status;
+	}
+
+	private async Task PopulateAnalysisStatusAsync(
+		TestEnvironmentStatus status,
+		CancellationToken cancellationToken)
+	{
+		status.HasAnalysisData = await VerifyRepositoryAnalyzedAsync(cancellationToken);
+		status.HasBranches = await VerifyRepositoryHasBranchesAsync(cancellationToken);
+		status.BranchCount = (await GetTestRepositoryBranchesAsync(cancellationToken: cancellationToken)).Count;
+		status.FileCount = (await GetTestRepositoryFilesAsync(cancellationToken: cancellationToken)).Count;
 	}
 
 	#endregion
@@ -470,33 +411,18 @@ public class TestDataManager : IDisposable
 	#region IDisposable
 
 	/// <summary>
-	/// Disposes the TestDataManager and executes cleanup actions
+	/// Disposes the TestDataManager, executing cleanup actions and disposing the client
 	/// </summary>
 	public void Dispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-
-	/// <summary>
-	/// Disposes the TestDataManager
-	/// </summary>
-	/// <param name="disposing">True if disposing, false if finalizing</param>
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!_disposed)
+		if (_disposed)
 		{
-			if (disposing)
-			{
-				// Execute cleanup actions
-				ExecuteCleanup();
-
-				// Dispose the client if we own it
-				_client?.Dispose();
-			}
-
-			_disposed = true;
+			return;
 		}
+
+		ExecuteCleanup();
+		_client.Dispose();
+		_disposed = true;
 	}
 
 	#endregion

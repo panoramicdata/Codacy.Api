@@ -3,8 +3,11 @@ namespace Codacy.Api.Test.Integration;
 /// <summary>
 /// Integration tests for Organizations API
 /// </summary>
+/// <remarks>
+/// The people-listing tests are inherited: see <see cref="OrganizationPeopleTestsBase"/>.
+/// </remarks>
 [Trait("Category", "Integration")]
-public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
+public class OrganizationsApiTests(ITestOutputHelper output) : OrganizationPeopleTestsBase(output)
 {
 	[Fact]
 	public async Task GetOrganization_ReturnsOrganizationDetails()
@@ -76,68 +79,19 @@ public class OrganizationsApiTests(ITestOutputHelper output) : TestBase(output)
 		billing.NumberOfSeats.Should().BeGreaterThanOrEqualTo(0);
 	}
 
-	[Fact]
-	public async Task ListPeopleFromOrganization_ReturnsPeople()
-	{
-		// Act
-		var response = await ListPeopleAsync();
-
-		// Assert - the authenticated user is a member, so there is always at least one person
-		var people = response.ShouldHaveNonEmptyData(r => r.Data);
-		people.Should().AllSatisfy(person => person.Email.Should().NotBeNull());
-	}
-
-	[Fact]
-	public async Task ListPeopleFromOrganization_OnlyMembers_ReturnsOnlyMembers()
-	{
-		// Act
-		var response = await ListPeopleAsync(onlyMembers: true);
-
-		// Assert
-		response.ShouldHaveNonEmptyData(r => r.Data);
-	}
-
-	[Fact]
-	public async Task ListPeopleFromOrganization_WithPagination_ReturnsLimitedResults()
-	{
-		// Arrange
-		const int limit = 5;
-
-		// Act
-		var response = await ListPeopleAsync(limit: limit);
-
-		// Assert
-		response.ShouldHavePageOfAtMost(limit, r => r.Data);
-	}
-
-	[Fact]
-	public async Task ListPeopleFromOrganization_WithSearch_FiltersResults()
-	{
-		// Arrange - the search term has to come from the organization's own people
-		var allPeople = (await ListPeopleAsync()).Data;
-		var firstPersonName = allPeople.Count == 0 ? null : allPeople[0].Name;
-		if (string.IsNullOrEmpty(firstPersonName))
-		{
-			return; // Nothing to search for
-		}
-
-		var searchTerm = firstPersonName[..Math.Min(2, firstPersonName.Length)];
-
-		// Act
-		var response = await ListPeopleAsync(search: searchTerm);
-
-		// Assert
-		response.ShouldHaveData(r => r.Data);
-	}
+	/// <inheritdoc />
+	/// <remarks>
+	/// This surface declares <c>onlyMembers</c> as a plain <c>bool</c> rather than the
+	/// <c>bool?</c> the People surface takes, so "unspecified" becomes the API's own default.
+	/// </remarks>
+	protected override Task<ListResponse<OrganizationPerson>> ListPeopleAsync(
+		int? limit = null,
+		string? search = null,
+		bool? onlyMembers = null)
+		=> Client.Organizations.ListPeopleFromOrganizationAsync(
+			TestProvider, TestOrganization, null, limit, search, onlyMembers ?? false, CancellationToken);
 
 	private Task<ListResponse<Repository>> ListRepositoriesAsync(int? limit = null, string? search = null)
 		=> Client.Organizations.ListOrganizationRepositoriesAsync(
 			TestProvider, TestOrganization, null, limit, search, null, null, null, CancellationToken);
-
-	private Task<ListResponse<OrganizationPerson>> ListPeopleAsync(
-		int? limit = null,
-		string? search = null,
-		bool onlyMembers = false)
-		=> Client.Organizations.ListPeopleFromOrganizationAsync(
-			TestProvider, TestOrganization, null, limit, search, onlyMembers, CancellationToken);
 }
