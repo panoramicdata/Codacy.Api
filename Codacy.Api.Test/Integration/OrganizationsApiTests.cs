@@ -44,7 +44,7 @@ public class OrganizationsApiTests(ITestOutputHelper output) : OrganizationPeopl
 		const int limit = 10;
 
 		// Act
-		var response = await ListRepositoriesAsync(limit: limit);
+		var response = await ListRepositoriesAsync(limit);
 
 		// Assert
 		response.ShouldHavePageOfAtMost(limit, r => r.Data);
@@ -57,7 +57,7 @@ public class OrganizationsApiTests(ITestOutputHelper output) : OrganizationPeopl
 		var searchTerm = TestRepository[..Math.Min(3, TestRepository.Length)];
 
 		// Act
-		var response = await ListRepositoriesAsync(search: searchTerm);
+		var response = await ListRepositoriesAsync(searchTerm);
 
 		// Assert - every returned repository matches the search term
 		var repositories = response.ShouldHaveData(r => r.Data);
@@ -79,19 +79,30 @@ public class OrganizationsApiTests(ITestOutputHelper output) : OrganizationPeopl
 		billing.NumberOfSeats.Should().BeGreaterThanOrEqualTo(0);
 	}
 
+	#pragma warning disable S2360
 	/// <inheritdoc />
 	/// <remarks>
 	/// This surface declares <c>onlyMembers</c> as a plain <c>bool</c> rather than the
 	/// <c>bool?</c> the People surface takes, so "unspecified" becomes the API's own default.
 	/// </remarks>
 	protected override Task<ListResponse<OrganizationPerson>> ListPeopleAsync(
-		int? limit = null,
-		string? search = null,
-		bool? onlyMembers = null)
+		int? limit,
+		string? search,
+		bool? onlyMembers)
 		=> Client.Organizations.ListPeopleFromOrganizationAsync(
 			TestProvider, TestOrganization, null, limit, search, onlyMembers ?? false, CancellationToken);
+	#pragma warning restore S2360
 
-	private Task<ListResponse<Repository>> ListRepositoriesAsync(int? limit = null, string? search = null)
+	private Task<ListResponse<Repository>> ListRepositoriesAsync()
+		=> ListRepositoriesAsync(null, null);
+
+	private Task<ListResponse<Repository>> ListRepositoriesAsync(int? limit)
+		=> ListRepositoriesAsync(limit, null);
+
+	private Task<ListResponse<Repository>> ListRepositoriesAsync(string? search)
+		=> ListRepositoriesAsync(null, search);
+
+	private Task<ListResponse<Repository>> ListRepositoriesAsync(int? limit, string? search)
 		=> Client.Organizations.ListOrganizationRepositoriesAsync(
 			TestProvider, TestOrganization, null, limit, search, null, null, null, CancellationToken);
 }

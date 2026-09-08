@@ -40,7 +40,7 @@ public abstract class OrganizationPeopleTestsBase(ITestOutputHelper output) : Te
 		const int limit = 5;
 
 		// Act
-		var response = await ListPeopleAsync(limit: limit);
+		var response = await ListPeopleAsync(limit);
 
 		// Assert
 		response.ShouldHavePageOfAtMost(limit, r => r.Data);
@@ -60,7 +60,7 @@ public abstract class OrganizationPeopleTestsBase(ITestOutputHelper output) : Te
 		var searchTerm = email[..Math.Min(3, email.Length)];
 
 		// Act
-		var response = await ListPeopleAsync(search: searchTerm);
+		var response = await ListPeopleAsync(searchTerm);
 
 		// Assert
 		response.ShouldHaveData(r => r.Data);
@@ -70,7 +70,19 @@ public abstract class OrganizationPeopleTestsBase(ITestOutputHelper output) : Te
 	/// Lists the organization's people through the client surface under test.
 	/// </summary>
 	protected abstract Task<ListResponse<OrganizationPerson>> ListPeopleAsync(
-		int? limit = null,
-		string? search = null,
-		bool? onlyMembers = null);
+		int? limit,
+		string? search,
+		bool? onlyMembers);
+
+	protected Task<ListResponse<OrganizationPerson>> ListPeopleAsync() =>
+		ListPeopleAsync(null, null, null);
+
+	protected Task<ListResponse<OrganizationPerson>> ListPeopleAsync(int? limit) =>
+		ListPeopleAsync(limit, null, null);
+
+	protected Task<ListResponse<OrganizationPerson>> ListPeopleAsync(string? search) =>
+		ListPeopleAsync(null, search, null);
+
+	protected Task<ListResponse<OrganizationPerson>> ListPeopleAsync(bool? onlyMembers) =>
+		ListPeopleAsync(null, null, onlyMembers);
 }

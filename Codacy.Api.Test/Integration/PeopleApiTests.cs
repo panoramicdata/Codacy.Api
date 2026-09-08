@@ -20,11 +20,13 @@ public class PeopleApiTests(ITestOutputHelper output) : OrganizationPeopleTestsB
 		response.ShouldHaveData(r => r.Data);
 	}
 
+	#pragma warning disable S2360
 	/// <inheritdoc />
 	protected override Task<ListResponse<OrganizationPerson>> ListPeopleAsync(
-		int? limit = null,
-		string? search = null,
-		bool? onlyMembers = null)
+		int? limit,
+		string? search,
+		bool? onlyMembers)
 		=> Client.People.ListPeopleFromOrganizationAsync(
 			TestProvider, TestOrganization, null, limit, search, onlyMembers, CancellationToken);
+	#pragma warning restore S2360
 }
