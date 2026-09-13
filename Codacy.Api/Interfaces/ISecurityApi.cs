@@ -11,11 +11,16 @@ public interface ISecurityApi
 	/// <summary>
 	/// Search security items for an organization
 	/// </summary>
+	/// <remarks>
+	/// The search bodies on this interface are non-nullable because a null one reaches Codacy as
+	/// the literal <c>null</c>, which it rejects with "DecodingFailure at .repositories: Missing
+	/// required field". Pass an empty instance to search unfiltered.
+	/// </remarks>
 	[Post("/api/v3/organizations/{provider}/{remoteOrganizationName}/security/items/search")]
 	Task<SrmItemsResponse> SearchSecurityItemsAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMItems? body,
+		[Body] SearchSRMItems body,
 		[Query] string? cursor,
 		[Query] int? limit,
 		[Query] string? sort,
@@ -60,7 +65,7 @@ public interface ISecurityApi
 	Task<SRMDashboardResponse> SearchSecurityDashboardAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMDashboard? body,
+		[Body] SearchSRMDashboard body,
 		CancellationToken cancellationToken);
 
 	/// <summary>
@@ -70,7 +75,7 @@ public interface ISecurityApi
 	Task<SRMDashboardRepositoriesResponse> SearchSecurityDashboardRepositoriesAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMDashboardRepositories? body,
+		[Body] SearchSRMDashboardRepositories body,
 		CancellationToken cancellationToken);
 
 	/// <summary>
@@ -80,7 +85,7 @@ public interface ISecurityApi
 	Task<SRMDashboardHistoryResponse> SearchSecurityDashboardHistoryAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMDashboardHistory? body,
+		[Body] SearchSRMDashboardHistory body,
 		CancellationToken cancellationToken);
 
 	/// <summary>
@@ -90,7 +95,7 @@ public interface ISecurityApi
 	Task<SRMDashboardCategoriesResponse> SearchSecurityDashboardCategoriesAsync(
 		Provider provider,
 		string remoteOrganizationName,
-		[Body] SearchSRMDashboardCategories? body,
+		[Body] SearchSRMDashboardCategories body,
 		CancellationToken cancellationToken);
 
 	/// <summary>

@@ -17,6 +17,18 @@ public class CodacyClient : ICodacyClient, IDisposable
 	private bool _disposed;
 
 	/// <summary>
+	/// The JSON configuration every request and response goes through. Exposed so that model
+	/// tests deserialize captured API responses exactly as the client does, rather than against
+	/// a second set of options that could drift away from these.
+	/// </summary>
+	internal static JsonSerializerOptions JsonSerializerOptions { get; } = new()
+	{
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+		PropertyNameCaseInsensitive = true,
+		Converters = { new JsonStringEnumConverter() }
+	};
+
+	/// <summary>
 	/// Initializes a new instance of the CodacyClient for testing
 	/// </summary>
 	/// <param name="options">Configuration options for the client</param>
@@ -33,13 +45,7 @@ public class CodacyClient : ICodacyClient, IDisposable
 		// Configure JSON serialization with camelCase naming policy
 		_refitSettings = new RefitSettings
 		{
-			ContentSerializer = new SystemTextJsonContentSerializer(
-				new JsonSerializerOptions
-				{
-					PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-					PropertyNameCaseInsensitive = true,
-					Converters = { new JsonStringEnumConverter() }
-				}),
+			ContentSerializer = new SystemTextJsonContentSerializer(JsonSerializerOptions),
 			// Without this, Provider reaches the URL as "Github" rather than "gh", and bools as
 			// "True" rather than "true".
 			UrlParameterFormatter = new CodacyUrlParameterFormatter()

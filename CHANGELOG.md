@@ -5,6 +5,53 @@ All notable changes to the Codacy.Api project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 4.0.0
+
+### Fixed
+- Rewrote every Security and Risk Management (SRM) model against the Codacy OpenAPI
+  specification. The previous models were hand-written from guesswork and described fields the
+  API never returns, so `SearchSecurityItemsAsync` threw `ApiException: An error occured
+  deserializing the response` on every call, and `ListSecurityRepositoriesAsync` silently
+  returned rows whose properties were all null.
+- The search bodies on `ISecurityApi` are no longer nullable. A null body reached Codacy as the
+  literal `null` and was rejected with `DecodingFailure at .repositories: Missing required
+  field`; pass an empty instance (for example `new SearchSRMItems()`) to search unfiltered.
+
+### Added
+- `SrmPriority`, `SrmStatus` and `SrmSource` enums, so a finding's severity and lifecycle state
+  are typed rather than free strings.
+- `SrmIgnoredBody`, `AdvisoryInformation`, `ContainerImageFilter`, `SrmDastReportState`,
+  `DastTool`, `OssfScorecardSeverity` and `OssfScorecardDocumentation`.
+- SCA, DAST, container and penetration-testing fields on `SrmItem`: `Cvss*`, `Cwe`, `Cve`,
+  `AffectedVersion`, `FixedVersion`, `DependencyChains`, `ImageName`, `ImageTag`, `Remediation`
+  and others.
+
+### Changed (breaking)
+- `SrmItem`: `Severity` → `Priority` (now `SrmPriority`), `Status` → `SrmStatus`, `Category` →
+  `SecurityCategory`, `FirstDetected`/`LastDetected` → `OpenedAt`/`DueAt`/`ClosedAt`. Added
+  `ItemSource`, `ItemSourceId`, `ScanType`, `HtmlUrl`, `ProjectKey`, `Ignored`. Removed
+  `Description`, `FilePath`, `LineNumber`, `IsIgnored`, `IgnoredReason`, `IgnoredBy`,
+  `IgnoredAt`, `PackageName` and `PackageVersion`, none of which the API returns.
+- `SearchSRMItems`: `Severities` → `Priorities` (now `List<SrmPriority>`), `Status` → `Statuses`
+  (now `List<SrmStatus>`). Added `ScanTypes`, `Segments`, `DastTargetUrls`, `SearchText` and
+  `ContainerImage`; removed `Query`, `IncludeIgnored`, `DateFrom` and `DateTo`. Unset filters
+  are now omitted rather than serialized as null.
+- `SecurityRepositoriesResponse.Data` is now `List<RepositorySummary>`; the `SecurityRepository`
+  type is removed, as the endpoint returns repository identities and not issue counts.
+- `SRMDashboard` now carries the real per-severity and per-scan-type counts
+  (`TotalOpen`, `OnTrack`, `DueSoon`, `Overdue`, `OpenCritical`, `OpenSast`, `OpenIaC`, …) in
+  place of the invented `ItemsByCategory` and `Trend`.
+- `SRMDashboardRepository` → `SRMRepositoryIssueCount`, `SRMDashboardHistoryPoint` →
+  `SRMHistoryDataPoint`, `SRMDashboardCategory` → `SRMCategoryIssueCount`, `DASTReport` →
+  `SRMDastReport`.
+- `SLAConfig` is now `CriticalSla`/`HighSla`/`MediumSla`/`LowSla`, wrapped under a `SlaConfig`
+  property on `SLAConfigResponse` and `SLAConfigBody`.
+- `SecurityManager`: `Username` → `Name` (optional), `AddedAt` → `CreatedAt`.
+- `IgnoreSRMItemBody`: `Notes` → `Comment`, and `Reason` is optional.
+- `OssfScorecard` gains `Date`, `FailingCheckCount` and `PassingCheckCount`; checks gain
+  `Details`, `Documentation` and `Severity`. `OssfScorecardUrlRequest` now takes an optional
+  `Url` or `Purl` rather than a required `RepositoryUrl`.
+
 ## 3.0.10
 
 ### Changed
