@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`sha256=<hex>`) HMAC-SHA256 of the raw body in constant time, and `Deserialize` reads the
   `quality.analysis.completed` payload into `WebhookAnalysisCompleted`.
 
+### Fixed
+- `SearchRepositoryIgnoredIssuesAsync` and `SyncOrganizationNameAsync` called paths that are
+  not in the official Codacy specification. They now use `.../ignoredIssues/search` and
+  `.../settings/sync`.
+
+### Deprecated
+- `CleanCacheAsync`: Codacy has removed `cache/clean` from its API.
+
+### Changed
+- `swagger.yaml` is now the official specification from `api.codacy.com` (still v3.1.0, but
+  about 3,000 lines longer than the copy it replaces).
+
 ## 4.0.0
 
 ### Fixed

@@ -86,6 +86,7 @@ public interface IOrganizationsApi
 	/// <summary>
 	/// Clean organization cache
 	/// </summary>
+	[Obsolete("Codacy has removed this endpoint from its API; calls return 404.")]
 	[Post("/api/v3/organizations/{provider}/{organizationName}/cache/clean")]
 	Task CleanCacheAsync(
 		Provider provider,
@@ -104,7 +105,7 @@ public interface IOrganizationsApi
 	/// <summary>
 	/// Sync organization name with Git provider
 	/// </summary>
-	[Post("/api/v3/organizations/{provider}/{organizationName}/sync")]
+	[Post("/api/v3/organizations/{provider}/{organizationName}/settings/sync")]
 	Task<SyncProviderSettingOrganizationResponse> SyncOrganizationNameAsync(
 		Provider provider,
 		string organizationName,
