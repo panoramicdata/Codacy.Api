@@ -109,4 +109,36 @@ public interface IOrganizationsApi
 		Provider provider,
 		string organizationName,
 		CancellationToken cancellationToken);
+
+	/// <summary>
+	/// List the webhook endpoints of an organization. Requires organization write permission.
+	/// </summary>
+	[Get("/api/v3/organizations/{provider}/{organizationName}/integrations/webhooks")]
+	Task<WebhookEndpointList> ListWebhookEndpointsAsync(
+		Provider provider,
+		string organizationName,
+		CancellationToken cancellationToken);
+
+	/// <summary>
+	/// Add a webhook endpoint to an organization. Codacy POSTs a <c>quality.analysis.completed</c>
+	/// delivery to it when a branch or pull request analysis finishes. The response holds the
+	/// signing secret, which is never returned again. Requires organization write permission and
+	/// a plan with webhooks enabled (403 otherwise).
+	/// </summary>
+	[Post("/api/v3/organizations/{provider}/{organizationName}/integrations/webhooks")]
+	Task<WebhookEndpointCreated> CreateWebhookEndpointAsync(
+		Provider provider,
+		string organizationName,
+		[Body] CreateWebhookEndpointBody body,
+		CancellationToken cancellationToken);
+
+	/// <summary>
+	/// Delete a webhook endpoint from an organization. Requires organization write permission.
+	/// </summary>
+	[Delete("/api/v3/organizations/{provider}/{organizationName}/integrations/webhooks/{webhookId}")]
+	Task DeleteWebhookEndpointAsync(
+		Provider provider,
+		string organizationName,
+		Guid webhookId,
+		CancellationToken cancellationToken);
 }
