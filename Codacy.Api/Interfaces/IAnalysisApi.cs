@@ -11,6 +11,10 @@ public interface IAnalysisApi
 	/// <summary>
 	/// List organization repositories with analysis information
 	/// </summary>
+	/// <remarks>
+	/// The <c>repositories</c> parameter is deprecated by Codacy, which limits repository filtering
+	/// to 100 names. Use <see cref="SearchOrganizationRepositoriesWithAnalysisAsync"/> instead.
+	/// </remarks>
 	[Get("/api/v3/analysis/organizations/{provider}/{organizationName}/repositories")]
 	Task<ListResponse<Repository>> ListOrganizationRepositoriesWithAnalysisAsync(
 		Provider provider,
@@ -372,6 +376,11 @@ public interface IAnalysisApi
 	/// <summary>
 	/// List organization pull requests
 	/// </summary>
+	/// <remarks>
+	/// The <c>repositories</c> parameter is deprecated by Codacy, which names no replacement for
+	/// this endpoint. Its guidance for the parameter is to use
+	/// <see cref="SearchOrganizationRepositoriesWithAnalysisAsync"/> instead.
+	/// </remarks>
 	[Get("/api/v3/analysis/organizations/{provider}/{organizationName}/pull-requests")]
 	Task<PullRequestWithAnalysisListResponse> ListOrganizationPullRequestsAsync(
 		Provider provider,

@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `.../settings/sync`.
 
 ### Deprecated
+- The `repositories` query parameter on `ListOrganizationRepositoriesWithAnalysisAsync` and
+  `ListOrganizationPullRequestsAsync`, which Codacy has deprecated. Use
+  `SearchOrganizationRepositoriesWithAnalysisAsync`. C# cannot mark a parameter `[Obsolete]`,
+  so this is stated in the XML documentation.
 - `CleanCacheAsync`: Codacy has removed `cache/clean` from its API.
 
 ### Changed
