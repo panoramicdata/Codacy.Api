@@ -5,6 +5,41 @@ All notable changes to the Codacy.Api project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+- Webhook endpoint management on `IOrganizationsApi`: `ListWebhookEndpointsAsync`,
+  `CreateWebhookEndpointAsync` and `DeleteWebhookEndpointAsync`. The create response carries the
+  signing secret, which Codacy returns only once.
+- `CodacyWebhook` for receivers: `VerifySignature` checks the `X-Codacy-Signature`
+  (`sha256=<hex>`) HMAC-SHA256 of the raw body in constant time, and `Deserialize` reads the
+  `quality.analysis.completed` payload into `WebhookAnalysisCompleted`.
+
+- Every other non-deprecated operation in the official specification that the client lacked,
+  about 170 in all, in 23 new API modules on `ICodacyClient`: `Sbom`, `Images`, `Reports`,
+  `AiInventory`, `Billing`, `OrganizationSettings`, `Enterprises`, `Admin`, `Platform`,
+  `RepositorySettings`, `RepositoryApiTokens`, `RepositoryFiles`, `RepositoryCoverageReports`,
+  `Diffs`, `GatePolicies`, `Segments`, `Jira`, `Slack`, `Dast`, `RepositoryToolPatterns`,
+  `AnalysisActions`, `Tools` and `Metrics`. These were written from the specification and have
+  not been exercised against the live API.
+- Methods that return a CSV report (`IReportsApi`) return a `Stream` the caller must dispose.
+
+### Fixed
+- `SearchRepositoryIgnoredIssuesAsync` and `SyncOrganizationNameAsync` called paths that are
+  not in the official Codacy specification. They now use `.../ignoredIssues/search` and
+  `.../settings/sync`.
+
+### Deprecated
+- The `repositories` query parameter on `ListOrganizationRepositoriesWithAnalysisAsync` and
+  `ListOrganizationPullRequestsAsync`, which Codacy has deprecated. Use
+  `SearchOrganizationRepositoriesWithAnalysisAsync`. C# cannot mark a parameter `[Obsolete]`,
+  so this is stated in the XML documentation.
+- `CleanCacheAsync`: Codacy has removed `cache/clean` from its API.
+
+### Changed
+- `swagger.yaml` is now the official specification from `api.codacy.com` (still v3.1.0, but
+  about 3,000 lines longer than the copy it replaces).
+
 ## 4.0.0
 
 ### Fixed

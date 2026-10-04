@@ -69,7 +69,7 @@ public interface IIssuesApi
 	/// <summary>
 	/// Search ignored issues
 	/// </summary>
-	[Post("/api/v3/analysis/organizations/{provider}/{organizationName}/repositories/{repositoryName}/issues/ignored/search")]
+	[Post("/api/v3/analysis/organizations/{provider}/{organizationName}/repositories/{repositoryName}/ignoredIssues/search")]
 	Task<ListResponse<IgnoredIssue>> SearchRepositoryIgnoredIssuesAsync(
 		Provider provider,
 		string organizationName,
