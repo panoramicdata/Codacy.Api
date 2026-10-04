@@ -15,6 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`sha256=<hex>`) HMAC-SHA256 of the raw body in constant time, and `Deserialize` reads the
   `quality.analysis.completed` payload into `WebhookAnalysisCompleted`.
 
+- Every other non-deprecated operation in the official specification that the client lacked,
+  about 170 in all, in 23 new API modules on `ICodacyClient`: `Sbom`, `Images`, `Reports`,
+  `AiInventory`, `Billing`, `OrganizationSettings`, `Enterprises`, `Admin`, `Platform`,
+  `RepositorySettings`, `RepositoryApiTokens`, `RepositoryFiles`, `RepositoryCoverageReports`,
+  `Diffs`, `GatePolicies`, `Segments`, `Jira`, `Slack`, `Dast`, `RepositoryToolPatterns`,
+  `AnalysisActions`, `Tools` and `Metrics`. These were written from the specification and have
+  not been exercised against the live API.
+- Methods that return a CSV report (`IReportsApi`) return a `Stream` the caller must dispose.
+
 ### Fixed
 - `SearchRepositoryIgnoredIssuesAsync` and `SyncOrganizationNameAsync` called paths that are
   not in the official Codacy specification. They now use `.../ignoredIssues/search` and
