@@ -13,13 +13,13 @@ namespace Codacy.Api;
 public static class CodacyWebhook
 {
 	/// <summary>Name of the header carrying the signature, <c>sha256=&lt;hex&gt;</c></summary>
-	public const string SignatureHeader = "X-Codacy-Signature";
+	public static string SignatureHeader { get; } = "X-Codacy-Signature";
 
 	/// <summary>Name of the header carrying a unique identifier per delivery attempt</summary>
-	public const string DeliveryHeader = "X-Codacy-Delivery";
+	public static string DeliveryHeader { get; } = "X-Codacy-Delivery";
 
 	/// <summary>The only event Codacy currently sends</summary>
-	public const string AnalysisCompletedEvent = "quality.analysis.completed";
+	public static string AnalysisCompletedEvent { get; } = "quality.analysis.completed";
 
 	private const string SignaturePrefix = "sha256=";
 
