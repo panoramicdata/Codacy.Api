@@ -1,59 +1,33 @@
-# Security Guidelines
+# Security Policy
 
-## Protecting Secrets
+## Supported Versions
 
-This project uses API tokens and secrets that must **never** be committed to the repository.
+Only the latest released version is supported with security updates.
 
-### Setup
+## Reporting a Vulnerability
 
-1. **Install the pre-commit hook** to catch accidental secret commits:
-   ```bash
-   git config core.hooksPath .githooks
-   ```
+If you discover a security vulnerability, please report it responsibly.
 
-2. **Use User Secrets** for local development (already configured):
-   ```bash
-   cd Codacy.Api.Test
-   dotnet user-secrets set "CodacyApi:ApiToken" "your-token-here"
-   ```
+**Do not open a public GitHub issue.**
 
-3. **Never commit**:
-   - `secrets.json` files (use `secrets.example.json` as template)
-   - `nuget-key.txt` (for NuGet publishing)
-   - Any file containing API tokens or passwords
+Instead, use GitHub's private vulnerability reporting: open this repository's **Security** tab
+and choose **Report a vulnerability**, or go straight to
+https://github.com/panoramicdata/Codacy.Api/security/advisories/new
 
-### What's Protected
+Please include:
 
-The `.gitignore` includes patterns to prevent committing:
-- `**/secrets.json` - User secrets
-- `*-key.txt` / `*-token.txt` - API keys and tokens
-- `*.log` / `*.logs` - Log files that might contain sensitive data
-- `**/TestResults/` - Test output that might leak secrets
+- A description of the vulnerability
+- Steps to reproduce the issue
+- Any relevant logs or screenshots
 
-### If You Accidentally Commit a Secret
+We will acknowledge receipt within 48 hours and aim to provide a fix or mitigation within 7 business days.
 
-1. **Immediately revoke the exposed credential** in the source system
-2. **Generate a new credential**
-3. **Update your local secrets** with the new value
-4. Consider using [BFG Repo-Cleaner](https://rtyley.github.io/bfg-repo-cleaner/) to remove from Git history
+## Disclosure Policy
 
-### GitGuardian Integration
+We follow a coordinated disclosure process. We ask that you:
 
-This repository is monitored by GitGuardian for accidental secret exposure. If you receive an alert:
+1. Allow us reasonable time to investigate and address the issue
+2. Avoid exploiting the vulnerability beyond what is necessary to demonstrate it
+3. Do not disclose the issue publicly until we have released a fix
 
-1. Don't panic - but act quickly
-2. Revoke the exposed credential immediately
-3. Generate and configure a new credential
-4. Review how the exposure happened and update processes
-
-### Debugging Safely
-
-When debugging tests that use API tokens:
-- The `LoggingHttpMessageHandler` masks tokens in logs
-- However, debugger evaluations can expose raw values
-- **Never copy/paste debugger output containing request headers**
-- Be careful with exception details that include HTTP request info
-
-## Reporting Security Issues
-
-If you discover a security vulnerability, please report it privately to the repository maintainers rather than opening a public issue.
+Thank you for helping keep our software and users safe.
