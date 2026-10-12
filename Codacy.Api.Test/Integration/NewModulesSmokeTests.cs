@@ -24,18 +24,11 @@ public class NewModulesSmokeTests(ITestOutputHelper output) : TestBase(output)
 	private string TestBranch => Configuration["CodacyApi:TestBranch"] is { Length: > 0 } branch ? branch : "main";
 
 	[Fact]
-	public async Task ReadOnlyEndpoints_DeserializeRealResponses()
+	public async Task RepositoryEndpoints_DeserializeRealResponses()
 	{
-		var p = TestProvider;
-		var o = TestOrganization;
-		var r = TestRepository;
-		var ct = CancellationToken;
+		using var client = CreateQuietClient();
+		var (p, o, r, ct) = (TestProvider, TestOrganization, TestRepository, CancellationToken);
 
-		// Logging off: the shared client logs response bodies, and some of these hold secrets or capability URLs.
-		var baseOptions = GetClientOptions();
-		using var client = new CodacyClient(new CodacyClientOptions { ApiToken = baseOptions.ApiToken, BaseUrl = baseOptions.BaseUrl });
-
-		// Repository settings, files, coverage and analysis
 		await Probe("RepositorySettings.GetQualitySettingsForRepository", () => client.RepositorySettings.GetQualitySettingsForRepositoryAsync(p, o, r, ct));
 		await Probe("RepositorySettings.GetBuildServerAnalysisSetting", () => client.RepositorySettings.GetBuildServerAnalysisSettingAsync(p, o, r, ct));
 		await Probe("RepositorySettings.GetRepositoryLanguages", () => client.RepositorySettings.GetRepositoryLanguagesAsync(p, o, r, ct));
@@ -44,12 +37,30 @@ public class NewModulesSmokeTests(ITestOutputHelper output) : TestBase(output)
 		await Probe("RepositoryFiles.ListDirectories", () => client.RepositoryFiles.ListDirectoriesAsync(p, o, r, null, null, null, null, null, 5, ct));
 		await Probe("RepositoryFiles.ListIgnoredFiles", () => client.RepositoryFiles.ListIgnoredFilesAsync(p, o, r, null, null, null, 5, ct));
 		await Probe("RepositoryCoverageReports.ListCoverageReports", () => client.RepositoryCoverageReports.ListCoverageReportsAsync(p, o, r, 5, ct));
+
+		Finish(minimumOk: 3);
+	}
+
+	[Fact]
+	public async Task AnalysisAndSbomEndpoints_DeserializeRealResponses()
+	{
+		using var client = CreateQuietClient();
+		var (p, o, r, ct) = (TestProvider, TestOrganization, TestRepository, CancellationToken);
+
 		await Probe("AnalysisActions.GetAutoconfigStatus", () => client.AnalysisActions.GetAutoconfigStatusAsync(p, o, r, ct));
 		await Probe("AnalysisActions.GetLatestAutoconfigRunSummary", () => client.AnalysisActions.GetLatestAutoconfigRunSummaryAsync(p, o, r, ct));
 		await Probe("AnalysisActions.HasQuickfixSuggestions", () => client.AnalysisActions.HasQuickfixSuggestionsAsync(p, o, r, TestBranch, ct));
 		await Probe("Sbom.GetRepositorySbomPresignedUrl", () => client.Sbom.GetRepositorySbomPresignedUrlAsync(p, o, r, ct));
 
-		// Gate policies, segments, integrations
+		Finish(minimumOk: 0);
+	}
+
+	[Fact]
+	public async Task PolicyAndSegmentEndpoints_DeserializeRealResponses()
+	{
+		using var client = CreateQuietClient();
+		var (p, o, ct) = (TestProvider, TestOrganization, CancellationToken);
+
 		var policies = await Probe("GatePolicies.ListGatePolicies", () => client.GatePolicies.ListGatePoliciesAsync(p, o, null, 5, ct));
 		if (policies?.Data.FirstOrDefault() is { } policy)
 		{
@@ -60,12 +71,31 @@ public class NewModulesSmokeTests(ITestOutputHelper output) : TestBase(output)
 		await Probe("Segments.GetSegmentsSyncStatus", () => client.Segments.GetSegmentsSyncStatusAsync(p, o, ct));
 		await Probe("Segments.GetSegmentsKeys", () => client.Segments.GetSegmentsKeysAsync(p, o, null, 5, null, ct));
 		await Probe("Segments.GetSegmentsKeysWithIds", () => client.Segments.GetSegmentsKeysWithIdsAsync(p, o, null, 5, null, ct));
+
+		Finish(minimumOk: 1);
+	}
+
+	[Fact]
+	public async Task IntegrationEndpoints_DeserializeRealResponses()
+	{
+		using var client = CreateQuietClient();
+		var (p, o, ct) = (TestProvider, TestOrganization, CancellationToken);
+
 		await Probe("Jira.GetJiraIntegration", () => client.Jira.GetJiraIntegrationAsync(p, o, ct));
 		await Probe("Slack.GetSlackIntegration", () => client.Slack.GetSlackIntegrationAsync(p, o, ct));
 		await Probe("Dast.GetDastTargets", () => client.Dast.GetDastTargetsAsync(p, o, null, 5, ct));
 		await Probe("Images.ListOrganizationImages", () => client.Images.ListOrganizationImagesAsync(p, o, null, 5, ct));
 
-		// Organization settings, billing and platform
+		// An organization may legitimately have none of these features.
+		Finish(minimumOk: 0);
+	}
+
+	[Fact]
+	public async Task OrganizationAndPlatformEndpoints_DeserializeRealResponses()
+	{
+		using var client = CreateQuietClient();
+		var (p, o, ct) = (TestProvider, TestOrganization, CancellationToken);
+
 		await Probe("OrganizationSettings.GetProviderSettings", () => client.OrganizationSettings.GetProviderSettingsAsync(p, o, ct));
 		await Probe("OrganizationSettings.RetrieveOrganizationOnboardingProgress", () => client.OrganizationSettings.RetrieveOrganizationOnboardingProgressAsync(p, o, ct));
 		await Probe("OrganizationSettings.GetGitProviderAppPermissions", () => client.OrganizationSettings.GetGitProviderAppPermissionsAsync(p, o, ct));
@@ -81,10 +111,19 @@ public class NewModulesSmokeTests(ITestOutputHelper output) : TestBase(output)
 		await Probe("Enterprises.ListEnterprises", () => client.Enterprises.ListEnterprisesAsync(p, null, 5, ct));
 		await Probe("Metrics.ReadyMetricsForOrganization", () => client.Metrics.ReadyMetricsForOrganizationAsync(p, o, ct));
 
-		// Tools and patterns
+		Finish(minimumOk: 3);
+	}
+
+	[Fact]
+	public async Task ToolAndPatternEndpoints_DeserializeRealResponses()
+	{
+		using var client = CreateQuietClient();
+		var (p, o, r, ct) = (TestProvider, TestOrganization, TestRepository, CancellationToken);
+
 		await Probe("Tools.ListLanguagesWithTools", () => client.Tools.ListLanguagesWithToolsAsync(ct));
 		await Probe("Tools.ListDuplicationTools", () => client.Tools.ListDuplicationToolsAsync(ct));
 		await Probe("Tools.ListMetricsTools", () => client.Tools.ListMetricsToolsAsync(ct));
+
 		var tools = await Probe("Tools.ListTools", () => client.Tools.ListToolsAsync(null, 5, ct));
 		if (tools?.Data.FirstOrDefault() is { } tool)
 		{
@@ -99,22 +138,37 @@ public class NewModulesSmokeTests(ITestOutputHelper output) : TestBase(output)
 			await Probe("RepositoryToolPatterns.ListRepositoryToolPatternConflicts", () => client.RepositoryToolPatterns.ListRepositoryToolPatternConflictsAsync(p, o, r, tool.Uuid, ct));
 		}
 
+		Finish(minimumOk: 3);
+	}
+
+	/// <summary>
+	/// A client with logging off: the shared one logs response bodies, and some of these hold secrets
+	/// or capability URLs.
+	/// </summary>
+	private CodacyClient CreateQuietClient()
+	{
+		var baseOptions = GetClientOptions();
+		return new CodacyClient(new CodacyClientOptions { ApiToken = baseOptions.ApiToken, BaseUrl = baseOptions.BaseUrl });
+	}
+
+	private void Finish(int minimumOk)
+	{
 		foreach (var line in _outcomes)
 		{
 			Output.WriteLine(line);
 		}
 
-		// A passing test shows no output, so the outcomes can also be written to a file.
+		// A passing test shows no output, so the outcomes can also be appended to a file.
 		if (Environment.GetEnvironmentVariable("CODACY_SMOKE_REPORT") is { Length: > 0 } reportPath)
 		{
-			File.WriteAllLines(reportPath, _outcomes);
+			File.AppendAllLines(reportPath, _outcomes);
 		}
 
 		var ok = _outcomes.Count(line => line.StartsWith("OK ", StringComparison.Ordinal));
 		Output.WriteLine($"{ok} OK, {_outcomes.Count - ok} refused or server-side, {_failures.Count} failed");
 
 		_failures.Should().BeEmpty("a failure here is a request Codacy rejected as malformed or a model that cannot read the real response");
-		ok.Should().BeGreaterThan(5, "if almost everything is refused the credentials or organization are probably wrong, and nothing was actually checked");
+		ok.Should().BeGreaterThanOrEqualTo(minimumOk, "if almost everything is refused the credentials or organization are probably wrong, and nothing was actually checked");
 	}
 
 	private async Task<T?> Probe<T>(string name, Func<Task<T>> call)
