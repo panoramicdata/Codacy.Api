@@ -28,7 +28,7 @@
         <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.12.0" />
         <PackageVersion Include="Moq" Version="4.21.0" />
         <PackageVersion Include="Polly" Version="8.8.0" />
-        <PackageVersion Include="xunit.v3" Version="4.0.1" />
+        <PackageVersion Include="xunit.v3" Version="4.0.2" />
         <PackageVersion Include="Xunit.Microsoft.DependencyInjection" Version="10.1.0" />
     </ItemGroup>
 
