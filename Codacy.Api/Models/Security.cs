@@ -263,42 +263,11 @@ public class ContainerImageFilter
 /// Codacy rejects explicit nulls on these filters, so every property is omitted when unset.
 /// An unfiltered search therefore serializes to <c>{}</c>.
 /// </remarks>
-public class SearchSRMItems
+public class SearchSRMItems : PostReportSecurityItemsBody
 {
-	/// <summary>Repository names to filter by.</summary>
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public List<string>? Repositories { get; set; }
-
-	/// <summary>Severities to filter by.</summary>
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public List<SrmPriority>? Priorities { get; set; }
-
-	/// <summary>Statuses to filter by.</summary>
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public List<SrmStatus>? Statuses { get; set; }
-
-	/// <summary>
-	/// Security categories to filter by. Use <c>_other_</c> to search for issues that have no
-	/// security category.
-	/// </summary>
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public List<string>? Categories { get; set; }
-
-	/// <summary>Scan types to filter by, for example <c>SAST</c> or <c>Secrets</c>.</summary>
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public List<string>? ScanTypes { get; set; }
-
-	/// <summary>Segment IDs to filter by.</summary>
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public List<long>? Segments { get; set; }
-
 	/// <summary>DAST target URLs to filter by.</summary>
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public List<string>? DastTargetUrls { get; set; }
-
-	/// <summary>Text to search for in security items.</summary>
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public string? SearchText { get; set; }
 
 	/// <summary>Container image to filter by.</summary>
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
