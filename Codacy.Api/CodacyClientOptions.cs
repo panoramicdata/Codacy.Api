@@ -63,6 +63,11 @@ public class CodacyClientOptions
 	public TimeSpan MaxRetryDelay { get; init; } = TimeSpan.FromSeconds(30);
 
 	/// <summary>
+	/// Gets or sets whether to refuse every request that changes Codacy before it is sent. Reads (GET, HEAD, OPTIONS and the POST search and report endpoints) are allowed. Not supported with HttpClient or HttpClientFactory
+	/// </summary>
+	public bool IsReadOnly { get; set; }
+
+	/// <summary>
 	/// An optional HTTP client factory to create HTTP clients. Should only be used if HttpClient is not provided
 	/// </summary>
 	public IHttpClientFactory? HttpClientFactory { get; init; }
@@ -118,6 +123,12 @@ public class CodacyClientOptions
 		if (HttpClient != null && HttpClientFactory != null)
 		{
 			throw new ArgumentException("Only one of HttpClient or HttpClientFactory can be provided.");
+		}
+
+		// A supplied client bypasses LoggingHttpClientHandler, which is where IsReadOnly is enforced
+		if (IsReadOnly && (HttpClient != null || HttpClientFactory != null))
+		{
+			throw new ArgumentException("IsReadOnly cannot be enforced when HttpClient or HttpClientFactory is provided.", nameof(IsReadOnly));
 		}
 	}
 }

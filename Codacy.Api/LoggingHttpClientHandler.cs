@@ -38,6 +38,11 @@ public partial class LoggingHttpClientHandler : DelegatingHandler
 	{
 		ArgumentNullException.ThrowIfNull(request);
 
+		if (_options.IsReadOnly && !IsReadRequest(request))
+		{
+			throw new InvalidOperationException($"The client is read-only: refusing {request.Method} {request.RequestUri}.");
+		}
+
 		// Add api-token authentication header
 		request.Headers.Add("api-token", _options.ApiToken);
 
@@ -60,6 +65,49 @@ public partial class LoggingHttpClientHandler : DelegatingHandler
 		}
 
 		return response;
+	}
+
+	// Codacy reads that need a body are POSTs, so they are allowed by path rather than by weakening the method check
+	private static readonly string[] _readPostSuffixes =
+	[
+		"/search",
+		"/issues/overview",
+		"/ai-inventory/providers/summary",
+		"/security/dashboard",
+		"/security/dependencies/ossf/scorecard"
+	];
+
+	private static readonly string[] _metricReadSuffixes = ["/latest", "/latest-grouped", "/period", "/period-grouped", "/timerange"];
+
+	private static bool IsReadRequest(HttpRequestMessage request)
+	{
+		if (request.Method == HttpMethod.Get || request.Method == HttpMethod.Head || request.Method == HttpMethod.Options)
+		{
+			return true;
+		}
+
+		if (request.Method != HttpMethod.Post || request.RequestUri is null)
+		{
+			return false;
+		}
+
+		var path = request.RequestUri.IsAbsoluteUri
+			? request.RequestUri.AbsolutePath
+			: request.RequestUri.OriginalString.Split('?')[0];
+		path = path.TrimEnd('/');
+
+		if (path.StartsWith("/api/v3/search/", StringComparison.OrdinalIgnoreCase))
+		{
+			return true;
+		}
+
+		if (path.Contains("/metrics/", StringComparison.OrdinalIgnoreCase)
+			&& _metricReadSuffixes.Any(suffix => path.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)))
+		{
+			return true;
+		}
+
+		return _readPostSuffixes.Any(suffix => path.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
 	}
 
 	/// <summary>
