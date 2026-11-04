@@ -94,8 +94,12 @@ public partial class LoggingHttpClientHandler : DelegatingHandler
 		var path = request.RequestUri.IsAbsoluteUri
 			? request.RequestUri.AbsolutePath
 			: request.RequestUri.OriginalString.Split('?')[0];
-		path = path.TrimEnd('/');
 
+		return IsReadPostPath(path.TrimEnd('/'));
+	}
+
+	private static bool IsReadPostPath(string path)
+	{
 		if (path.StartsWith("/api/v3/search/", StringComparison.OrdinalIgnoreCase))
 		{
 			return true;
