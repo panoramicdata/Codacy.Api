@@ -74,7 +74,8 @@ public partial class LoggingHttpClientHandler : DelegatingHandler
 		"/issues/overview",
 		"/ai-inventory/providers/summary",
 		"/security/dashboard",
-		"/security/dependencies/ossf/scorecard"
+		"/security/dependencies/ossf/scorecard",
+		"/session/heartbeat"
 	];
 
 	private static readonly string[] _metricReadSuffixes = ["/latest", "/latest-grouped", "/period", "/period-grouped", "/timerange"];

@@ -81,6 +81,7 @@ public class ReadOnlyOptionTests
 	[InlineData("POST", Org + "/metrics/open-issues/latest", true)]
 	[InlineData("POST", "/api/v3/search/analysis/organizations/gh/acme/repositories", true)]
 	[InlineData("GET", Org + "/repositories", true)]
+	[InlineData("POST", "/api/v3/session/heartbeat", true)]
 	public async Task ReadOnlyHandler_AllowsOnlyReads(string method, string path, bool expectedSent)
 	{
 		using var server = new CountingServer();
