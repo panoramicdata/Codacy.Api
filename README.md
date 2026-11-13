@@ -8,6 +8,8 @@
 
 A comprehensive, modern .NET library for interacting with the [Codacy](https://www.codacy.com/) API. This library provides full coverage of the Codacy API with a clean, intuitive interface using modern C# patterns and best practices.
 
+Supports .NET 11.0.
+
 ## 📚 Official Documentation
 
 - **API Documentation**: [https://docs.codacy.com/codacy-api/](https://docs.codacy.com/codacy-api/)
@@ -18,7 +20,7 @@ A comprehensive, modern .NET library for interacting with the [Codacy](https://w
 ## Features
 
 - 🎯 **Complete API Coverage** - Full support for all Codacy endpoints
-- 🚀 **Modern .NET** - Built for .NET 10 with modern C# features
+- 🚀 **Modern .NET** - Built for .NET 11.0 with modern C# features
 - 🔒 **Type Safety** - Strongly typed models and responses
 - 📝 **Comprehensive Logging** - Built-in logging and request/response interception
 - 🔄 **Retry Logic** - Automatic retry with exponential backoff
@@ -296,7 +298,7 @@ We welcome contributions from the community! Here's how you can help:
    cd Codacy.Api
    ```
 
-2. **Install .NET 10 SDK**:
+2. **Install .NET 11.0 SDK**:
    Download from [dotnet.microsoft.com](https://dotnet.microsoft.com/download)
 
 3. **Set up User Secrets for testing**:
