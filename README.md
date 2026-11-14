@@ -6,6 +6,8 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/919d6d51b2aa4ec894145eb9c01e51e1)](https://app.codacy.com/gh/panoramicdata/Codacy.Api/dashboard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> **Need help with APIs or .NET?** Panoramic Data are experts in APIs and .NET, and we can help with your development. [Contact us](https://www.panoramicdata.com/contact-us) or see our [software services](https://www.panoramicdata.com/services/software).
+
 A comprehensive, modern .NET library for interacting with the [Codacy](https://www.codacy.com/) API. This library provides full coverage of the Codacy API with a clean, intuitive interface using modern C# patterns and best practices.
 
 Supports .NET 11.0.
