@@ -14,8 +14,9 @@
         <PackageVersion Include="Microsoft.Extensions.Http" Version="11.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="11.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0" />
-        <PackageVersion Include="Refit" Version="16.4.0" />
-        <PackageVersion Include="Refit.HttpClientFactory" Version="16.4.0" />
+        <PackageVersion Include="Refit" Version="17.0.0" />
+        <PackageVersion Include="Refit.Reflection" Version="17.0.0" />
+        <PackageVersion Include="Refit.HttpClientFactory" Version="17.0.0" />
 
         <!-- Test dependencies -->
         <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />

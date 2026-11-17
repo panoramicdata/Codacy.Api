@@ -19,7 +19,7 @@ namespace Codacy.Api;
 public class CodacyUrlParameterFormatter : DefaultUrlParameterFormatter
 {
 	/// <inheritdoc />
-	public override string? Format(object? value, ICustomAttributeProvider attributeProvider, Type type)
+	public override string? Format(object? value, IParameterAttributeProvider attributeProvider, Type type)
 		=> value switch
 		{
 			// The provider short code the API addresses repositories by: gh, gl, bb.
